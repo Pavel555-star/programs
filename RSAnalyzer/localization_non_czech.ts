@@ -99,7 +99,7 @@
     <message>
         <location filename="mainwindow.cpp" line="132"/>
         <source>Zvolte minimum a maximum intervalů/ délek stran čtverců: </source>
-        <translation>Choose minimum and maximum of of intervals/lenghts sides of squares: </translation>
+        <translation>Choose minimum and maximum of of intervals/lengths sides of squares: </translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="133"/>
@@ -130,20 +130,17 @@
     <message>
         <location filename="mainwindow.cpp" line="138"/>
         <source>Modrá: </source>
-        <translatorcomment>Blue: </translatorcomment>
-        <translation></translation>
+        <translation>Blue:</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="157"/>
         <source>Soubor s výsledky</source>
-        <translatorcomment>File for results</translatorcomment>
-        <translation></translation>
+        <translation>File for results</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="158"/>
         <source>Zde můžete zvolit soubor pro výsupní data.</source>
-        <translatorcomment>You can choose file for output data here.</translatorcomment>
-        <translation></translation>
+        <translation>You can choose file for output data here.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="213"/>
