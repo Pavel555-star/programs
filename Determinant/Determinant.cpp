@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
 using namespace std;
-
-int determinant(int order, long* pointer) // Výpočet determinantu matice (spolehlivý pro všechny matice do 8 * 8 bytů čísel)
+template <typename T>
+T determinant(int order, T* pointer) // Výpočet determinantu matice (spolehlivý pro všechny matice do 8 * 8 bytů čísel)
 {
 int i;
 int j;
-long det = 0;
-long line = 1;
+T det = 0;
+T line = 1;
 
 switch (order)
     {
@@ -18,7 +18,7 @@ switch (order)
     case 2:
         return((pointer[0]*pointer[3])-(pointer[1]*pointer[2])); // Pro matice 2. řádu vrátí determinant matice 2. řádu
     case 3:{ // Výpočet Sarusovým pravidlem
-        long matrix[3][5];
+        T matrix[3][5];
         for (j = 0; j < 3; j++) // Překopírování matice do pomocné matice
             for (i = 0; i < 3; i++)
                 matrix[i][j] = pointer[i+3*j];
@@ -48,7 +48,7 @@ if ((order >= 4) and (order <= 8)) // Výpočet rozvojem dle sloupce
     int subi;
     int subj;
     int prefactor;
-    long* submatrix = new long[(order-1) * (order-1)];
+    T* submatrix = new T[(order-1) * (order-1)];
     for (x = 0; x < order; x++)
     {
         subi = 0;
@@ -82,13 +82,13 @@ if (order >= 9) // Výpočet Gaussovou eliminací do trojúhelníkového tvaru
     int radek;
     int k;
     int sign = 1;
-    long den;
-    long n;
-    long d;
-    long* buffer = new long[order * order];
-    long* denominator = new long[order * order];
-    long* temp1 = new long[order];
-    long* temp2 = new long[order];
+    T den;
+    T n;
+    T d;
+    T* buffer = new T[order * order];
+    T* denominator = new T[order * order];
+    T* temp1 = new T[order];
+    T* temp2 = new T[order];
     for (i = 0; i < order; i++)
     {
         for (j = 0; j < order; j++)
@@ -189,4 +189,4 @@ cout << "Zadali jste matici / You are entered the matrix: \n";
       }
 cout<<"Determinant matice je / Determinant of the matrix is: "<< determinant(order, matrix) << " ";
 
-return 0;}
+return 0;} // Autor Ing. Pavel Florián Ph.D. dovoluje šíření tohoto programu jen s uvedením svého jména
