@@ -189,4 +189,4 @@ cout << "Zadali jste matici / You are entered the matrix: \n";
       }
 cout<<"Determinant matice je / Determinant of the matrix is: "<< determinant(order, matrix) << " ";
 
-return 0;} // Autor Ing. Pavel Florián Ph.D. dovoluje šíření tohoto programu jen s uvedením svého jména
+return 0;} // Autor Ing. Pavel Florián Ph.D. dovoluje šíření tohoto programu jen s uvedením svého jména.
