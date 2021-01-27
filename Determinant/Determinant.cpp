@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 template <typename T>
-T determinant(int order, T* pointer) // Výpočet determinantu matice (spolehlivý pro všechny matice do 8 * 8 bytů čísel)
+T determinant(int order, T* pointer) // Výpočet determinantu matice (spolehlivý pro všechny matice do 8 * 8 bytů čísel) při použití datového typu Long
 {
 int i;
 int j;
