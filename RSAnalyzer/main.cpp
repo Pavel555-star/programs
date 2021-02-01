@@ -28,6 +28,9 @@ int main(int argc, char *argv[])
             RSAnalyzer analyzer; // Ovládání aplikace parametry příkazové řádky
             int IterMin = 0;
             int IterMax = 0;
+
+            string color;
+            string choice;
             string min = "";
             string max = "";
             if (argc > 5)
@@ -37,22 +40,34 @@ int main(int argc, char *argv[])
                 max = argv[5];
                 IterMax = stoi(max);
                 }
-            if (argv[3] = "text")
+            if (argc > 8)
                 {
-                analyzer.Load_CSV(argv[1]);
+                color = argv[6];
+                analyzer.R = stoi(color);
+                color = argv[7];
+                analyzer.G = stoi(color);
+                color = argv[8];
+                analyzer.B = stoi(color);
+                }
+
+            choice = argv[3];
+            if (choice == "t") // Pro textové soubory
+                {
+                analyzer.Load_CSV(argv[1]); // Načtení vstupního souboru
                 analyzer.Analyze_1D(IterMin, IterMax);
                 }
-            if (argv[3] = "binary")
+            if (choice == "b") // Pro binární soubory
                 {
-                analyzer.Load_Wav(argv[1]);
+                analyzer.Load_Wav(argv[1]); // Načtení vstupního souboru
                 analyzer.Analyze_1D(IterMin, IterMax);
                 }
-            if (argv[3] = "picture")
+            if (choice == "p") // Pro obrázky
                 {
-                analyzer.Load_Image(argv[1]);
+                analyzer.Load_Image(argv[1]); // Načtení vstupního souboru
                 analyzer.Analyze_2D(IterMin, IterMax);
                 }
-            analyzer.Save_File(argv[2],  2, 0);
+
+            analyzer.Save_File(argv[2],  2, 0); // Uložení výstupního souboru
         }
     }
 }
