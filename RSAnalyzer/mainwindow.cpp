@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     R = 1;
     G = 1;
     B = 1;
+    AudioFormat = 2;
     RSAnalyzer analyzer;
 
 
@@ -94,6 +95,7 @@ void MainWindow::Open_Audio()
 {
     File_Path = QFileDialog::getOpenFileName(this,
         tr("Otevřít nekódovaný audio soubor"), QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first(), tr("Audio soubory (*.wav *.raw *.pcm, ...)"));
+    analyzer.CountBytes = AudioFormat;
     analyzer.Load_Wav(File_Path);
     analyzer.Analyze_1D(IterMin, IterMax);
     analyzer.Save_File(Output_Path,  2, 0);
@@ -132,20 +134,25 @@ void MainWindow::Settings()
     QLabel *Range = new QLabel(tr("Zvolte minimum a maximum intervalů/ délek stran čtverců: "));
     QLabel *Minimum = new QLabel(tr("Minimum: "));
     QLabel *Maximum = new QLabel(tr("Maximum: "));
+    QLabel *Size = new QLabel(tr("Zvolte počty bytů čísel binárních souborů (1-8): "));
     QLabel *Color = new QLabel(tr("Zvolte počty zahrnutí jednotlivých barev do analýzy: "));
     QLabel *Red = new QLabel(tr("Červená: "));
     QLabel *Green = new QLabel(tr("Zelená: "));
     QLabel *Blue = new QLabel(tr("Modrá: "));
 
 
+
     QDoubleSpinBox *min = new QDoubleSpinBox();
     QDoubleSpinBox *max = new QDoubleSpinBox();
+    QDoubleSpinBox *size = new QDoubleSpinBox();
+
     QComboBox *red = new QComboBox();
     QComboBox *green = new QComboBox();
     QComboBox *blue = new QComboBox();
 
     min->setRange(0, 1000000000);
     max->setRange(0, 1000000000);
+    size->setRange(1, 8);
 
     red->addItem("0");
     red->addItem("1");
@@ -160,25 +167,29 @@ void MainWindow::Settings()
     set_grid->addWidget(Range, 0, 0, 1, 1);
     set_grid->addWidget(Minimum, 1, 0, 1, 1);
     set_grid->addWidget(Maximum, 2, 0, 1, 1);
-    set_grid->addWidget(Color, 3, 0, 1, 1);
-    set_grid->addWidget(Red, 4, 0, 1, 1);
-    set_grid->addWidget(Green, 5, 0, 1, 1);
-    set_grid->addWidget(Blue, 6, 0, 1, 1);
+    set_grid->addWidget(Size, 3, 0, 1, 1);
+    set_grid->addWidget(Color, 4, 0, 1, 1);
+    set_grid->addWidget(Red, 5, 0, 1, 1);
+    set_grid->addWidget(Green, 6, 0, 1, 1);
+    set_grid->addWidget(Blue, 7, 0, 1, 1);
 
-    set_grid->addWidget(saveButton, 7, 0, 1, 1);
 
     set_grid->addWidget(min, 1, 1, 1, 1);
     set_grid->addWidget(max, 2, 1, 1, 1);
-    set_grid->addWidget(red, 4, 1, 1, 1);
-    set_grid->addWidget(green, 5, 1, 1, 1);
-    set_grid->addWidget(blue, 6, 1, 1, 1);
+    set_grid->addWidget(size, 3, 1, 1, 1);
+    set_grid->addWidget(red, 5, 1, 1, 1);
+    set_grid->addWidget(green, 6, 1, 1, 1);
+    set_grid->addWidget(blue, 7, 1, 1, 1);
 
+    set_grid->addWidget(saveButton, 8, 0, 1, 1);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(Save_Dialog()));
 
     settings->exec();
 
     IterMin = min->value();
     IterMax = max->value();
+    AudioFormat = size->value();
+
     if (red->currentText() == "0")
             R =0;
     if (red->currentText() == "1")

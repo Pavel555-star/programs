@@ -11,9 +11,10 @@ class RSAnalyzer
 public:
     RSAnalyzer();
 
-    int R = 1;  // Konstanta určující důležitost červené barvy pro fraktální analýzu
-    int G = 1;  // Konstanta určující důležitost zelené barvy pro fraktální analýzu
-    int B = 1;  // Konstanta určující důležitost modré barvy pro fraktální analýzu
+    int R = 1;  // Proměnná určující důležitost červené barvy pro fraktální analýzu
+    int G = 1;  // Proměnná určující důležitost zelené barvy pro fraktální analýzu
+    int B = 1;  // Proměnná určující důležitost modré barvy pro fraktální analýzu
+    int CountBytes = 2; // Proměnná určující počet bytů  čísla v binárních souborech
 
     bool Load_CSV(QString inFileName); // Funkce pro načtení CSV souborů
     bool Load_Wav(QString InputFile); // Funkce R/S načtení binárních souborů (audio, ...)

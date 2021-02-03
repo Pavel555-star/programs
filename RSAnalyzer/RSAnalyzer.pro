@@ -27,6 +27,8 @@ HEADERS += \
 TRANSLATIONS +=\
     localization_non_czech.ts \
 
+INCLUDEPATH += </usr/include/x86_64-linux-gnu/qt5/QtMultimedia>
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

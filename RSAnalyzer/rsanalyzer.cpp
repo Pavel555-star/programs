@@ -7,7 +7,6 @@ using namespace std;
 #include <QFile>
 #include <QVector>
 
-
 RSAnalyzer::RSAnalyzer()
 {
 }
@@ -57,6 +56,7 @@ bool RSAnalyzer::Load_Wav(QString InputFile)
 {
 // Načítací funkce programu
 int i;
+long j;
 inFileName = InputFile;
 QFile inFile(inFileName);
 QByteArray BA;
@@ -66,15 +66,31 @@ if (!inFile.open(QIODevice::ReadOnly)) // Načítací část programu
 
 int size = inFile.size();
 Input.clear();
-Input.reserve(size);
+Input.reserve((size/CountBytes) + 1);
 BA.resize(size);
 BA = inFile.readAll();
 
 for (i = 0; i < (size); i++)
 {
-    if (i % 4 == 0)
+    if (i % CountBytes == 0)
     {
-    Input.append(double(BA[i]*BA[i+1]*BA[i+2]*BA[i+3]));
+    j = BA[i];
+    if (CountBytes > 1)
+        j = j + (BA[i+1] << 8);
+    if (CountBytes > 2)
+        j = j +  (BA[i+2] << 16);
+    if (CountBytes > 3)
+        j = j + (BA[i+3] << 24);
+    if (CountBytes > 4)
+        j = j + (BA[i+4] << 32);
+    if (CountBytes > 5)
+        j = j + (BA[i+5] << 40);
+    if (CountBytes > 6)
+        j = j + (BA[i+6] << 48);
+    if (CountBytes > 7)
+        j = j + (BA[i+7] << 56);
+
+    Input.append(double(j));
     }
 }
 inFile.close();

@@ -47,6 +47,7 @@ private:
     int R;
     int G;
     int B;
+    int AudioFormat;
     QString File_Path;
     QString Output_Path;
     QString Result = "";
