@@ -10,15 +10,21 @@ using namespace std;
 RSAnalyzer::RSAnalyzer()
 {
 }
-bool RSAnalyzer::Load_CSV(QString InputFile)
+bool RSAnalyzer::Load_CSV(QString InputFile, int Count_Deliminator)
 {
     // Načítací funkce programu
-    inFileName = InputFile;
+    QString inFileName = InputFile;
     QFile inFile(inFileName);
-    QByteArray process_line;
-    QByteArray znaky = "0123456789.";
-    QByteArray Buffer_1;
+    QByteArray Process_Line;
+    QByteArray Znaky = "0123456789.,-";
+    QByteArray Deliminator = ",;";
     QByteArray Buffer_2;
+    qint64 LineLength;
+
+
+
+    int Delim_Count = Count_Deliminator;
+    char Buffer[1024];
 
     int lines = 0; // Počet řádků vstupního souboru
     int i, m;
@@ -28,7 +34,7 @@ bool RSAnalyzer::Load_CSV(QString InputFile)
         return (false);
 
     while (!inFile.atEnd()){
-        process_line = inFile.readLine();
+        LineLength = inFile.readLine(Buffer, 1024);
         lines++;}
     inFile.close();
 
@@ -40,13 +46,27 @@ bool RSAnalyzer::Load_CSV(QString InputFile)
         return (false);
 
     while ((!inFile.atEnd())) {
-        process_line = inFile.readLine();
-        m = process_line.size();
+        LineLength = inFile.readLine(Buffer, 1024);
+        m = LineLength;
+        Delim_Count = Count_Deliminator;
+
         for (i = 0; i < m; i++)
-           if (znaky.indexOf(process_line[i]) != -1)
-               Buffer_1.append(process_line[i]);
-        Input.append(Buffer_1.toDouble(&ok));
-        Buffer_1 = "";
+            {
+            if ((Deliminator.indexOf(Buffer[i]) != -1) and (Buffer[i+1] == ' '))
+            {
+                Delim_Count = Delim_Count - 1;
+            }
+            if ((Znaky.indexOf(Buffer[i]) != -1) and (Delim_Count == 1))
+                {
+                if (Buffer[i] == ',')
+                    Buffer[i] = '.';
+                Buffer_2.append(Buffer[i]);
+                }
+            }
+
+        Input.append(Buffer_2.toDouble(&ok));
+        Buffer_2 = "";
+        Delim_Count = Count_Deliminator;
         }
     inFile.close();
     return(true);

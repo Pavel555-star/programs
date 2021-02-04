@@ -81,7 +81,7 @@ void MainWindow::Open_CSV()
 {
         File_Path = QFileDialog::getOpenFileName(this,
             tr("Otevřít textový soubor"), QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).first(), tr("Textové soubory (*.csv *.txt *.inf, ...)"));
-        analyzer.Load_CSV(File_Path);
+        analyzer.Load_CSV(File_Path, 1);
         analyzer.Analyze_1D(IterMin, IterMax);
         analyzer.Save_File(Output_Path,  2, 0);
         Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);

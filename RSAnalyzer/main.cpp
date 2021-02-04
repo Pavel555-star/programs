@@ -29,12 +29,15 @@ int main(int argc, char *argv[])
             int IterMin = 0;
             int IterMax = 0;
             int CountBytes = 2;
+            int ColumnNumber = 1;
+
 
             string color;
             string bytes;
             string choice;
             string min = "";
             string max = "";
+            string column = "";
             if (argc > 5)
                 {
                 min = argv[4];
@@ -48,7 +51,12 @@ int main(int argc, char *argv[])
             choice = argv[3];
             if (choice == "t") // Pro textové soubory
                 {
-                analyzer.Load_CSV(argv[1]); // Načtení vstupního souboru
+                if (argc > 6)
+                    {
+                    column = argv[6];
+                    ColumnNumber = stoi(column); // Číslo sloupce SCV souboru (1 - první sloupec)
+                    }
+                analyzer.Load_CSV(argv[1], ColumnNumber); // Načtení vstupního souboru
                 analyzer.Analyze_1D(IterMin, IterMax);
                 }
             if (choice == "b") // Pro binární soubory
