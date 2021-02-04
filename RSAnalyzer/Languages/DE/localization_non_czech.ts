@@ -55,7 +55,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="43"/>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>Nápověda</source>
         <translation>Hilfe</translation>
     </message>
@@ -63,7 +63,7 @@
         <location filename="mainwindow.cpp" line="44"/>
         <source>Zobrazí informace o programu a jeho použití.</source>
         <oldsource>Zobrazí informace o programu a jeho použití</oldsource>
-        <translation>Zeigt Informationen zum Programm und seiner Verwendung an </translation>
+        <translation>Zeigt Informationen zum Programm und seiner Verwendung an.</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="83"/>
@@ -72,6 +72,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="83"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>Textové soubory (*.csv *.txt *.inf, ...)</source>
         <translation>Textdateien (*.csv *.txt *.inf, ...)</translation>
     </message>
@@ -111,7 +112,7 @@
         <translation>Maximum: </translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="137"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Zvolte počty bytů čísel binárních souborů (1-8): </source>
         <translation>Wählen Sie die Anzahl der Bytes der Binärdateinummern (1-8): </translation>
     </message>
@@ -137,6 +138,11 @@
         <translation>Blau: </translation>
     </message>
     <message>
+        <location filename="mainwindow.cpp" line="143"/>
+        <source>Zvolte číslo sloupce v CSV souboru: </source>
+        <translation>Wählen Sie eine Spaltennummer in der CSV-Datei: </translation>
+    </message>
+    <message>
         <location filename="mainwindow.cpp" line="164"/>
         <source>Soubor s výsledky</source>
         <translation>Datei für Ergebnisse</translation>
@@ -147,7 +153,7 @@
         <translation>Hier können Sie eine Datei für die Ausgabedaten auswählen.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>Toto je program pro fraktální analýzu textových, binárních a obrázkových souborů.
 R/S analýza probíhá vydělením hodnoty rozsahu hodnot směrodatnou odchylkou (R/S) hodnot v daném intervalu. 
 Analýza mřížkovou metodou probíhá výpočtem počtu čtverců (box count) na křivce hodnot v zadaném intervalu 
@@ -168,7 +174,7 @@ In den Einstellungen ist es möglich, die Ausgabedatei auszuwählen,
 Das Programm wurde programmiert von Ing. Pavel Florián Ph.D. im Jahr 2021.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="238"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>Zvolit textový soubor</source>
         <translation>Wählen Sie eine Textdatei</translation>
     </message>

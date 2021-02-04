@@ -11,12 +11,12 @@ MainWindow::MainWindow(QWidget *parent)
     Output_Path = "output.csv";
     IterMin = 0;
     IterMax = 0;
+    Column_Number = 1;
     R = 1;
     G = 1;
     B = 1;
     AudioFormat = 2;
     RSAnalyzer analyzer;
-
 
 
     resize(640, 480);
@@ -81,7 +81,7 @@ void MainWindow::Open_CSV()
 {
         File_Path = QFileDialog::getOpenFileName(this,
             tr("Otevřít textový soubor"), QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).first(), tr("Textové soubory (*.csv *.txt *.inf, ...)"));
-        analyzer.Load_CSV(File_Path, 1);
+        analyzer.Load_CSV(File_Path, Column_Number);
         analyzer.Analyze_1D(IterMin, IterMax);
         analyzer.Save_File(Output_Path,  2, 0);
         Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);
@@ -134,18 +134,18 @@ void MainWindow::Settings()
     QLabel *Range = new QLabel(tr("Zvolte minimum a maximum intervalů/ délek stran čtverců: "));
     QLabel *Minimum = new QLabel(tr("Minimum: "));
     QLabel *Maximum = new QLabel(tr("Maximum: "));
-    QLabel *Size = new QLabel(tr("Zvolte počty bytů čísel binárních souborů (1-8): "));
+
     QLabel *Color = new QLabel(tr("Zvolte počty zahrnutí jednotlivých barev do analýzy: "));
     QLabel *Red = new QLabel(tr("Červená: "));
     QLabel *Green = new QLabel(tr("Zelená: "));
     QLabel *Blue = new QLabel(tr("Modrá: "));
-
-
+    QLabel *Size = new QLabel(tr("Zvolte počty bytů čísel binárních souborů (1-8): "));
+    QLabel *Column = new QLabel(tr("Zvolte číslo sloupce v CSV souboru: "));
 
     QDoubleSpinBox *min = new QDoubleSpinBox();
     QDoubleSpinBox *max = new QDoubleSpinBox();
     QDoubleSpinBox *size = new QDoubleSpinBox();
-
+    QDoubleSpinBox *column = new QDoubleSpinBox();
     QComboBox *red = new QComboBox();
     QComboBox *green = new QComboBox();
     QComboBox *blue = new QComboBox();
@@ -153,7 +153,7 @@ void MainWindow::Settings()
     min->setRange(0, 1000000000);
     max->setRange(0, 1000000000);
     size->setRange(1, 8);
-
+    column->setRange(1, 8);
     red->addItem("0");
     red->addItem("1");
     green->addItem("0");
@@ -167,29 +167,28 @@ void MainWindow::Settings()
     set_grid->addWidget(Range, 0, 0, 1, 1);
     set_grid->addWidget(Minimum, 1, 0, 1, 1);
     set_grid->addWidget(Maximum, 2, 0, 1, 1);
-    set_grid->addWidget(Size, 3, 0, 1, 1);
-    set_grid->addWidget(Color, 4, 0, 1, 1);
-    set_grid->addWidget(Red, 5, 0, 1, 1);
-    set_grid->addWidget(Green, 6, 0, 1, 1);
-    set_grid->addWidget(Blue, 7, 0, 1, 1);
-
+    set_grid->addWidget(Color, 3, 0, 1, 1);
+    set_grid->addWidget(Red, 4, 0, 1, 1);
+    set_grid->addWidget(Green, 5, 0, 1, 1);
+    set_grid->addWidget(Blue, 6, 0, 1, 1);
+    set_grid->addWidget(Size, 7, 0, 1, 1);
+    set_grid->addWidget(Column, 8, 0, 1, 1);
 
     set_grid->addWidget(min, 1, 1, 1, 1);
     set_grid->addWidget(max, 2, 1, 1, 1);
-    set_grid->addWidget(size, 3, 1, 1, 1);
-    set_grid->addWidget(red, 5, 1, 1, 1);
-    set_grid->addWidget(green, 6, 1, 1, 1);
-    set_grid->addWidget(blue, 7, 1, 1, 1);
+    set_grid->addWidget(red, 4, 1, 1, 1);
+    set_grid->addWidget(green, 5, 1, 1, 1);
+    set_grid->addWidget(blue, 6, 1, 1, 1);
+    set_grid->addWidget(size, 7, 1, 1, 1);
+    set_grid->addWidget(column, 8, 1, 1, 1);
 
-    set_grid->addWidget(saveButton, 8, 0, 1, 1);
+    set_grid->addWidget(saveButton, 9, 0, 1, 1);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(Save_Dialog()));
-
     settings->exec();
-
     IterMin = min->value();
     IterMax = max->value();
     AudioFormat = size->value();
-
+    Column_Number = column->value();
     if (red->currentText() == "0")
             R =0;
     if (red->currentText() == "1")
@@ -202,7 +201,6 @@ void MainWindow::Settings()
             G =0;
     if (blue->currentText() == "1")
             G =1;
-
     if (Range != nullptr) delete Range;
     if (Minimum != nullptr) delete Minimum;
     if (Maximum != nullptr) delete Maximum;
@@ -210,12 +208,17 @@ void MainWindow::Settings()
     if (Red != nullptr) delete Red;
     if (Green != nullptr) delete Green;
     if (Blue != nullptr) delete Blue;
+    if (Size != nullptr) delete Size;
+    if (Column != nullptr) delete Column;
 
     if (min != nullptr) delete min;
     if (max != nullptr) delete max;
     if (red != nullptr) delete red;
     if (green != nullptr) delete green;
     if (blue != nullptr) delete blue;
+    if (size != nullptr) delete size;
+    if (column != nullptr) delete column;
+
     if (saveButton != nullptr) delete saveButton;
 }
 void MainWindow::Help()

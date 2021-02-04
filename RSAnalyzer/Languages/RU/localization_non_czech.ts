@@ -55,7 +55,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="43"/>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>Nápověda</source>
         <translation>Помогите</translation>
     </message>
@@ -72,6 +72,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="83"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>Textové soubory (*.csv *.txt *.inf, ...)</source>
         <translation>Текстовые файлы (*.csv *.txt *.inf, ...)</translation>
     </message>
@@ -111,9 +112,9 @@
         <translation>Максимум: </translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="137"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Zvolte počty bytů čísel binárních souborů (1-8): </source>
-        <translation type="unfinished">Выберите количество байтов номеров двоичных файлов (1-8): </translation>
+        <translation>Выберите количество байтов номеров двоичных файлов (1-8): </translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="138"/>
@@ -137,6 +138,11 @@
         <translation>Синий: </translation>
     </message>
     <message>
+        <location filename="mainwindow.cpp" line="143"/>
+        <source>Zvolte číslo sloupce v CSV souboru: </source>
+        <translation>Выберите номер столбца в файле CSV: </translation>
+    </message>
+    <message>
         <location filename="mainwindow.cpp" line="164"/>
         <source>Soubor s výsledky</source>
         <translation>Файл с результатами</translation>
@@ -147,7 +153,7 @@
         <translation>Здесь вы можете выбрать файл для вывода данных.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>Toto je program pro fraktální analýzu textových, binárních a obrázkových souborů.
 R/S analýza probíhá vydělením hodnoty rozsahu hodnot směrodatnou odchylkou (R/S) hodnot v daném intervalu. 
 Analýza mřížkovou metodou probíhá výpočtem počtu čtverců (box count) na křivce hodnot v zadaném intervalu 
@@ -168,7 +174,7 @@ Program naprogramoval Ing. Pavel Florián Ph.D. v roce 2021.</source>
 Программу разработал инж. Павел Флориан Ph.D. в 2021 г.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="238"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>Zvolit textový soubor</source>
         <translation>Выбрать текстовый файл</translation>
     </message>

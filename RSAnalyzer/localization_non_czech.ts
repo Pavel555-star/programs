@@ -55,7 +55,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="43"/>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>Nápověda</source>
         <translation>Help</translation>
     </message>
@@ -72,6 +72,7 @@
     </message>
     <message>
         <location filename="mainwindow.cpp" line="83"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>Textové soubory (*.csv *.txt *.inf, ...)</source>
         <translation>Text files (*.csv *.txt *.inf, ...)</translation>
     </message>
@@ -111,7 +112,7 @@
         <translation>Maximum: </translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="137"/>
+        <location filename="mainwindow.cpp" line="142"/>
         <source>Zvolte počty bytů čísel binárních souborů (1-8): </source>
         <translation>Choose count of bytes in numbers in binary files: </translation>
     </message>
@@ -134,7 +135,12 @@
     <message>
         <location filename="mainwindow.cpp" line="141"/>
         <source>Modrá: </source>
-        <translation>Blue:</translation>
+        <translation>Blue: </translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="143"/>
+        <source>Zvolte číslo sloupce v CSV souboru: </source>
+        <translation>Choose number of column in CSV file: </translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="164"/>
@@ -147,7 +153,7 @@
         <translation>You can choose file for output data here.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="224"/>
+        <location filename="mainwindow.cpp" line="227"/>
         <source>Toto je program pro fraktální analýzu textových, binárních a obrázkových souborů.
 R/S analýza probíhá vydělením hodnoty rozsahu hodnot směrodatnou odchylkou (R/S) hodnot v daném intervalu. 
 Analýza mřížkovou metodou probíhá výpočtem počtu čtverců (box count) na křivce hodnot v zadaném intervalu 
@@ -168,7 +174,7 @@ In the settings it is possible to select the output file,
 The program was programmed by Ing. Pavel Florián Ph.D. in 2021.</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="238"/>
+        <location filename="mainwindow.cpp" line="241"/>
         <source>Zvolit textový soubor</source>
         <translation>Choose text file</translation>
     </message>

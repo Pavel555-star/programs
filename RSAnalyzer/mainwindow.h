@@ -44,6 +44,7 @@ private:
 
     int IterMin;
     int IterMax;
+    int Column_Number;
     int R;
     int G;
     int B;
