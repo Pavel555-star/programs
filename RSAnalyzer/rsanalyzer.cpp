@@ -228,9 +228,11 @@ void RSAnalyzer::Analyze_1D(int IterMin, int iterMax)
                     s = s + ((prumer - Input[o])*(prumer - Input[o]));
                  }
                  range = max_y - min_y;
-                 s = s/scale;
-                 if (s > 0)
+                 if ((s/scale) > 0)
+                 {
+                     s = sqrt(s/scale);
                      RS = RS + range/s;
+                 }
                  else
                      errors++;
 
@@ -240,9 +242,9 @@ void RSAnalyzer::Analyze_1D(int IterMin, int iterMax)
                  min_y = 1.7E+308;
              }
          RS = RS/(iter-errors);
-         Output_x.append(log2(iter));
-         Output_RS.append(log2(RS));
-         Output_2.append(log2(lenght));
+         Output_x.append(double(log2(iter)));
+         Output_RS.append(double(log2(RS)));
+         Output_2.append(double(log2(lenght)));
          RS = 0;
          lenght = 0;
          errors = 0;
@@ -264,7 +266,7 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
     int errors = 0;
 
     long range = 0;
-    long int s = 0;
+    long s = 0;
     double s2 =0;
     long max = 0;
     long min = 2147483647;
@@ -316,7 +318,7 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
                         {
                             value = Image.pixelColor((i * scale_x) + k,(j * scale_y) + l);
                             sum_value = value.red() + value.green() + value.blue();
-                            s = s + ((prumer - sum_value) * (prumer - sum_value));
+                            s = s + ((prumer - sum_value) * (prumer - sum_value))^1/2;
                         }
                     if (p_prumer == 0)
                         p_prumer = prumer;
@@ -324,9 +326,11 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
                         count++;
 
                 range = max - min;
-                s = s/(scale_x * scale_y);
-                if (s > 0)
+                if ((s/(scale_x * scale_y)) > 0)
+                {
+                    s = sqrt(s/(scale_x * scale_y));
                     s2 = s2 + double(range)/double(s);
+                }
                 else
                     errors++;
                 prumer = 0;
@@ -336,8 +340,8 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
                 }
         s2 = s2/((iter*iter)-errors);
         Output_x.append(double(log2(iter*iter)));
-        Output_RS.append(log2(s2));
-        Output_2.append(log2(count));
+        Output_RS.append((log2(s2)));
+        Output_2.append((log2(count)));
         s2 = 0;
         errors = 0;
         count = 0;
