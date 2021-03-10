@@ -86,6 +86,7 @@ void MainWindow::Open_CSV()
         analyzer.Save_File(Output_Path,  2, 0);
         Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);
         TextLabel->setText(Result);
+        ImageLabel->clear();
         resize(640, 480);
 
 
@@ -101,6 +102,9 @@ void MainWindow::Open_Audio()
     analyzer.Save_File(Output_Path,  2, 0);
     Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);
     TextLabel->setText(Result);
+    ImageLabel->clear();
+    resize(640, 480);
+
 
 }
 
