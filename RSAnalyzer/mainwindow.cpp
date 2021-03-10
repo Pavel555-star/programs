@@ -89,7 +89,6 @@ void MainWindow::Open_CSV()
         ImageLabel->clear();
         resize(640, 480);
 
-
 }
 
 void MainWindow::Open_Audio()
@@ -104,10 +103,7 @@ void MainWindow::Open_Audio()
     TextLabel->setText(Result);
     ImageLabel->clear();
     resize(640, 480);
-
-
 }
-
 void MainWindow::Open_Picture()
 {
     File_Path = QFileDialog::getOpenFileName(this,
