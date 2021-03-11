@@ -96,7 +96,7 @@ void MainWindow::Open_Audio()
     File_Path = QFileDialog::getOpenFileName(this,
         tr("Otevřít nekódovaný audio soubor"), QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first(), tr("Audio soubory (*.wav *.raw *.pcm, ...)"));
     analyzer.CountBytes = AudioFormat;
-    analyzer.Load_Wav(File_Path);
+    analyzer.Load_Binary(File_Path);
     analyzer.Analyze_1D(IterMin, IterMax);
     analyzer.Save_File(Output_Path,  2, 0);
     Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);

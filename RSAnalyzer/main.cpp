@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
                     CountBytes = stoi(bytes); // Počty bytů čísel binárního souboru
                     analyzer.CountBytes = CountBytes;
                     }
-                analyzer.Load_Wav(argv[1]); // Načtení vstupního souboru
+                analyzer.Load_Binary(argv[1]); // Načtení vstupního souboru
                 analyzer.Analyze_1D(IterMin, IterMax);
                 }
             if (choice == "p") // Pro obrázky

@@ -17,7 +17,7 @@ public:
     int CountBytes = 2; // Proměnná určující počet bytů  čísla v binárních souborech
 
     bool Load_CSV(QString inFileName, int Count_Deliminator); // Funkce pro načtení CSV souborů
-    bool Load_Wav(QString InputFile); // Funkce R/S načtení binárních souborů (audio, ...)
+    bool Load_Binary(QString InputFile); // Funkce R/S načtení binárních souborů (audio, ...)
     bool Load_Image(QString InputFile); // Funkce R/S pro načtení obrázků
     bool Save_File(QString outFileName, int format_x, int format_y); // Funkce pro ukládání souborů ve formátu CSV
 

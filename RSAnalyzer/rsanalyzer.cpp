@@ -72,7 +72,7 @@ bool RSAnalyzer::Load_CSV(QString InputFile, int Count_Deliminator)
     return(true);
 }
 
-bool RSAnalyzer::Load_Wav(QString InputFile)
+bool RSAnalyzer::Load_Binary(QString InputFile)
 {
 // Načítací funkce programu
 int i;
@@ -211,7 +211,7 @@ void RSAnalyzer::Analyze_1D(int IterMin, int iterMax)
         scale = n/iter;
             for (i = 0; i < iter; i++)
             {
-                lenght = lenght + scale  + abs(Input[((i + 1) * scale)] - Input[i * scale]);
+                lenght = lenght + abs(Input[((i + 1) * scale)] - Input[i * scale]);
                 for (j = 0; j < scale; j++)
                 {
                      o = (i * scale) + j;
