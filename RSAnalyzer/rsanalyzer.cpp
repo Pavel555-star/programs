@@ -281,6 +281,8 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
     height = Image.height();
     LineSize = Image.bytesPerLine();
 
+    QVector<int> RGB;
+    RGB.reserve(width*height*3);
 
     Output_x.clear();
     Output_RS.clear();
