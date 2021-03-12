@@ -256,7 +256,6 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
     int width;
     int height;
     int LineSize;
-    QColor value;
     int sum_value; 
 
     int scale_x;
@@ -274,6 +273,9 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
 
     long p_prumer = 0;
     long count = 0;
+
+    uchar *bits = Image.bits();
+    uint pointer_diff;
 
     width = Image.width();
     height = Image.height();
@@ -303,8 +305,10 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
                     for (k = 0; k < scale_x; k++)
                         for (l = 0; l < scale_y; l++)
                         {
-                            value = Image.pixelColor((i * scale_x) + k,(j * scale_y) + l);
-                            sum_value = value.red() + value.green() + value.blue();
+                            pointer_diff = 4 * ((i * scale_x) + k,((j * scale_y) + l) * width);
+                            sum_value = R * bits[pointer_diff] +
+                                    G * bits[pointer_diff + 1] +
+                                    B * bits[pointer_diff + 2];
                             prumer = prumer + sum_value;
                             if (sum_value > max)
                                 max = sum_value;
@@ -316,8 +320,10 @@ void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
                     for (k = 0; k < scale_x; k++)
                         for (l = 0; l < scale_y; l++)
                         {
-                            value = Image.pixelColor((i * scale_x) + k,(j * scale_y) + l);
-                            sum_value = value.red() + value.green() + value.blue();
+                            pointer_diff = 4 * ((i * scale_x) + k,((j * scale_y) + l) * width);
+                            sum_value = R * bits[pointer_diff] +
+                                    G * bits[pointer_diff + 1] +
+                                    B * bits[pointer_diff + 2];
                             s = s + ((prumer - sum_value) * (prumer - sum_value))^1/2;
                         }
                     if (p_prumer == 0)
