@@ -82,7 +82,7 @@ void MainWindow::Open_CSV()
         File_Path = QFileDialog::getOpenFileName(this,
             tr("Otevřít textový soubor"), QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).first(), tr("Textové soubory (*.csv *.txt *.inf, ...)"));
         analyzer.Load_CSV(File_Path, Column_Number);
-        analyzer.Analyze_1D(IterMin, IterMax);
+        analyzer.Analyze_Curve(IterMin, IterMax);
         analyzer.Save_File(Output_Path,  2, 0);
         Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);
         TextLabel->setText(Result);
@@ -97,7 +97,7 @@ void MainWindow::Open_Audio()
         tr("Otevřít nekódovaný audio soubor"), QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first(), tr("Audio soubory (*.wav *.raw *.pcm, ...)"));
     analyzer.CountBytes = AudioFormat;
     analyzer.Load_Binary(File_Path);
-    analyzer.Analyze_1D(IterMin, IterMax);
+    analyzer.Analyze_Curve(IterMin, IterMax);
     analyzer.Save_File(Output_Path,  2, 0);
     Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);
     TextLabel->setText(Result);
@@ -119,8 +119,8 @@ void MainWindow::Open_Picture()
     analyzer.R = R;
     analyzer.G = G;
     analyzer.B = B;
-    analyzer.Load_Image(File_Path);  
-    analyzer.Analyze_2D(IterMin, IterMax);
+    analyzer.Load_Picture(File_Path);
+    analyzer.Analyze_Picture(IterMin, IterMax);
     analyzer.Save_File(Output_Path,  2, 0);
     Result_String(analyzer.Output_x, analyzer.Output_RS, analyzer.Output_2);
     TextLabel->setText(Result);

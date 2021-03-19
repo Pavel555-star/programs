@@ -16,15 +16,17 @@ bool RSAnalyzer::Load_CSV(QString InputFile, int Count_Deliminator)
     QString inFileName = InputFile;
     QFile inFile(inFileName);
     QByteArray Process_Line;
-    QByteArray Znaky = "0123456789.,-";
+    QByteArray Znaky = "0123456789.,+-eE";
     QByteArray Deliminator = ",;";
+    QByteArray Terminator = "abcfghijklmnopqrstuvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ";
+    QByteArray Buffer_1;
     QByteArray Buffer_2;
+    QByteArray Buffer_3;
+
     qint64 LineLength;
 
-
-
     int Delim_Count = Count_Deliminator;
-    char Buffer[1024];
+    char Line[1024];
 
     int lines = 0; // Počet řádků vstupního souboru
     int i, m;
@@ -34,41 +36,82 @@ bool RSAnalyzer::Load_CSV(QString InputFile, int Count_Deliminator)
         return (false);
 
     while (!inFile.atEnd()){
-        LineLength = inFile.readLine(Buffer, 1024);
+        LineLength = inFile.readLine(Line, 1024);
         lines++;}
     inFile.close();
 
     Input.clear();
+    Input_2.clear();
+    Input_3.clear();
     Input.reserve(lines);
-    pInput = Input.data();
+    Input_2.reserve(lines);
+    Input_3.reserve(lines);
 
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) // Načítací část programu
         return (false);
 
     while ((!inFile.atEnd())) {
-        LineLength = inFile.readLine(Buffer, 1024);
+        LineLength = inFile.readLine(Line, 1024);
+        if (Terminator.indexOf(Line[0]) != -1)
+            continue;
         m = LineLength;
         Delim_Count = Count_Deliminator;
 
         for (i = 0; i < m; i++)
             {
-            if ((Deliminator.indexOf(Buffer[i]) != -1) and (Buffer[i+1] == ' '))
+            if ((Deliminator.indexOf(Line[i]) != -1) and (Line[i+1] == ' '))
             {
                 Delim_Count = Delim_Count - 1;
             }
-            if ((Znaky.indexOf(Buffer[i]) != -1) and (Delim_Count == 1))
+            if ((Znaky.indexOf(Line[i]) != -1) and (Delim_Count == 1))
                 {
-                if (Buffer[i] == ',')
-                    Buffer[i] = '.';
-                Buffer_2.append(Buffer[i]);
+                if (Line[i] == ',')
+                    Line[i] = '.';
+                Buffer_1.append(Line[i]);
+                }
+            if ((Znaky.indexOf(Line[i]) != -1) and (Delim_Count == 0))
+                {
+                if (Line[i] == ',')
+                    Line[i] = '.';
+                Buffer_2.append(Line[i]);
+                }
+            if ((Znaky.indexOf(Line[i]) != -1) and (Delim_Count == -1))
+                {
+                if (Line[i] == ',')
+                    Line[i] = '.';
+                Buffer_3.append(Line[i]);
                 }
             }
 
-        Input.append(Buffer_2.toDouble(&ok));
+        if (Buffer_1 != "")
+        {
+        Input.append(Buffer_1.toDouble(&ok));
+        Buffer_1 = "";
+        }
+        if (Buffer_2 != "")
+        {
+        Input_2.append(Buffer_2.toDouble(&ok));
         Buffer_2 = "";
+        }
+        if (Buffer_3 != "")
+        {
+        Input_3.append(Buffer_3.toDouble(&ok));
+        Buffer_3 = "";
+        }
         Delim_Count = Count_Deliminator;
         }
     inFile.close();
+
+    Dimension_Curve = 1;
+    if (Input.size() == Input_2.size())
+        Dimension_Curve = 2;
+    if ((Input.size() == Input_3.size()) and (Dimension_Curve == 2))
+        Dimension_Curve = 3;
+
+    pInput = Input.data();
+    pInput_2 = Input_2.data();
+    pInput_3 = Input_3.data();
+
     return(true);
 }
 
@@ -87,8 +130,10 @@ if (!inFile.open(QIODevice::ReadOnly)) // Načítací část programu
 int size = inFile.size();
 Input.clear();
 Input.reserve((size/CountBytes) + 1);
+pInput = Input.data();
 BA.resize(size);
 BA = inFile.readAll();
+Dimension_Curve = 1;
 
 for (i = 0; i < (size); i++)
 {
@@ -117,7 +162,7 @@ inFile.close();
 return(true);
 }
 
-bool RSAnalyzer::Load_Image(QString InputFile)
+bool RSAnalyzer::Load_Picture(QString InputFile)
 {
 // Načítací funkce programu
 Image.load(InputFile);
@@ -181,7 +226,7 @@ for (c = 0; c < d; c++)
 outFile.close();
 return(true);
 }
-void RSAnalyzer::Analyze_1D(int IterMin, int iterMax)
+void RSAnalyzer::Analyze_Curve(int IterMin, int iterMax)
 { // Výpočetní část programu
     int scale;
     int i, j = 0;
@@ -191,12 +236,16 @@ void RSAnalyzer::Analyze_1D(int IterMin, int iterMax)
     int iter = 1;
     int errors = 0;
 
+    int dimension;
+
     double range = 0;
     double s;
     double max_y = 0;
     double min_y = 1.7E+308;
     double prumer = 0;
     double RS = 0;
+    double *pContainer;
+    double d_x;
 
     double lenght;
 
@@ -204,53 +253,114 @@ void RSAnalyzer::Analyze_1D(int IterMin, int iterMax)
     Output_RS.clear();
     Output_2.clear();
     Input.append(Input[n - 1]);
+    if (Dimension_Curve > 1)
+    Input_2.append(Input_2[n - 1]);
+    if (Dimension_Curve > 2)
+    Input_3.append(Input_3[n - 1]);
 
-    for (iter =1; iter <= npp; iter = iter * 2)
+
+
+     for (iter = 1; iter <= npp; iter = iter * 2)
         if (((iter > IterMin) and (iter < iterMax)) or iterMax == 0)
         {
         scale = n/iter;
             for (i = 0; i < iter; i++)
             {
-                lenght = lenght + abs(Input[((i + 1) * scale)] - Input[i * scale]);
-                for (j = 0; j < scale; j++)
+                switch (Dimension_Curve) // Analýza délky
                 {
-                     o = (i * scale) + j;
-                     prumer = prumer + Input[o];
-                   if (Input[o] > max_y)
-                       max_y = Input[o];
-                   if (Input[o] < min_y)
-                        min_y = Input[o];
-                 }
-                 prumer = (prumer)/j;
-                 for (j = 0; j < scale; j++)
-                 {
-                    o = (i * scale) + j;
-                    s = s + ((prumer - Input[o])*(prumer - Input[o]));
-                 }
-                 range = max_y - min_y;
-                 if ((s/scale) > 0)
-                 {
+                case 1:
+                {
+                    d_x = pInput[(i + 1) * scale] - pInput[i * scale];
+                    if (d_x >= 0)
+                        lenght = lenght + d_x;
+                    else
+                        lenght = lenght - d_x;
+                    break;
+                }
+                case 2:
+                {
+                    lenght = lenght + sqrt((pInput[((i + 1) * scale)] - pInput[i * scale], 2)
+                            * (pInput[((i + 1) * scale)] - pInput[i * scale], 2)
+                            + (pInput_2[((i + 1) * scale)] - pInput_2[i * scale])
+                            * (pInput_2[((i + 1) * scale)] - pInput_2[i * scale]));
+                    break;
+                }
+                case 3:
+                {
+                    lenght = lenght + sqrt((pInput[((i + 1) * scale)] - pInput[i * scale])
+                            * (pInput[((i + 1) * scale)] - pInput[i * scale])
+                            + (pInput_2[((i + 1) * scale)] - pInput_2[i * scale])
+                            * (pInput_2[((i + 1) * scale)] - pInput_2[i * scale])
+                            + (pInput_3[((i + 1) * scale)] - pInput_3[i * scale]) *
+                            (pInput_3[((i + 1) * scale)] - pInput_3[i * scale]));
+                    break;
+                }
+                }
+                for (dimension = 1; dimension <= Dimension_Curve; dimension++) // R/S Analýza
+                {
+                    switch (dimension)
+                    {
+                    case 1:
+                    {
+                        pContainer = pInput;
+                        break;
+                    }
+                    case 2:
+                    {
+                        pContainer = pInput_2;
+                        break;
+                    }
+                    case 3:
+                    {
+                        pContainer = pInput_3;
+                        break;
+                    }
+                    }
+
+                    for (j = 0; j < scale; j++)
+                    {
+                         o = (i * scale) + j;
+                         prumer = prumer + pContainer[o];
+                       if (pContainer[o] > max_y)
+                           max_y = pContainer[o];
+                       if (pContainer[o] < min_y)
+                            min_y = pContainer[o];
+                     }
+
+                     prumer = (prumer)/j;
+                     for (j = 0; j < scale; j++)
+                     {
+                        o = (i * scale) + j;
+                        s = s + ((prumer - pContainer[o])*(prumer - pContainer[o]));
+                     }
+                     range = max_y - min_y;
+                     if ((s/scale) > 0)
+                     {
                      s = sqrt(s/scale);
                      RS = RS + range/s;
-                 }
-                 else
-                     errors++;
+                     }
+                     else
+                         errors++;
+                     s = 0;
+                     prumer = 0;
+                     max_y = 0;
+                     min_y = 1.7E+308;
+                     }
 
-                 s = 0;
-                 prumer = 0;
-                 max_y = 0;
-                 min_y = 1.7E+308;
+
              }
-         RS = RS/(iter-errors);
-         Output_x.append(double(log2(iter)));
-         Output_RS.append(double(log2(RS)));
-         Output_2.append(double(log2(lenght)));
-         RS = 0;
-         lenght = 0;
-         errors = 0;
-         }
+
+             RS = RS/((Dimension_Curve * iter) - errors);
+
+             Output_x.append(double(log2(iter)));
+             Output_RS.append(double(log2(RS)));
+             Output_2.append(double(log2(lenght)));
+             RS = 0;
+             lenght = 0;
+             errors = 0;
+    }
 }
-void RSAnalyzer::Analyze_2D(int IterMin, int iterMax)
+void RSAnalyzer::Analyze_Picture(int IterMin, int iterMax)
 { // Výpočetní část programu
 
     int width;

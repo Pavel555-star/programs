@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
                     ColumnNumber = stoi(column); // Číslo sloupce SCV souboru (1 - první sloupec)
                     }
                 analyzer.Load_CSV(argv[1], ColumnNumber); // Načtení vstupního souboru
-                analyzer.Analyze_1D(IterMin, IterMax);
+                analyzer.Analyze_Curve(IterMin, IterMax);
                 }
             if (choice == "b") // Pro binární soubory
                 {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
                     analyzer.CountBytes = CountBytes;
                     }
                 analyzer.Load_Binary(argv[1]); // Načtení vstupního souboru
-                analyzer.Analyze_1D(IterMin, IterMax);
+                analyzer.Analyze_Curve(IterMin, IterMax);
                 }
             if (choice == "p") // Pro obrázky
                 {
@@ -81,8 +81,8 @@ int main(int argc, char *argv[])
                     color = argv[8];
                     analyzer.B = stoi(color);
                     }
-                analyzer.Load_Image(argv[1]); // Načtení vstupního souboru
-                analyzer.Analyze_2D(IterMin, IterMax);
+                analyzer.Load_Picture(argv[1]); // Načtení vstupního souboru
+                analyzer.Analyze_Picture(IterMin, IterMax);
                 }
 
             analyzer.Save_File(argv[2],  2, 0); // Uložení výstupního souboru
