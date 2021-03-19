@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 template <typename T>
-T determinant(int order, T* pointer) // Výpočet determinantu matice (spolehlivý pro všechny matice do 8 * 8 bytů čísel) při použití datového typu long
+T determinant(int order, T* pointer) // Výpočet determinantu matice (spolehlivý pro všechny matice do 8 * 8 bytů čísel při použití datového typu long)
 {
 int i;
 int j;
@@ -115,7 +115,7 @@ if (order >= 9) // Výpočet Gaussovou eliminací do trojúhelníkového tvaru
             {
                 n = buffer[i + (order * j)];
                 d = buffer[i + (order * radek)];
-                if ((n % d) == 0)
+                if ((long(n) % long(d)) == 0)
                 {
                 n = n/d;
                 d = 1;
@@ -152,7 +152,7 @@ if (order >= 9) // Výpočet Gaussovou eliminací do trojúhelníkového tvaru
     {
         det = det * buffer[i + (order * i)];
         den = den * denominator[i + (order * i)];
-        if ((det % den) == 0)
+        if ((long(det) % long(den)) == 0)
         {
         det = det/den;
         den =1;
@@ -170,23 +170,23 @@ return det;
 int main(void) {
 
 int order, j, i;
-long* matrix;
+double* matrix;
 
-cout << "Zadejte řád matice / Enter the order of matrix:\n";
+cout << "Zadejte řád matice: / Enter the order of matrix: / Geben Sie die Reihenfolge der Matrix ein:  / Введите порядок матрицы:\n";
 cin >> order;
-matrix = new long[(order) * (order)];
+matrix = new double[(order) * (order)];
 
-cout << "Zadejte elementy matice / Enter the elements of matrix:\n";
+cout << "Zadejte elementy matice: / Enter the elements of matrix: / Eingeben Matrixelemente: / Ввести элементы матрицы:  \n";
 for (j = 0; j < order; j++)
    for (i = 0; i < order; i++)
       cin >> matrix[i + (order * j)];
 
-cout << "Zadali jste matici / You are entered the matrix: \n";     
+cout << "Zadali jste matici: / You have entered the matrix: / Du hast eine Matrix eingegeben: / Вы вошли в матрицу:  \n";     
    for (j = 0; j < order; j++) {  
       for (i = 0; i < order; i++)
          cout << matrix[i + (order * j)] <<" ";
       cout<<endl;
       }
-cout<<"Determinant matice je / Determinant of the matrix is: "<< determinant(order, matrix) << " ";
+cout<<"Determinant matice je: / Determinant of the matrix is: / Die Determinante der Matrix ist:  / Определитель матрицы:   "<< determinant(order, matrix) << " ";
 
 return 0;} // Autor Ing. Pavel Florián Ph.D. dovoluje šíření tohoto programu jen s uvedením svého jména.
