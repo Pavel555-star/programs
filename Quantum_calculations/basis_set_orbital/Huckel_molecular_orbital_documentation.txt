@@ -1,0 +1,48 @@
+Huckel molecular orbital program code documentation 
+class Huckel_calculations:
+public variables:
+
+vector<T> determinants;
+This vector contains beta multipliers from roots of Huckel matrix.
+
+vector<T> spectra;
+This vector contains beta multipliers for calculated spectra
+
+vector<T> coeficients;
+This vector contains coefficients of wavefunctions density.
+
+vector<T> sequence;
+This vector contains sequence of atoms in vibrating frame in molecule.
+
+bool cyclic;
+This variable contains information about cyclicity of compound.
+
+unsigned int determinant_exception_handle = 0;
+1, if there are exceptions with alocate memory in determinant calculations
+
+functions:
+
+inline T Determinant(unsigned int order, T* matrix_pointer, T* buffer, T* denominator, T* temp1, T* temp2)
+
+This function return determinant of matrix, variable order means order of matrix, matrix_pointer is reference to matrix
+of size order * order, buffer, denominator, temp1 and temp2 are variables for storing temporary data of size order * order.
+
+T Huckel_Determinant_set(unsigned int order, T* pointer,unsigned int count, T min, T step, T* output_values)
+
+This function create array of determinants of matrix with increased values added to matrix diagonal.
+Variable order means order of matrix, matrix is reference to matrix of size order * order, count is count of values,
+min is initial value, step is difference between two values and output_values is array for results.
+
+T Huckel_Determinant_solver(unsigned int order, T* matrix)
+
+This function solve roots of matrix with diagonal increasing between -32 and 32.
+Variable order means order of matrix, matrix is reference to matrix of size order * order,
+results are stored into public variable determinants.
+
+T Huckel_Spectra_solver(T Overlap_integral)
+
+This function solve spectra for Overlap_integral,
+
+T Huckel_Wavefunction_Coefficient_solver(unsigned int order, T* pointer)
+
+This function solve wavefunction coefficients and sequence for Huckel matrix of size order * order in pointer variable array.
