@@ -325,10 +325,9 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
                 }
             return det;
         }
-        }
-        
+    }
     if ((order >= 4) and (order <= 7)) // Calculation by development according to the column
-    {
+        {
         unsigned int x;
         unsigned int subi;
         unsigned int subj;
@@ -342,30 +341,30 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
             determinant_exception_handle = 1;
             }
         for (x = 0; x < order; x++)
-        {
-        subi = 0;
-        for (i = 1; i < order; i++) 
             {
-            subj = 0;
-            for (j = 0; j < order; j++)
+            subi = 0;
+            for (i = 1; i < order; i++) 
                 {
-                if (j == x)
-                    continue;
-                submatrix[subi+((order-1) * subj)] = pointer[i + (order * j)];
-                subj++;
+                subj = 0;
+                for (j = 0; j < order; j++)
+                    {
+                    if (j == x)
+                        continue;
+                    submatrix[subi+((order-1) * subj)] = pointer[i + (order * j)];
+                    subj++;
+                    }
+                subi++;
                 }
-            subi++;
+            if (pointer[order * x] != 0)
+                {
+                if (x % 2 == 0)
+                    prefactor = 1;
+                else
+                    prefactor = -1;
+                det = det + (prefactor * pointer[order * x] * this->Determinant(order-1, submatrix,
+                nullptr, nullptr, nullptr,nullptr));
+                }
             }
-        if (pointer[order * x] != 0)
-            {
-            if (x % 2 == 0)
-                prefactor = 1;
-            else
-                prefactor = -1;
-            det = det + (prefactor * pointer[order * x] * this->Determinant(order-1, submatrix,
-            nullptr, nullptr, nullptr,nullptr));
-            }
-        }
         delete[] submatrix;
         }
     // vectorisation code    
@@ -385,14 +384,14 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
         T temp2_s[64];
         
         for (i = 0; i < (order * order); i++)
-        {
+            {
             buffer_s[i] = pointer[i]; // Copying of matrix to modifications
             denominator_s[i] = 1; // Filling of denominator_s matrix by ones
-        }
+            }
         for (i = 0; i < order; i++)
-        {
-            for (j = i; j < order; j++)
             {
+            for (j = i; j < order; j++)
+                {
                 if (buffer_s[i + (order * j)] != 0) // Finding of first line with non-zero value in the given column
                 {
                 line_G = j;
@@ -400,7 +399,7 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
                 }
                 if ((j == (order-1)) and (buffer_s[i + (order * j)] == 0)) // Zero control
                   return(0);
-            }
+                }
             for (j = i; j < order; j++) // Addition and subtraction of lines
                 {
                 if ((line_G != j) and (buffer_s[i + (order * j)] != 0)) 
@@ -483,7 +482,7 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
                     denominator_s[k + (order * i)] = temp2_s[k];
                     }
                 }
-        }
+            }
         det = 1;
         den = 1;
         for (i = 0; i < order; i++)
@@ -690,7 +689,6 @@ T* output_values)
         delete[] temp1;
         delete[] temp2;
         }
-    
     return(0);
     }
 template <typename T>
@@ -4536,27 +4534,44 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
     size = side * side * side;
     pixel_lenght = T(vector_lenght)/T(lenght_order) * Hartree_lenght;
     
-    x_gradient = (wavefunction_2[1] - wavefunction_2[0])/pixel_lenght;
-    y_gradient = (wavefunction_2[side] - wavefunction_2[0])/pixel_lenght;
-    z_gradient = (wavefunction_2[side * side] - wavefunction_2[0])/pixel_lenght;
-    for (i = 0; i < size/2; i++) // Optimalization for pipelining with non sequential reading of memory
+    for (i = 0; i < side * side; i++) // Optimalization for pipelining with non sequential reading of memory
         {
+        if (i >= 1)
+            x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - 1])/(pixel_lenght * 2);
+        else
+            x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i])/pixel_lenght;
+        
+        if (i >= side)
+            y_gradient = (wavefunction_2[i + side] - wavefunction_2[i - side])/(pixel_lenght * 2);
+        else
+            y_gradient = (wavefunction_2[i + side] - wavefunction_2[i])/pixel_lenght;
+        
+        z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i])/pixel_lenght;
         Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
-        x_gradient = (wavefunction_2[i + 2] - wavefunction_2[i + 1])/pixel_lenght;
-        y_gradient = (wavefunction_2[i + side + 1] - wavefunction_2[i + 1])/pixel_lenght;
-        z_gradient = (wavefunction_2[i + (side * side) + 1] - wavefunction_2[i + 1])/pixel_lenght;
         }
-    x_gradient = (wavefunction_2[size/2] - wavefunction_2[size/2 - 1])/pixel_lenght;
-    y_gradient = (wavefunction_2[size/2] - wavefunction_2[size/2 - side])/pixel_lenght;
-    z_gradient = (wavefunction_2[size/2] - wavefunction_2[size/2 - (side * side)])/pixel_lenght;
-    for (i = size/2; i + 1 < size; i++)
+    for (i = (side * side); i < size - (side * side); i++)
         {
-        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
-        x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i])/pixel_lenght;
-        y_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - side + 1])/pixel_lenght;
-        z_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - (side * side) + 1])/pixel_lenght;
+        Laplacian_1[i - 1] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - 1])/(pixel_lenght * 2);
+        y_gradient = (wavefunction_2[i + side] - wavefunction_2[i - side])/(pixel_lenght * 2);
+        z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i - (side * side)])/(pixel_lenght * 2);
         }
-    Laplacian_1[size - 1] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+    Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3)/2.00;
+    for (i = size - (side * side); i < size ; i++)
+        {
+        if (size - i > 1)
+            x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - 1])/(pixel_lenght * 2);
+        else
+            x_gradient = (wavefunction_2[i] - wavefunction_2[i - 1])/pixel_lenght;
+        
+        if (size - i > side)
+            y_gradient = (wavefunction_2[i + side] - wavefunction_2[i - side])/(pixel_lenght * 2);
+        else
+            y_gradient = (wavefunction_2[i] - wavefunction_2[i - side])/pixel_lenght;
+        
+        z_gradient = (wavefunction_2[i] - wavefunction_2[i - (side * side)])/(pixel_lenght);
+        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        }
     return(0);
     }
 template <typename T>
@@ -4732,6 +4747,7 @@ unsigned int lenght_order, T x, T y, T z)
     unsigned int i, j, k, l, m, n;
     unsigned int x_contraction, y_contraction, z_contraction, x_side, y_side, z_side;
     int x_shift, y_shift, z_shift;
+
     T constant;
     T radius;
     T point_value_distance;
@@ -4871,11 +4887,9 @@ T d_x, T d_y, T d_z)
         z_1_min = z_contraction;
         z_2_min = 0;
         }
-    
     x_condition = side - x_contraction;   
     x_condition_2 = x_condition - (x_condition % 8);
-    
-        // vectorisation code
+    // vectorisation code
     if (d_x != 0 or d_y != 0 or d_z != 0)
         for (i = 0; i < (side - z_contraction); i++)
             {
@@ -4951,9 +4965,7 @@ T d_x, T d_y, T d_z)
     + result_array[6] + result_array[7]) * (-h * h)/(8 * Pi * Pi * me);
         // end of vectorisation code
     return(0);
-    
     }
-
 template <typename T>
 T basis_set_calculations<T>::Rydberg_energy(unsigned int Z, unsigned int n)
     {
@@ -6868,7 +6880,6 @@ T x_difference, T y_difference, T z_difference)
                                     break;
                                     }
                                 }
-                            
                             for (j = 0; j < atom_wavefunctions_2->n.size(); j++) 
                                 { // finding and processing electron with in the same spin-orbital and test for bonding
                                 if (atom_wavefunctions_2->n[j] == atom_wavefunctions_2->n[indexes_4[i]] and
@@ -6889,7 +6900,6 @@ T x_difference, T y_difference, T z_difference)
                 if (count_bonds <= i_2)
                     break;
                 }
-                
         if (i_1 > i_2)  // setting number of electron pairs for processing
             count_to_process = i_2;
         else
@@ -6989,28 +6999,24 @@ T basis_set_calculations<T>::Sum_atomic_wavefunctions(atom_wavefunctions *atom_w
     T x;
     T y;
     T z;
-    T Z, Z_2;
+    T Z, Z_2; // for adding inner valence shell by noble gas atoms
     T reduced_Z, reduced_Z_2;
     T count_electrons, count_electrons_2;
-    // for adding inner valence shell by noble gas atoms
     Z_2 = 0;
     reduced_Z_2 = 0;
     count_electrons_2 = 0;
     size_1 = atom_wavefunctions_1->n.size();
     size_2 = atom_wavefunctions_2->n.size();
     
-    
     if (size_1 > 0 and size_2 > 0)
         {
         x = atom_wavefunctions_2->x[0];
         y = atom_wavefunctions_2->y[0];
         z = atom_wavefunctions_2->z[0];
-        
         Z = atom_wavefunctions_2->Z[0];
         reduced_Z = atom_wavefunctions_2->reduced_Z[0];
         count_electrons = atom_wavefunctions_2->count_electrons[0];
         charge = atom_wavefunctions_2->charge[0];
-        
         Z_2 = Z;
         charge_2 = charge;
         reduced_Z_2 = reduced_Z;
@@ -9019,7 +9025,6 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     bool t24_flag, t25_flag, t26_flag, t27_flag, t28_flag, t29_flag, t30_flag;
     bool t39_flag, t40_flag, t41_flag, t42_flag, t43_flag, t44_flag, t45_flag;
     bool t54_flag, t55_flag, t56_flag, t57_flag, t58_flag, t59_flag, t60_flag;
-    
     thread t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15;
     thread t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26, t27, t28, t29, t30;
     thread t31, t32, t33, t34, t35, t36, t37, t38, t39, t40, t41, t42, t43, t44, t45;
@@ -9734,7 +9739,6 @@ bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T
     
     bool read_switch;
     bool previous_deleted;
-    
     string input;
     string character;
     string atoms_string[max_atoms];
@@ -10030,8 +10034,7 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     unsigned int i, j;
     unsigned int matrix_order;
     
-    T Hamiltonian;
-    T last_Hamiltonian;
+    T Hamiltonian, last_Hamiltonian;
     
     last_Hamiltonian = 0;
     matrix_order = results.n.size();
@@ -10164,7 +10167,6 @@ T basis_set_calculations<T>::Clear()
     determinants.clear();
     spectra_EPR.clear();
     electron_spectra.clear();
-    
     atoms.n.clear();
     atoms.l.clear();
     atoms.m.clear();
@@ -10173,7 +10175,6 @@ T basis_set_calculations<T>::Clear()
     atoms.wavefunction_coefficients.clear();
     atoms.bonding.clear();
     atoms.paired_with_previous.clear();
-    
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
@@ -10198,7 +10199,6 @@ T basis_set_calculations<T>::Clear()
     results.x.clear();
     results.y.clear();
     results.z.clear();
-    
     small_results.electron_numbers.clear();
     small_results.electron_numbers.clear();
     small_results.x.clear();
@@ -10208,7 +10208,6 @@ T basis_set_calculations<T>::Clear()
     small_results.l.clear();
     small_results.m.clear();
     small_results.Z.clear();
-    
     electron_number = 0;
     iterations = 0;
     determinant_exception_handle = 0;
@@ -10221,6 +10220,7 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
+
 /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
