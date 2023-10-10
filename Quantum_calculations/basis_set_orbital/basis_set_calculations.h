@@ -13,7 +13,6 @@ public:
     vector<T> determinants;
     vector<T> spectra_EPR;
     vector<T> electron_spectra;
-    
     const T Phi = (1.00 + sqrt(5))/2.00; // The golden ratio
     const T Pi = 4.00/sqrt(Phi); // Pi constant derived from Phi
     const T E0 = 8.8541878128E-12; // F·m^-1, m^-3·kg^-1·s^4·A^2
@@ -26,14 +25,12 @@ public:
     const T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
     const T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
     const T vector_lenght = 10.00; // constant for dimension of wavefunction vectors in Hartree lenghts
-    const unsigned int max_electrons = 1024; // constant for maximum electrons in Hartree-Fock matrix
-    const unsigned int max_atoms = 128; // constant for maximum atoms in Hartree-Fock matrix
-    
+    const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
+    const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
     unsigned int electron_number = 0;
     unsigned int iterations = 0;
     unsigned int determinant_exception_handle = 0;
     unsigned int overlap_integral_exception_handle = 0;
-    
     T nucleus_repulsive_energy;
     T relative_permitivity = 1;
     T relative_electron_mass = 1;
@@ -50,7 +47,6 @@ public:
     T* correction_matrix = nullptr;
     T* corr_basis_set_matrix = nullptr;
     T* spin_density_matrix = nullptr;
-    
     struct atom_orbitals {
     vector<unsigned int> n;
     vector<unsigned int> l;
@@ -65,7 +61,6 @@ public:
     unsigned int Z;
     T electronegativity;
     } atoms;
-    
     struct atom_wavefunctions {
     vector<T*> lenghts;
     vector<T*> wavefunctions;
@@ -93,7 +88,6 @@ public:
     vector<T> y;
     vector<T> z;
     } results;
-    
     struct small_atom_wavefunctions {
     // This structure is for generating small wavefunction vectors for integration lenght of exchange interaction
     vector<unsigned int> electron_numbers;
@@ -110,7 +104,7 @@ public:
     vector<unsigned int> Z;
     } small_results;
 public:
-// Section 1 - solving Hartree-Fock matrixes - inherited from Huckel_calculations
+// Section 1 - solving basis set matrixes - inherited from Huckel_calculations
 inline T Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2);
 T basis_set_Determinant_set(unsigned int order, T* pointer,unsigned int count, T min, T step, T* output_values);
 T basis_set_Determinant_solver(unsigned int order, T* pointer);
@@ -226,7 +220,7 @@ T Probabilities_lenght(T* probabilities, unsigned int lenght_order);
 T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order);
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
-T Integral_coulombic(T radius_1, T radius_2, T distance, T* result);
+T Integral_coulombic(T radius_1, T radius_2, T distance, T* result, bool spin_bonded);
 T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integral_nucleus_atraction(T* probabilities, T probabilities_lenght, T* result, T* lenght, T multiplier,
 unsigned int lenght_order, T lenght_x, T lenght_y, T lenght_z, unsigned int Z);
@@ -262,14 +256,14 @@ T Solve_basis_set_matrix(T* basis_set_matrix, T* overlap_integral_matrix, unsign
 vector<T>* values, atom_wavefunctions *atom_wavefunctions);
 T Solve_spin_density_matrix(T* spin_density_matrix, unsigned int order, vector<T>* energetic_levels);
 public:
-// section 6 - completing Hartree-Fock method and user interface handling
+// section 6 - completing basis set method and user interface handling
 T Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR);
 T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions);
 
 T Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
 unsigned int size_order, bool alocate);
 T String_to_list_electrons(string UI_input, unsigned int size_order,
-bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
+bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
 T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
 vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
@@ -4720,7 +4714,7 @@ unsigned int lenght_order, T x, T y, T z)
     return(0);
     }
 template <typename T>
-inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T distance,  T* result)
+inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T distance,  T* result, bool spin_bonded)
     { // Calculate the coulombic integral - potential energy of electron to proton of other atoms, aproximate
     T constant;
     T radius;
@@ -4728,11 +4722,15 @@ inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T
     
     constant = e*e/(4*Pi*E0);
     
-    if (radius_1 >= radius_2)
-        radius = radius_1 + (Phi - 1) * radius_2;
+    if (spin_bonded == true)
+        radius = radius_1 + radius_2;
     else
-        radius = radius_2 + (Phi - 1) * radius_1;
-    
+        {
+        if (radius_1 >= radius_2)
+            radius = radius_1 + (Phi - 1) * radius_2;
+        else
+            radius = radius_2 + (Phi - 1) * radius_1;
+        }
     efective_lenght = sqrt((radius * radius) + (distance * distance));
     if ((not (isnan(constant/efective_lenght))) and (not (isinf(constant/efective_lenght)))) // Check for NaN and inf values
         result[0] = constant/efective_lenght;
@@ -7146,8 +7144,8 @@ atom_wavefunctions *atom_wavefunctions)
         matrix[i] = 0;
         nucleuses[i] = 0;
         }
-    // closed-shell Hartree-Fock method optimalization code
-    for (i = 0; i < sum_electrons ; i++) // for restricted and unrestricted Hartree-Fock method
+    // closed-shell basis set method optimalization code
+    for (i = 0; i < sum_electrons ; i++) // for restricted and unrestricted basis set method
         {
         if (spin_paired[i] == -1)
             {
@@ -7355,7 +7353,7 @@ atom_wavefunctions *atom_wavefunctions)
                 
             } // subtract previous values in the row
         }
-    // closed-shell Hartree-Fock method optimalization code
+    // closed-shell basis set method optimalization code
     if (restriction == true) // copying values in restricted basis_set_method
         for (i = 0; i < order; i++)
             {
@@ -7372,7 +7370,7 @@ atom_wavefunctions *atom_wavefunctions)
                     }
                 }
             }
-    // end closed-shell Hartree-Fock method optimalization code
+    // end closed-shell basis set method optimalization code
     for (i = 0; i < order; i++) // including the wavefunctions coefficients for linear combination
         {
         matrix[i * (1 + order)] = matrix[i * (1 + order)] * wavefunction_coefficients[i] * wavefunction_coefficients[i];
@@ -7410,7 +7408,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     T* small_probabilities[max_electrons];
     T distance, radius_1, radius_2;
     bool restriction;
-    
+    bool spin_bonded;
     thread t76, t77, t78, t79, t80, t81, t82, t83, t84, t85, t86, t87, t88, t89, t90;
     bool t84_flag, t85_flag, t86_flag, t87_flag, t88_flag, t89_flag, t90_flag;
     
@@ -7449,16 +7447,20 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     for (i = 0; i < count_electrons; i++) // Using regression curve for s1 - s1 integrals
         {
         for (j = i + 1; j < count_electrons; j++)
-            if ((l[i] == 0 and l[j] == 0) or ((l[i] == 0 or l[j] == 0) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
+            if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
                 {
                 radius_1 = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
                 radius_2 = efective_radius_base[j] * wavefunction_lenght_multipliers[j];
                 distance = sqrt(((x[j] - x[i]) * (x[j] - x[i])) + ((y[j] - y[i]) * (y[j] - y[i])) + ((z[j] - z[i]) * (z[j] - z[i])))
                 * Hartree_lenght;
-                Integral_coulombic(radius_1, radius_2, distance, matrix + (i + (j * order)));
+                if (spin_paired[i] == j and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+                    spin_bonded = true;
+                else
+                    spin_bonded = false;
+                Integral_coulombic(radius_1, radius_2, distance, matrix + (i + (j * order)), spin_bonded);
                 }
         }
-    // closed-shell Hartree-Fock method optimalization code
+    // closed-shell basis set method optimalization code
     for (i = 0; i < count_electrons ; i++)
         {
         if (atom_wavefunctions->spin_paired[i] == -1)// for molecules an open-shell systems
@@ -7475,7 +7477,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             else
                 {
                 if ((bonding[i] >= 0) or spin_paired[i] > i)
-                    { // for restricted Hartree-Fock method only in bonding orbitals both electrons
+                    { // for restricted basis set method only in bonding orbitals both electrons
                     index[count_orbitals] = i;
                     count_orbitals++;
                     }
@@ -7639,7 +7641,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t90_flag = false;
             }
         } // End of multithreading code
-    // closed-shell Hartree-Fock method optimalization code 
+    // closed-shell basis set method optimalization code 
     if (restriction == true) // copy calculated values for electrons in pairs with same wavefunction pairs
         for (i = 0; i < index_size; i++)
             for (j = i + 1; j < index_size; j++)
@@ -7654,7 +7656,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
                 and bonding[index[j]] == -1)
                     matrix[spin_paired[index[i]] + ((spin_paired[index[j]]) * order)] = matrix[index[i] + (index[j] * order)];
                 }
-    // end of closed-shell Hartree-Fock method optimalization code 
+    // end of closed-shell basis set method optimalization code 
     for (i = 0; i < order; i++) // including the wavefunctions coefficients for linear combination
         for (j = 0; j < i; j++)
             {
@@ -7724,7 +7726,7 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
         }
     for (i = 0; i < (order * order); i++) // initializing matrix array
         matrix[i] = 0;
-    // closed-shell Hartree-Fock method optimalization code
+    // closed-shell basis set method optimalization code
     for (i = 0; i < count_electrons ; i++)
         {
         if (atom_wavefunctions->spin_paired[i] == -1)// for molecules an open-shell systems
@@ -7741,7 +7743,7 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
             else
                 {
                 if ((bonding[i] >= 0) or spin_paired[i] > i)
-                    { // for restricted Hartree-Fock method only in bonding orbitals both electrons
+                    { // for restricted basis set method only in bonding orbitals both electrons
                     index[count_orbitals] = i;
                     count_orbitals++;
                     }
@@ -7795,7 +7797,7 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
                     }
             }
         index_2_size = k;
-        // end of closed-shell Hartree-Fock method optimalization code    
+        // end of closed-shell basis set method optimalization code    
         // multithreading code        
         for (j = 0; (j + 7) < index_2_size; j = j + 8)
             { // calculate overlap integrals multithread
@@ -7932,7 +7934,7 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
             t105_flag = false;
             }
         } // end of multithreading code
-    // closed-shell Hartree-Fock method optimalization code 
+    // closed-shell basis set method optimalization code 
     if (restriction == true) // copy calculated values for electrons in pairs with same wavefunction pairs
         for (i = 0; i < index_size; i++)
             for (j = i + 1; j < index_size; j++)
@@ -7947,7 +7949,7 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
                 and bonding[index[j]] == -1)
                     matrix[spin_paired[index[i]] + ((spin_paired[index[j]]) * order)] = matrix[index[i] + (index[j] * order)];
                 }
-    // end of closed-shell Hartree-Fock method optimalization code 
+    // end of closed-shell basis set method optimalization code 
     for (i = 0; i < order; i++) // copy 1 absolute value for electrons in pairs with same wavefunction pairs
         if ((restriction == true) and (spin_paired[i] >= i) and  (bonding[i] == -1))
         matrix[i + spin_paired[i] * order] = 1;
@@ -8340,7 +8342,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
         matrix[i * (1 + order)] = (h * h)/(8 * Pi * Pi * me * Hartree_lenght * Hartree_lenght) *
         (Z[i] * Z[i] * wavefunction_lenght_multipliers[i])/(n[i] * n[i]) * wavefunction_coefficients[i]; 
         }
-    // closed-shell Hartree-Fock method optimalization code
+    // closed-shell basis set method optimalization code
     for (i = 0; i < count_electrons ; i++)
         {
         if (atom_wavefunctions->spin_paired[i] == -1)// for molecules an open-shell systems
@@ -8357,7 +8359,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
             else
                 {
                 if ((bonding[i] >= 0) or spin_paired[i] > i)
-                    { // for restricted Hartree-Fock method only in bonding orbitals both electrons
+                    { // for restricted basis set method only in bonding orbitals both electrons
                     index[count_orbitals] = i;
                     count_orbitals++;
                     }
@@ -8520,7 +8522,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
             t135_flag = false;
             }
         } // End of multithreading code
-    // closed-shell Hartree-Fock method optimalization code 
+    // closed-shell basis set method optimalization code 
     if (restriction == true) // copy calculated values for electrons in pairs with same wavefunction pairs
         for (i = 0; i < index_size; i++)
             for (j = i + 1; j < index_size; j++)
@@ -8535,7 +8537,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
                 and bonding[index[j]] == -1)
                     matrix[spin_paired[index[i]] + ((spin_paired[index[j]]) * order)] = matrix[index[i] + (index[j] * order)];
                 }
-    // end of closed-shell Hartree-Fock method optimalization code 
+    // end of closed-shell basis set method optimalization code 
     for (i = 0; i < order; i++) // including the wavefunctions coefficients for linear combination
         for (j = 0; j < i; j++)
             { // Correct two electron kinetic energie according to lenghts
@@ -8831,7 +8833,7 @@ T basis_set_calculations<T>::Solve_spin_density_matrix(T* spin_density_matrix, u
     
     return(0);
     }
-// end of section 5 - generating matrices of integrals and Fock matrices, section 6: completing Hartree-Fock method
+// end of section 5 - generating matrices of integrals and Fock matrices, section 6: completing basis set method
 // and user interface handling
 template <typename T>
 T basis_set_calculations<T>::Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR)
@@ -9070,7 +9072,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     t60_flag = false;
     restriction = true;
     
-    for (i = 0; i < count_electrons; i++) // Switch between restricted and unrestricted Hartree-Fock method
+    for (i = 0; i < count_electrons; i++) // Switch between restricted and unrestricted basis set method
         {
         if (atom_wavefunctions->spin_paired[i] == -1)
             restriction = false;
@@ -9082,7 +9084,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         constraints[i] = atom_wavefunctions->wavefunction_constraints[i];
         electron_numbers[i] = atom_wavefunctions->electron_numbers[i];
         }
-    // closed-shell Hartree-Fock method optimalization code
+    // closed-shell basis set method optimalization code
     j = 0;
     if (restriction == true)
         {
@@ -9145,7 +9147,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 pointers_to_Laplacians[index[i]] = pointer_to_Laplacian;
                 if (restriction == true and (spins[spin_paired[index[i]]] == -0.5)
                     and (bonding[index[i]] == -1 or Z[index[i]] == Z[bonding[index[i]]]))
-                    {  // for restricted Hartree-Fock method
+                    {  // for restricted basis set method
                     pointers_to_lenghts[spin_paired[index[i]]] = pointer_to_lenght;
                     pointers_to_wavefunctions[spin_paired[index[i]]] = pointer_to_wavefunction;
                     pointers_to_probabilities[spin_paired[index[i]]] = pointer_to_probability;
@@ -9265,7 +9267,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
             {
             multipliers[i] = atom_wavefunctions->wavefunction_lenght_multipliers[index[i]];
             multiplier_array[i] = (vector_lenght/size_order) * multipliers[i];
-            } // end of closed-shell Hartree-Fock method optimalization code
+            } // end of closed-shell basis set method optimalization code
     for (i = 0; i < small_atom_wavefunctions_size; i++) // Generating small wavefunctions
         { 
         Orbitals_to_wavefunctions(small_atom_wavefunctions->n[i], small_atom_wavefunctions->l[i], small_atom_wavefunctions->m[i],
@@ -9704,13 +9706,13 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         }
     // end of multithreading code
     
-    // closed-shell Hartree-Fock method optimalization code    
+    // closed-shell basis set method optimalization code    
     for (i = 0; i < count_orbitals; i++)
         if (restriction == true and (spins[spin_paired[index[i]]] == -0.5)
-        and (bonding[index[i]] == -1 or Z[index[i]] == Z[bonding[index[i]]])) // for restricted Hartree-Fock method
+        and (bonding[index[i]] == -1 or Z[index[i]] == Z[bonding[index[i]]])) // for restricted basis set method
             efective_radius_base_array[spin_paired[index[i]]] = efective_radius_base_array[index[i]];
                 
-    // end of closed-shell Hartree-Fock method optimalization code
+    // end of closed-shell basis set method optimalization code
     if (alocate == true)
         {
         for (i = 0; i < count_electrons; i++) // copy values to vectors for restricted and unrestricted method
@@ -9726,7 +9728,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     }
 template <typename T>
 T basis_set_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
-bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
+bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     {
     unsigned int i, j, k;
     unsigned int last_readed_index;
@@ -9776,7 +9778,6 @@ bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T
         if (Atom_orbitals_generate(input, &atoms) != -1)
             {
             Create_atomic_wavefunctions(&atoms, &results, size_order, 0, 0, 0);
-            Generate_atomic_wavefunctions(&results, &small_results, size_order, true);
             matrix_order = atoms.n.size();
             }
         else
@@ -9940,9 +9941,6 @@ bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T
                 }
         for (i = 0; i < count_atoms; i++) // sumarizing wavefunctions
             Sum_atomic_wavefunctions(&results, &wavefunctions[i]);
-        if (generate == true)
-            if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
-                return(-1);
         }
     try {
         nuclear_atraction_integral_matrix = new T[matrix_order * matrix_order];
@@ -10033,7 +10031,6 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     {
     unsigned int i, j;
     unsigned int matrix_order;
-    
     T Hamiltonian, last_Hamiltonian;
     
     last_Hamiltonian = 0;
@@ -10041,6 +10038,10 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     memset(basis_set_matrix, 0, matrix_order * matrix_order);
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
+    
+    if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
+        return(-1);
+    
     for (i = 0; i < max_iterations + 1; i++)
         {
         iterations++;
@@ -10220,7 +10221,6 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-
 /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.

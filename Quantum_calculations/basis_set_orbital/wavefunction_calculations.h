@@ -63,7 +63,7 @@ private:
     T Create_crystal_field(central_cations *central_cations);
 public:
     T String_to_advanced_parameters(string UI_input, unsigned int size_order,
-    bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
+    bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
     T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
     vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
     T Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, vector<unsigned int> atom_numbers);
@@ -346,7 +346,7 @@ T Wavefunction_calculations<T>::Create_crystal_field(central_cations *central_ca
     }
 template <typename T>
 T Wavefunction_calculations<T>::String_to_advanced_parameters(string UI_input, unsigned int size_order,
-    bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
+    bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     { // kompletně přepsat
     unsigned int i, j, k;
     unsigned int last_readed_index;
@@ -377,7 +377,7 @@ T Wavefunction_calculations<T>::String_to_advanced_parameters(string UI_input, u
     count_hybridization = 0;
     count_central_cations = 0;
     
-    if (this->String_to_list_electrons(UI_input, size_order, extern_coordinates, generate, x_2, y_2, z_2) == -1)
+    if (this->String_to_list_electrons(UI_input, size_order, extern_coordinates, x_2, y_2, z_2) == -1)
         return(-1); // generate list of electons and check of first input string by function from parrent class
      
     read_switch = false;

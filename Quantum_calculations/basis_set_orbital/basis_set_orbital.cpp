@@ -59,10 +59,10 @@ cout<<"     #@@@@@@@@@@@@@@&                                                    
 cout<<"                                                                                                    " <<endl;
 cout<< endl;
 
-cout<<"Program for Hartree-Fock energy levels calculation of atoms, ions and molecules." <<endl;
-cout<<"Program pro Hartree-Fockovy výpočty energetických hladin atomů, iontů a molekul." <<endl;
-cout<<"Programm zur Hartree-Fock-Berechnung von Energieniveaus von Atomen, Ionen und Molekülen." <<endl;
-cout<<"Программа для расчетов Хартри-Фока энергетических уровней атомов, ионов и молекул." <<endl;
+cout<<"Program for basis set of wavefunctions calculation of atoms, ions and molecules." <<endl;
+cout<<"Program pro výpočty základní sady vlnových funkcí atomů, iontů a molekul." <<endl;
+cout<<"Programm zur Grundsatz von Wellenfunktionen Berechnung von Atomen, Ionen und Molekülen." <<endl;
+cout<<"Программа для расчеты базовый набор волновых функций уровней атомов, ионов и молекул." <<endl;
 cout<< endl;
 
 if (argc > 9) // load list of excitations from parameters
@@ -113,7 +113,7 @@ else
     lenght_order = stoi(argv[4]);
     }
     
-success = Wavefunction_calculations.String_to_advanced_parameters(input, lenght_order, false, true,
+success = Wavefunction_calculations.String_to_advanced_parameters(input, lenght_order, false,
 nullptr, nullptr, nullptr);
 if (success == 0)
     {
@@ -127,6 +127,8 @@ if (success == 0)
             Wavefunction_calculations.results.m[number_electrons[i]] = m[i];
         if (spins[i] == 0.5 or spins[i] == -0.5)
             Wavefunction_calculations.results.spins[number_electrons[i]] = spins[i];
+        
+        Wavefunction_calculations.results.spin_paired[number_electrons[i]] = -1;
         }
     Hamiltonian = Wavefunction_calculations.Execute_calculation(max_iterations, fidelity, lenght_order, false,
     &values, &spin_density_matrix, &spin_values);
