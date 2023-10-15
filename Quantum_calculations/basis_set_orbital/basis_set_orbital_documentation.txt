@@ -1,5 +1,5 @@
-basis_set_calculations code documentation version 1.00
-class Hartree_Fock_calculations:
+basis_set_calculations code documentation version 1.11
+class basis_set_calculations:
 
 public variables and constants:
 vector<T> determinants;
@@ -95,13 +95,13 @@ Pointer to overlap_efective_lenght_integral_matrix (count_electrons * count_elec
 T* resonance_integral_matrix;
 Pointer to resonance integral matrix (count_electrons * count_electrons)
 
-T* Hartree_Fock_matrix;
+T* basis_set_matrix;
 Pointer to Hartree-Fock matrix (count_electrons * count_electrons)
 
 T* correction_matrix;
-Pointer to correction matrix (count_electrons * count_electrons) to calculate post_Hartree_Fock_matrix
+Pointer to correction matrix (count_electrons * count_electrons) to calculate post_basis_set_matrix
 
-T* post_Hartree_Fock_matrix;
+T* post_basis_set_matrix;
 Pointer to post_Hartree-Fock matrix (count_electrons * count_electrons)
 
 T* spin_density_matrix;
@@ -268,13 +268,13 @@ inline T Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, 
 This function return determinant of matrix, variable order means order of matrix, pointer is reference to matrix of size order * order,
 buffer, denominator, temp1 and temp2 are variables for storing temporary data of size order * order.
 
-T Hartree_Fock_Determinant_set(unsigned int order, T* pointer,unsigned int count, T min, T step, T* output_values)
+T basis_set_Determinant_set(unsigned int order, T* pointer,unsigned int count, T min, T step, T* output_values)
 
 This function create array of determinants of matrix with increased values added to matrix diagonal.
 Variable order means order of matrix, pointer is reference to matrix of size order * order, count is count of values,
 min is initial value, step is difference between two values and output_values is array for results.
 
-T Hartree_Fock_Determinant_solver(unsigned int order, T* pointer)
+T basis_set_Determinant_solver(unsigned int order, T* pointer)
 
 This function solve roots of matrix with diagonal increasing between -4 and 4.
 Variable order means order of matrix, pointer is reference to matrix of size order * order,
@@ -462,16 +462,16 @@ T Calculate_kinetic_integral_matrix(T* matrix, unsigned int order, atom_wavefunc
 This function generate kinetic integral matrix into array matrix of size order * order for
 *atom_wavefunctions.
 
-T Calculate_Hartree_Fock_matrix(T* nuclear_atraction_integral_matrix, T* coulombic_integral_matrix, T* resonance_integral_matrix,
-T* kinetic_integral_matrix,  T* Hartree_Fock_matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions)
+T Calculate_basis_set_matrix(T* nuclear_atraction_integral_matrix, T* coulombic_integral_matrix, T* resonance_integral_matrix,
+T* kinetic_integral_matrix,  T* basis_set_matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions)
     
-This function generate Hartree-Fock matrix into array Hartree_Fock_matrix by adding arrays nuclear_atraction_integral_matrix,
+This function generate Hartree-Fock matrix into array basis_set_matrix by adding arrays nuclear_atraction_integral_matrix,
 coulombic_integral_matrix, resonance_integral_matrix and T* kinetic_integral_matrix, of size order * order for atom_wavefunctions.
 In generated Hartree-Fock matrix is added spin-orbit interaction for open-shell systems.
 
-T Calculate_Post_Hartree_Fock_matrix(T* Hartree_Fock_matrix, T* correction_matrix, T* post_Hartree_Fock_matrix, unsigned int order)
+T Calculate_Post_basis_set_matrix(T* basis_set_matrix, T* correction_matrix, T* post_basis_set_matrix, unsigned int order)
 
-This function generate post Hartree-Fock matrix into array post_Hartree_Fock_matrix by adding arrays Hartree_Fock_matrix
+This function generate post Hartree-Fock matrix into array post_basis_set_matrix by adding arrays basis_set_matrix
 and correction_matrix of size order * order.
 
 T Calculate_spin_density_matrix(T* overlap_integral_matrix, T* spin_density_matrix, unsigned int order,
@@ -480,10 +480,10 @@ T Calculate_spin_density_matrix(T* overlap_integral_matrix, T* spin_density_matr
 This function generate post spin density matrix into array spin_density_matrix by multiplying array overlap_integral_matrix by spin sign
 from atom_wavefunctions. Arrays are of size order * order.
 
-T Solve_Hartree_Fock_matrix(T* Hartree_Fock_matrix, T* overlap_integral_matrix, unsigned int order,
+T Solve_basis_set_matrix(T* basis_set_matrix, T* overlap_integral_matrix, unsigned int order,
     vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     
-This function solve Hartree-Fock matrix in array post_Hartree_Fock_matrix according array overlap_integral_matrix for atom_wavefunctions
+This function solve Hartree-Fock matrix in array post_basis_set_matrix according array overlap_integral_matrix for atom_wavefunctions
 into vector values and set new values of wavefunction_lenght_multipliers in atom_wavefunctions. Arrays are of size order * order.
 
 T Solve_spin_density_matrix(T* spin_density_matrix, unsigned int order,
@@ -507,7 +507,7 @@ This function generate Lenghts, Wavefunctions and Probabilities cube arrays for 
 Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays
 and alocate is true for initial calling.
 
-T Hartree_Fock_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
+T basis_set_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
     bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
 
 Function String_to_list_electrons convert input string to list of electrons in class structure results.
@@ -515,7 +515,7 @@ Variable UI_input is input string, size_order is the lenght orders (number of pi
 wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
 If generate is true, then wavefunctions are generated.
 
-T Hartree_Fock_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
 vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 
 Function Calculate run Hartree-Fock calculation.
@@ -530,7 +530,7 @@ Functions in section 6 calls functions in sections 2, 5 and 5.
 Functions in section 5 calls functions in sections 3 and 1.
 For all sections are used public variables and constants.
 
-T Hartree_Fock_calculations<T>::Clear();
+T basis_set_calculations<T>::Clear();
 This function free the memory.
 
 class wavefunction_calculations:
@@ -684,3 +684,65 @@ This function test the center symetry, find symetry axes and symetry planes and 
 T* D3_vector_multiply(T* a, T* b, T* c);
 
 This function returns the vector multiple of three-dimensional vectors pointered by a and b into vector pointered by c.
+//  Density functional theory section
+vector <T*> atoms_electron_densities; - This vector contains electron densities cubes of atoms.
+vector <T*> atoms_spin_densities;- This vector contains spin densities cubes of atoms.
+vector <T*> atoms_Ksi_densities; - This vector contains Ksi densities cubes of atoms.
+vector <T*> atoms_gradients_densities; - This vector contains electron densities cubes of atoms.
+vector <T> HF_exchange_energies; - This vector contains electron exchange energies from integrals.
+vector <T> exchange_energies; - This vector contains electron exchange energies from density functional.
+vector <T> correlation_energies; - This vector contains electron correlation energies from density functional.
+vector <T> electron_energies; - This vector contains total electron energies.
+    
+array<T, 118> Wigner_Seitz_radiuses - This array contains Wigner-Seitz radiuses of elements.
+
+T beta = 0.066725; - scalable argument
+T gamma = (1 - log(2))/(this->Pi * this->Pi); - scalable argument, equal 0.031091, scalable argument to 0.025
+T omega = 0.046644; - scalable argument
+
+T Alocate_densities(unsigned int size_order);
+This function alocate densities cubes.
+
+T Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end, unsigned int atom_size,
+vector<T> spins, vector<int> spin_paired, bool spin_density);
+
+This function compute atom electron densities or atom spin densities cubes from primary electron densities cubes.
+
+T Compute_densities(vector<T*> densities, vector<T*> atoms_densities, vector<unsigned int> index,
+unsigned int size_order, vector<T> spins, vector<int> spin_paired, bool spin_density);
+
+This function compute atom electron densities or atom spin densities cubes from primary electron densities cubes by multithreading.
+
+T Correct_densities(vector<T*> atoms_densities_list, vector<T>  x, vector <T> y, vector <T> z, unsigned int size_order);
+
+This function correct atom electron densities or atom spin densities cubes from primary electron densities cubes by multithreading.
+The correction is by adding overlaping densities from other atoms.
+
+T Compute_Ksi_thread(T* spin_density, T* electron_density, T* Ksi_density, unsigned int size_order);
+
+This function compute atom Ksi density from atom densities cubes.
+
+T Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order);
+
+This function compute atom gradient density from atom densities cubes.
+
+T Compute_Ksi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
+vector<T*> atoms_Ksi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
+
+This function compute atom gradient and Ksi densities from atom densities cubes by multithreading.
+    
+T PBE_thread(T* atoms_gradients_density, T* atoms_Ksi_density, T* electron_density,
+unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius);
+
+This function compute exchange and correction energy for electron with electron density in electron_density.
+
+T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities, vector<T*> electron_densities,
+unsigned int size_order);
+
+This function compute exchange and correction energies by multithreading.
+
+T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values);
+
+This function execute computation of PBE density functional, equivalent to Execute_calculation.
+//  End of density functional theory section

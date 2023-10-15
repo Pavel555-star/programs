@@ -24,13 +24,13 @@ public:
     const T c = 299796000; // m·s^-1
     const T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
     const T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
-    const T vector_lenght = 10.00; // constant for dimension of wavefunction vectors in Hartree lenghts
     const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
     unsigned int electron_number = 0;
     unsigned int iterations = 0;
     unsigned int determinant_exception_handle = 0;
     unsigned int overlap_integral_exception_handle = 0;
+    T vector_lenght = 5.00; // constant for dimension of wavefunction vectors in Hartree lenghts
     T nucleus_repulsive_energy;
     T relative_permitivity = 1;
     T relative_electron_mass = 1;
@@ -4585,6 +4585,8 @@ unsigned int lenght_order, T x, T y, T z)
     x_contraction = abs(x * lenght_order/vector_lenght);
     y_contraction = abs(y * lenght_order/vector_lenght);
     z_contraction = abs(z * lenght_order/vector_lenght);
+    if (x_contraction >= side or y_contraction >= side  or z_contraction >= side)
+        return(-1);
     
     size = (side - x_contraction) * (side - y_contraction) * (side - z_contraction);
     try {
@@ -4723,13 +4725,18 @@ inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T
     constant = e*e/(4*Pi*E0);
     
     if (spin_bonded == true)
-        radius = radius_1 + radius_2;
+        {
+        if (radius_1 >= radius_2)
+            radius = radius_1 + (radius_2 * 8.00/9.00);
+        else
+            radius = radius_2 + (radius_1 * 8.00/9.00);
+        }
     else
         {
         if (radius_1 >= radius_2)
-            radius = radius_1 + (Phi - 1) * radius_2;
+            radius = radius_1 + 2.00/3.00 * radius_2;
         else
-            radius = radius_2 + (Phi - 1) * radius_1;
+            radius = radius_2 + 2.00/3.00 * radius_1;
         }
     efective_lenght = sqrt((radius * radius) + (distance * distance));
     if ((not (isnan(constant/efective_lenght))) and (not (isinf(constant/efective_lenght)))) // Check for NaN and inf values
@@ -7085,7 +7092,6 @@ atom_wavefunctions *atom_wavefunctions)
     unsigned int sum_electrons;
     unsigned int matrix_shift;
     unsigned int ind_nuc_size;
-    
     unsigned int index[max_electrons]; // Index of electrons positions forcomputing nuclear atraction integrals
     unsigned int ind_nuc[max_electrons + 1]; // Index of nucleuses
     
@@ -7392,7 +7398,6 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     unsigned int index_size, index_2_size;
     unsigned int index[max_electrons];
     unsigned int index_2_array[max_electrons];
-    
     T wavefunction_coefficients[max_electrons];
     T efective_radius_base[max_electrons];
     T wavefunction_lenght_multipliers[max_electrons];
@@ -7440,14 +7445,14 @@ small_atom_wavefunctions *small_atom_wavefunctions)
         z[i] = atom_wavefunctions->z[i];
         small_probabilities[i] = small_atom_wavefunctions->probabilities[i];
         }
-        
     for (i = 0; i < (order * order); i++) // Initializing matrix array
         matrix[i] = 0;
         
     for (i = 0; i < count_electrons; i++) // Using regression curve for s1 - s1 integrals
         {
         for (j = i + 1; j < count_electrons; j++)
-            if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
+            if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+            or spin_paired[i] == j)
                 {
                 radius_1 = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
                 radius_2 = efective_radius_base[j] * wavefunction_lenght_multipliers[j];
@@ -8603,7 +8608,7 @@ unsigned int order, atom_wavefunctions *atom_wavefunctions)
         if (spin_paired[i] == -1)
             {
             for (j = 0; j < order; j++)
-                potential_energy[i] = potential_energy[i] + basis_set_matrix[(i * order) + j];
+                potential_energy[i] = kinetic_integral_matrix[(i * order) + j];
                 
             for (j = 0; j < order; j++)
                 {
@@ -8676,6 +8681,15 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     T overlaps[max_electrons];
     T Eigenvectors[max_electrons];
     T Hamiltonian = 0;
+    T new_old_iteration_ratio[] =  {0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250,
+    0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250, 0.250};
     
     unsigned int* n = atom_wavefunctions->n.data();
     unsigned int* l = atom_wavefunctions->l.data();
@@ -8801,14 +8815,11 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
         {
         if ((Z[i] - charge[i]))
             multiplier_constant = 1.00/sqrt(Z[i] - charge[i]);
-        
-        if (l[i] > 0)
-            multiplier_constant = multiplier_constant * (1.00 - (T(l[i] * (l[i] + 1))/T(2 * n[i] * n[i])))/1.00;
             
         if (Eigenvectors[i] != 0 and -correction_matrix[i * (1 + order)] != Rydberg_energy(Z[i], n[i]) and constraints[i] == 0)
             {
-            multiplier = sqrt(wavefunction_lenght_multipliers[i]) * sqrt(sqrt(abs(Rydberg_energy(Z[i], n[i])
-            /Eigenvectors[i] * multiplier_constant)));
+            multiplier = pow(wavefunction_lenght_multipliers[i], 1 - new_old_iteration_ratio[Z[i] - charge[i]]) *
+            pow(sqrt(abs(Rydberg_energy(Z[i], n[i]) /Eigenvectors[i] * multiplier_constant)), new_old_iteration_ratio[Z[i] - charge[i]]);
             if (multiplier > 1.00/1024 and multiplier < 1024)
                 wavefunction_lenght_multipliers[i] = multiplier;
             }
@@ -8841,31 +8852,26 @@ T basis_set_calculations<T>::Atom_orbitals_generate(string UI_input, atom_orbita
     unsigned int i;
     unsigned int input_size;
     unsigned int element_number;
-    
     int shift, sign, string_position;
     vector<int> positions_to_erase;
     string input, shift_string;
     bool found;
-    
     struct numbers {
     vector<unsigned int> numbers;
     string text;
     } numbers;
     numbers.numbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     numbers.text = {"0123456789"};
-    
     struct signs {
     vector<int> sign;
     string text;
     } signs;
     signs.sign = { 1, -1};
     signs.text = {"+-"};
-    
     struct order_elements {
     vector<unsigned int> numbers;
     vector<string> elements;
     } order_elements;
-    
     order_elements.numbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
     21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
     51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
@@ -8930,7 +8936,14 @@ T basis_set_calculations<T>::Atom_orbitals_generate(string UI_input, atom_orbita
     (element_number < 54 and (element_number + shift) > 54) or
     (element_number < 86 and (element_number + shift) > 86))
         return(-1);
-        
+    
+    if (element_number > 10 and vector_lenght < 10) // Simulations for large space
+        vector_lenght = 10;
+    if (element_number > 36 and vector_lenght < 15)
+        vector_lenght = 15;
+    if (element_number > 86 and vector_lenght < 20)
+        vector_lenght = 20;
+    
     input.clear();
     input = order_elements.elements[element_number + shift];
     Atoms_to_valence_orbitals(input, atom_orbitals_PTR);
@@ -8944,7 +8957,6 @@ T basis_set_calculations<T>::Nucleus_repulsive_energy(atom_wavefunctions *atom_w
     {
     unsigned int i, j;
     unsigned int sum_electrons;
-    
     vector<unsigned int> ind_nuc;
     T square_lenght;
     T energy;
@@ -8986,13 +8998,11 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     unsigned int count_electrons;
     unsigned int wavefunction_size;
     unsigned int spin_paired_electron_index;
-    
     unsigned int n_i[max_electrons];
     unsigned int l_i[max_electrons];
     int m_i[max_electrons];
     unsigned int Z[max_electrons];
     unsigned int Z_i[max_electrons];
-    
     T* pointers_to_lenghts[max_electrons];
     T* pointers_to_wavefunctions[max_electrons];
     T* pointers_to_probabilities[max_electrons];
@@ -9001,11 +9011,9 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     T* pointer_to_wavefunction;
     T* pointer_to_probability;
     T* pointer_to_Laplacian;
-    
     unsigned int small_lenght_order;
     unsigned int small_wavefunction_size;
     unsigned int small_atom_wavefunctions_size;
-    
     T* small_lenghts[max_electrons];
     T* small_wavefunctions[max_electrons];
     T* small_probabilities[max_electrons];
@@ -9022,7 +9030,6 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     unsigned int constraints[max_electrons];
     unsigned int electron_numbers[max_electrons];
     bool restriction;
-    
     bool t9_flag, t10_flag, t11_flag, t12_flag, t13_flag, t14_flag, t15_flag;
     bool t24_flag, t25_flag, t26_flag, t27_flag, t28_flag, t29_flag, t30_flag;
     bool t39_flag, t40_flag, t41_flag, t42_flag, t43_flag, t44_flag, t45_flag;
@@ -9705,13 +9712,11 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         t60_flag = false;
         }
     // end of multithreading code
-    
     // closed-shell basis set method optimalization code    
     for (i = 0; i < count_orbitals; i++)
         if (restriction == true and (spins[spin_paired[index[i]]] == -0.5)
         and (bonding[index[i]] == -1 or Z[index[i]] == Z[bonding[index[i]]])) // for restricted basis set method
             efective_radius_base_array[spin_paired[index[i]]] = efective_radius_base_array[index[i]];
-                
     // end of closed-shell basis set method optimalization code
     if (alocate == true)
         {
@@ -9738,7 +9743,6 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     unsigned int count_coordinates;
     unsigned int count_bonds;
     unsigned int count_potentials;
-    
     bool read_switch;
     bool previous_deleted;
     string input;
@@ -9751,14 +9755,11 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     vector<atom_wavefunctions> wavefunctions;
     vector<T> x, y, z;
     vector<T> potentials;
-    
     const string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-";
     const string numbers = "+-0123456789.";
     const string begin_brackets = "([{<";
     const string end_brackets = ")]}>";
-    
-    struct bond
-    { // for molecules
+    struct bond { // for molecules
     vector<unsigned int> atom_1;
     vector<unsigned int> atom_2;
     vector<unsigned int> bond_count;
@@ -10038,7 +10039,6 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     memset(basis_set_matrix, 0, matrix_order * matrix_order);
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
-    
     if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
         return(-1);
     
