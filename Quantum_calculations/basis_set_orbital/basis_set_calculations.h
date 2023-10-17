@@ -15,15 +15,15 @@ public:
     vector<T> electron_spectra;
     const T Phi = (1.00 + sqrt(5))/2.00; // The golden ratio
     const T Pi = 4.00/sqrt(Phi); // Pi constant derived from Phi
-    const T E0 = 8.8541878128E-12; // F·m^-1, m^-3·kg^-1·s^4·A^2
-    const T h = 6.62607015E-34; // J·s , kg·m^2/s
-    const T vacuum_permeability = 1.25663706212E-6; // N·A^−2, kg·m·s^-2·A^−2
-    const T e = 1.602176634E-19; // C
-    const T me = 9.1093837E-31;
-    const T mp = 1.67262192E-27;
-    const T c = 299796000; // m·s^-1
-    const T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
-    const T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
+    T E0 = 8.8541878128E-12; // F·m^-1, m^-3·kg^-1·s^4·A^2
+    T h = 6.62607015E-34; // J·s , kg·m^2/s
+    T vacuum_permeability = 1.25663706212E-6; // N·A^−2, kg·m·s^-2·A^−2
+    T e = 1.602176634E-19; // C
+    T me = 9.1093837E-31;
+    T mp = 1.67262192E-27;
+    T c = 299796000; // m·s^-1
+    T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
+    T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
     const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
     unsigned int electron_number = 0;
@@ -121,23 +121,18 @@ T Wavefunction_7s_generate(T* wavefunction, T* lenghts, bool alocate, unsigned i
 T Wavefunction_2px_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_2pz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_2py_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_3px_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_3pz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_3py_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_4px_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4pz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4py_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_5px_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5pz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5py_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_6px_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6pz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6py_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_7px_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7pz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7py_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -147,25 +142,21 @@ T Wavefunction_3dxz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned
 T Wavefunction_3dz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_3dyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_3dxy_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_4dx2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4dxz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4dz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4dyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4dxy_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_5dx2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5dxz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5dz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5dyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5dxy_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_6dx2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6dxz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6dz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6dyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6dxy_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_7dx2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7dxz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7dz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -179,7 +170,6 @@ T Wavefunction_4fz3_generate(T* wavefunction, T* lenghts, bool alocate, unsigned
 T Wavefunction_4fyz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4fxyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
  T Wavefunction_4fy_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_5fx_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5fz_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5fxz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -187,7 +177,6 @@ T Wavefunction_5fz3_generate(T* wavefunction, T* lenghts, bool alocate, unsigned
 T Wavefunction_5fyz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5fxyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5fy_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_6fx_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6fz_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6fxz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -195,7 +184,6 @@ T Wavefunction_6fz3_generate(T* wavefunction, T* lenghts, bool alocate, unsigned
 T Wavefunction_6fyz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6fxyz_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_6fy_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
 T Wavefunction_7fx_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7fz_x2_y2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7fxz2_generate(T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -208,7 +196,6 @@ T Wavefunction_normalize(T* wavefunction_pointer, T normalisation_constant, unsi
 T Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts,
 bool alocate, unsigned int Z, T multiplier);
 T Set_Hartree_length(unsigned int Z);
-
 // Section 3 - mathematical operation for wavefunctions, probabilities densities and integrals
 unsigned int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
 unsigned int lenght_order, T d_x, T d_y, T d_z);
@@ -229,7 +216,6 @@ T Rydberg_energy(unsigned int Z, unsigned int n);
 T Orbital_moment_energy(int m, T* B0);
 T Spin_moment_energy(T s, T B0);
 T Orbital_magnetic_field(T potential_energy, T radius, int l);
-
 // Section 4 - generating lists of electrons
 T Quantum_numbers_to_orbitals(unsigned int n, unsigned int l, int fulness, atom_orbitals* atom_orbitals_PTR);
 T Atoms_to_valence_orbitals(string atom, atom_orbitals* atom_orbitals_PTR);
@@ -238,7 +224,6 @@ unsigned int size_order,T x,T y,T z);
 T Create_bond_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2,
 unsigned int count, T electronegativity_1, T electronegativity_2, T x_diference, T y_diference, T z_diference);
 T Sum_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2);
-
 // section 5 - generating matrices of integrals and Fock matrices
 T Create_nuclear_atraction_integral_matrix(T* matrix, T* nucleuses, unsigned int order, atom_wavefunctions *atom_wavefunctions);
 T Create_coulombic_integral_matrix(T* matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
@@ -259,12 +244,11 @@ public:
 // section 6 - completing basis set method and user interface handling
 T Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR);
 T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions);
-
 T Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
 unsigned int size_order, bool alocate);
 T String_to_list_electrons(string UI_input, unsigned int size_order,
 bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
-T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool alocate,
 vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();
@@ -4727,16 +4711,16 @@ inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T
     if (spin_bonded == true)
         {
         if (radius_1 >= radius_2)
-            radius = radius_1 + (radius_2 * 8.00/9.00);
+            radius = radius_1 + (radius_2 * (Phi + 1)/3.00);
         else
-            radius = radius_2 + (radius_1 * 8.00/9.00);
+            radius = radius_2 + (radius_1 * (Phi + 1)/3.00);
         }
     else
         {
         if (radius_1 >= radius_2)
-            radius = radius_1 + 2.00/3.00 * radius_2;
+            radius = radius_1 + (Phi - 1) * radius_2;
         else
-            radius = radius_2 + 2.00/3.00 * radius_1;
+            radius = radius_2 + (Phi - 1) * radius_1;
         }
     efective_lenght = sqrt((radius * radius) + (distance * distance));
     if ((not (isnan(constant/efective_lenght))) and (not (isinf(constant/efective_lenght)))) // Check for NaN and inf values
@@ -7452,7 +7436,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
         {
         for (j = i + 1; j < count_electrons; j++)
             if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
-            or spin_paired[i] == j)
+            or (spin_paired[i] == j and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
                 {
                 radius_1 = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
                 radius_2 = efective_radius_base[j] * wavefunction_lenght_multipliers[j];
@@ -8063,9 +8047,9 @@ small_atom_wavefunctions *small_atom_wavefunctions)
                     radius_1 = efective_radius_base[i]/wavefunction_lenght_multipliers[i];
                     radius_2 = efective_radius_base[j]/wavefunction_lenght_multipliers[j];
                     if (radius_1 >= radius_2)
-                        radius = radius_1 + (Phi - 1) * radius_2;
+                        radius = radius_1 + (Phi + 1)/3.00 * radius_2;
                     else
-                        radius = radius_2 + (Phi - 1) * radius_1;  
+                        radius = radius_2 + (Phi + 1)/3.00 * radius_1;  
                     efective_lenght = radius * (1.481178577 - (0.700616171 * abs(overlap_matrix[(i * order) + j]))
                     + (0.224068020 * abs(overlap_matrix[(i * order) + j]) * abs(overlap_matrix[(i * order) + j])));
                     overlap_efective_lenght_integral_matrix[(i * order) +j] = efective_lenght;
@@ -8222,7 +8206,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
         for (j = 0; j < i; j++)
             if ((overlap_matrix[(i * order) + j] != 0) and (bonding[i] >= 0 or antibonding[i] >= 0) and
             (bonding[j] >= 0 or antibonding[j] >= 0) and (x[i] != x[j] or y[i] != y[j] or z[i] != z[j]))
-                { 
+                {
                 resonance_integral_matrix[(i * order) + j] = constant/overlap_efective_lenght_integral_matrix[(i * order) + j] *
                 abs(overlap_matrix[(i * order) + j] * overlap_matrix[(i * order) + j]) * spins[i] * spins[j] * 4;
                 } // correction for hybridization of orbitals 
@@ -8393,7 +8377,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
         index_2_size = k;
         // multithreading code
         for (j = 0; (j + 7) < index_2_size; j = j + 8)
-            { // calculate coulombic integrals multithread
+            { // calculate kinetic integrals multithread
             t121 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
             Laplacians[index_2_array[j]], &matrix[index[i] + (index_2_array[j] * order)], lenght_orders[index_2_array[j]],
             x[index_2_array[j]] - x[index[i]], y[index_2_array[j]] - y[index[i]], z[index_2_array[j]] - z[index[i]]);
@@ -10027,7 +10011,7 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     return(0);
     }
 template <typename T>
-T basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool alocate,
 vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     {
     unsigned int i, j;
@@ -10039,8 +10023,24 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     memset(basis_set_matrix, 0, matrix_order * matrix_order);
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
-    if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
-        return(-1);
+    if (alocate == true)
+        {
+        if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
+            return(-1);
+        }
+    else
+        {
+        Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix, resonance_integral_matrix,
+        kinetic_integral_matrix, basis_set_matrix, matrix_order, &results);
+        Calculate_corr_basis_set_matrix(basis_set_matrix, correction_matrix, corr_basis_set_matrix, matrix_order);
+        Hamiltonian = Solve_basis_set_matrix(corr_basis_set_matrix, overlap_integral_matrix, matrix_order, values, &results);
+        nucleus_repulsive_energy = Nucleus_repulsive_energy(&results);
+        Hamiltonian = Hamiltonian + nucleus_repulsive_energy;
+        Calculate_spin_density_matrix(overlap_integral_matrix, spin_density_matrix, matrix_order, &results);
+        Solve_spin_density_matrix(spin_density_matrix, matrix_order, spin_values);
+        for (i = 0; i < (matrix_order * matrix_order); i++)
+            spin_density_vector->push_back(spin_density_matrix[i]);
+        }
     
     for (i = 0; i < max_iterations + 1; i++)
         {
@@ -10069,9 +10069,7 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     Solve_spin_density_matrix(spin_density_matrix, matrix_order, spin_values);
     for (i = 0; i < (matrix_order * matrix_order); i++)
         spin_density_vector->push_back(spin_density_matrix[i]);
-        
-    if (dealocate == true)
-        Clear();
+    
     return(Hamiltonian);
     }
 template <typename T>
@@ -10221,6 +10219,8 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
+
+
 /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.

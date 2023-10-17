@@ -4,9 +4,6 @@
 #include <bits/stdc++.h>
 #include "wavefunction_calculations.h"
 #include "Huckel_calculations.h"
-/*
-#include "Visualization_3D.h"
-*/
 using namespace std;
 // compiler parameters: -pthread -ffast-math -fno-finite-math-only
 
@@ -210,7 +207,6 @@ if  (success == 0 and Huckel_matrix_order[0] >= 2
     {
     Huckel_calculations.Huckel_Determinant_solver(Huckel_matrix_order[0], Huckel_matrix);
     Huckel_calculations.Huckel_Spectra_solver();
-    Huckel_calculations.Huckel_Wavefunction_Coefficient_solver(Huckel_matrix_order[0], Huckel_matrix);
     
     cout << "Energy levels: / Energetivké hladiny: / Energieniveaus: / Уровни энергии:" << endl;
     if (Huckel_calculations.determinants.size() > 0)
@@ -237,24 +233,6 @@ if  (success == 0 and Huckel_matrix_order[0] >= 2
         cout << "Pi-stucture is non-cyclic. / Pi struktura je necyklická. / Die Pi-Struktur ist nichtzyklisch." 
         << "/ Структура Пи нециклический." << endl;
     cout << endl;
-    cout << "Orders of atom: / Pořadí atomů: / Ordnung der Atome: / порядок атомов:" << endl;
-    for (i = 0; i < Huckel_calculations.sequence.size(); i++)
-        cout << Huckel_calculations.sequence[i] <<endl;
-    cout << endl;
-    cout << "Values of their wavefunctions: / Hodnoty jejich vlnových funkcí:" <<
-    "/ Werte ihrer Wellenfunktionen: / значения их волновых функций:" << endl;
- 
-    j = 0;
-    for (i = 0; i < Huckel_calculations.coefficients.size(); i++)
-        {
-        cout << Huckel_calculations.coefficients[i] <<endl;
-        j++;
-        if (j >= Huckel_matrix_order[0])
-            {
-            j = 0;
-            cout << endl;
-            }
-        }
     }
 if (success == 0)
     {
@@ -285,31 +263,6 @@ if (success == 0)
         
     delete Huckel_matrix_order;
     }
-/*
-Visualization_3D.Compute_densities(&Wavefunction_calculations.results.probabilities, &Wavefunction_calculations.index_atoms, lenght_order,
-&Wavefunction_calculations.results.spins, &Wavefunction_calculations.results.spin_paired, false);
-Visualization_3D.Generate_coordinates(Wavefunction_calculations.vector_lenght, &Wavefunction_calculations.results.x,
-&Wavefunction_calculations.results.y, &Wavefunction_calculations.results.z);
-Visualization_3D.Compute_densities_weights_95(&Visualization_3D.atoms_densities_list, &Visualization_3D.weights_95, lenght_order, true);
-Visualization_3D.Generate_2D_cross_section(0 , 0);
-average = Visualization_3D.averages[0];
-x = Visualization_3D.x_pixels_list[0];
-y = Visualization_3D.y_pixels_list[0];
-
-overall_density = Visualization_3D.Cross_sections_2D[0];
-
-for (i = 0; i < y; i++)
-    {
-    for (j = 0; j < x; j++)
-        {
-        if (overall_density[j + (i * x)] > 0)
-            cout << "#";
-        else
-            cout << " ";
-        }
-    cout << endl;
-    }
-*/
 return(0);
 };
 
