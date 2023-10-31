@@ -89,7 +89,7 @@ public:
     vector<T> z;
     } results;
     struct small_atom_wavefunctions {
-    // This structure is for generating small wavefunction vectors for integration lenght of exchange interaction
+    // This structure is for generating small wavefunction vectors for integration lenght of exchange integration
     vector<unsigned int> electron_numbers;
     vector<unsigned int> lenght_orders;
     vector<T*> lenghts;
@@ -196,7 +196,7 @@ T Wavefunction_normalize(T* wavefunction_pointer, T normalisation_constant, unsi
 T Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts,
 bool alocate, unsigned int Z, T multiplier);
 T Set_Hartree_length(unsigned int Z);
-// Section 3 - mathematical operation for wavefunctions, probabilities densities and integrals
+// Section 3 - mathematical operations for wavefunctions, probabilities densities and integrals
 unsigned int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
 unsigned int lenght_order, T d_x, T d_y, T d_z);
 T Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities, unsigned int lenght_order);
@@ -4246,7 +4246,7 @@ T basis_set_calculations<T>::Set_Hartree_length(unsigned int Z)
     relative_Hartree_lenght = 1/relative_electron_mass;
     return(0);
     }
-// End of Section 2 - generating wavefunctions, Section 3 - mathematical operation for wavefunctions, probabilities densities and
+// End of Section 2 - generating wavefunctions, Section 3 - mathematical operations for wavefunctions, probabilities densities and
 // integrals
 template <typename T>
 unsigned int basis_set_calculations<T>::Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
@@ -4831,7 +4831,6 @@ T d_x, T d_y, T d_z)
     x_contraction = abs(x);
     y_contraction = abs(y);
     z_contraction = abs(z);
-    
     if (x_contraction > side)
         x_contraction = side;
     if (y_contraction > side)
@@ -4987,7 +4986,7 @@ T basis_set_calculations<T>::Orbital_magnetic_field(T potential_energy, T radius
     B = potential_energy/(radius * radius * me * e * c * c) * L;
     return(B);
     }
-// End of Section 3 - mathematical operation for wavefunctions, probabiliti densities and integrals
+// End of Section 3 - mathematical operations for wavefunctions, probabiliti densities and integrals
 //Section 4 - generating lists of electrons
 template <typename T>
 T basis_set_calculations<T>::Quantum_numbers_to_orbitals(unsigned int n, unsigned int l, int fulness,
@@ -6582,11 +6581,6 @@ T x_difference, T y_difference, T z_difference)
     
     count_bonds = count;
     
-    if (electronegativity_1 > electronegativity_2)
-        polarity = (electronegativity_1 - electronegativity_2)/electronegativity_1;
-    else
-        polarity = (electronegativity_1 - electronegativity_2)/electronegativity_2;
-    
     if (abs(x_difference) >= abs(y_difference) and abs(x_difference) >= abs(z_difference)) // set preferred l
         preferred_m = 1;
     else 
@@ -6955,6 +6949,13 @@ T x_difference, T y_difference, T z_difference)
                 atom_wavefunctions_2->pi_bonding[indexes_2[i]] = atom_wavefunctions_1->electron_numbers[indexes_1[i]];
                 }
             count_bonds--;
+            polarity = (electronegativity_1 - electronegativity_2)/1.7;
+            polarity = polarity/sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference);
+            polarity = polarity * (atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]]);
+            if (polarity > 1)
+                polarity = 1;
+            if (polarity < -1)
+                polarity = -1;
             coefficient_1 = sqrt(1 + polarity);
             coefficient_2 = sqrt(1 - polarity);
             atom_wavefunctions_1->wavefunction_coefficients[indexes_1[i]] = coefficient_1;
@@ -7353,11 +7354,9 @@ atom_wavefunctions *atom_wavefunctions)
                     nucleuses_distances[i * order + ind_nuc[j]] = nucleuses_distances[spin_paired[i] * order + ind_nuc[j]];
             
                 matrix[i * (1 + order)] = matrix[spin_paired[i] * (1 + order)];
-            
+                
                 for (j = 0; j < order; j++)
-                    {
                     nucleuses[i * order + j] = nucleuses[spin_paired[i] * order + j];
-                    }
                 }
             }
     // end closed-shell basis set method optimalization code
@@ -7367,9 +7366,7 @@ atom_wavefunctions *atom_wavefunctions)
         
         for (j = 0; j < ind_nuc_size; j++)
             for (k = ind_nuc[j] + 1; k < ind_nuc[j + 1]; k++)
-                {
                 nucleuses_distances[i * order + k] = nucleuses_distances[i * order + ind_nuc[j]];
-                }
         }
     return(0);
     }
@@ -7435,14 +7432,15 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     for (i = 0; i < count_electrons; i++) // Using regression curve for s1 - s1 integrals
         {
         for (j = i + 1; j < count_electrons; j++)
-            if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+            if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1)
+            and (spin_paired[i] >= 0 and spin_paired[j] >= 0) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
             or (spin_paired[i] == j and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
                 {
                 radius_1 = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
                 radius_2 = efective_radius_base[j] * wavefunction_lenght_multipliers[j];
                 distance = sqrt(((x[j] - x[i]) * (x[j] - x[i])) + ((y[j] - y[i]) * (y[j] - y[i])) + ((z[j] - z[i]) * (z[j] - z[i])))
                 * Hartree_lenght;
-                if (spin_paired[i] == j and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+                if ((spin_paired[i] == j or (l[i] == 0 and l[j] == 0)) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
                     spin_bonded = true;
                 else
                     spin_bonded = false;
@@ -8015,6 +8013,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
         electron_numbers[i] = atom_wavefunctions->electron_numbers[i];
         efective_radius_base[i] = atom_wavefunctions->efective_radius_base[i];
         wavefunction_lenght_multipliers[i] = atom_wavefunctions->wavefunction_lenght_multipliers[i];
+        wavefunction_coefficients[i] = atom_wavefunctions->wavefunction_coefficients[i];
         bonding[i] = atom_wavefunctions->bonding[i];
         antibonding[i] = atom_wavefunctions->antibonding[i];
         }
@@ -8240,8 +8239,8 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             for (j = 0; j < order; j++)
                 if (resonance_integral_matrix[(i * order) + j] != 0)
                    resonance_integral_matrix[(i * order) + j] = resonance_integral_matrix[(i * order) + j];
-        } // Correction for hydrogen molecule
-    for (i = 0; i < order; i++) // correction for  localizing bonds - column-wise
+        }
+    for (i = 0; i < order; i++) // correction for multiple delocalized bonds - column-wise
         {
         count_interactions = 0;
         for (j = 0; j < order; j++)
@@ -8252,8 +8251,16 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             for (j = 0; j < order; j++)
                 if (resonance_integral_matrix[(j * order) + i] != 0)
                     resonance_integral_matrix[(j * order) + i] = resonance_integral_matrix[(j * order) + i];
-        } // Correction for hydrogen molecule
-                
+        }
+    for (i = 0; i < order; i++) // correction for polar bonds
+        for (j = 0; j < i; j++)
+            {
+            if (wavefunction_coefficients[i] < 1)
+                resonance_integral_matrix[(i * order) + j] = resonance_integral_matrix[(i * order) + j] * wavefunction_coefficients[i];
+            
+            if (wavefunction_coefficients[j] < 1)
+                resonance_integral_matrix[(i * order) + j] = resonance_integral_matrix[(i * order) + j] * wavefunction_coefficients[j];
+            }
     for (i = 0; i < order; i++) // second copy calculated values upper diagonal
         for (j = 0; j < i; j++)
             resonance_integral_matrix[(j * order) + i] = resonance_integral_matrix[(i * order) + j];
@@ -9723,10 +9730,7 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     unsigned int last_readed_index;
     unsigned int input_size;
     unsigned int matrix_order;
-    unsigned int count_atoms;
-    unsigned int count_coordinates;
-    unsigned int count_bonds;
-    unsigned int count_potentials;
+    unsigned int count_atoms, count_coordinates, count_bonds, count_potentials;
     bool read_switch;
     bool previous_deleted;
     string input;
@@ -10024,10 +10028,8 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
     if (alocate == true)
-        {
         if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
             return(-1);
-        }
     else
         {
         Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix, resonance_integral_matrix,
@@ -10219,8 +10221,6 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-
-
 /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.

@@ -4,6 +4,9 @@
 #include <bits/stdc++.h>
 #include "wavefunction_calculations.h"
 #include "Huckel_calculations.h"
+/*
+#include "Visualization_3D.h"
+*/
 using namespace std;
 // compiler parameters: -pthread -ffast-math -fno-finite-math-only
 
@@ -125,9 +128,9 @@ if (success == 0)
         if (spins[i] == 0.5 or spins[i] == -0.5)
             Wavefunction_calculations.results.spins[number_electrons[i]] = spins[i];
         
-        Wavefunction_calculations.results.spin_paired[number_electrons[i]] = -1;
+        Wavefunction_calculations.results.spin_paired[number_electrons[i]] = spins[i];
         }
-    Hamiltonian = Wavefunction_calculations.Execute_calculation(max_iterations, fidelity, lenght_order, false,
+    Hamiltonian = Wavefunction_calculations.Execute_PBE(max_iterations, fidelity, lenght_order, false,
     &values, &spin_density_matrix, &spin_values);
     Huckel_matrix_order = new unsigned int[1];
     count_electrons = Wavefunction_calculations.results.n.size();
@@ -263,6 +266,41 @@ if (success == 0)
         
     delete Huckel_matrix_order;
     }
+cout << "Korelační energie elektronů: / Correlation energies of electrons: / Elektronenkorrelationsenergie: / электронная корреляционная энергия:" << endl;
+for  (i = 0; i < Wavefunction_calculations.correlation_energies.size(); i++)
+    {
+    cout << Wavefunction_calculations.correlation_energies[i]/Wavefunction_calculations.e << " eV" << endl;
+    }
+cout << "Výměnné energie elektronů: / Exchange energies of electrons: / обменная: / электронная обменная энергия:" << endl;
+for  (i = 0; i < Wavefunction_calculations.exchange_energies.size(); i++)
+    {
+    cout << Wavefunction_calculations.exchange_energies[i]/Wavefunction_calculations.e << " eV" << endl;
+    }
+/*
+Visualization_3D.Compute_densities(&Wavefunction_calculations.results.probabilities, &Wavefunction_calculations.index_atoms, lenght_order,
+&Wavefunction_calculations.results.spins, &Wavefunction_calculations.results.spin_paired, false);
+Visualization_3D.Generate_coordinates(Wavefunction_calculations.vector_lenght, &Wavefunction_calculations.results.x,
+&Wavefunction_calculations.results.y, &Wavefunction_calculations.results.z);
+Visualization_3D.Compute_densities_weights_95(&Visualization_3D.atoms_densities_list, &Visualization_3D.weights_95, lenght_order, true);
+Visualization_3D.Generate_2D_cross_section(0 , 0);
+average = Visualization_3D.averages[0];
+x = Visualization_3D.x_pixels_list[0];
+y = Visualization_3D.y_pixels_list[0];
+
+overall_density = Visualization_3D.Cross_sections_2D[0];
+
+for (i = 0; i < y; i++)
+    {
+    for (j = 0; j < x; j++)
+        {
+        if (overall_density[j + (i * x)] > 0)
+            cout << "#";
+        else
+            cout << " ";
+        }
+    cout << endl;
+    }
+*/
 return(0);
 };
 

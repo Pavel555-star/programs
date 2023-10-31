@@ -56,14 +56,75 @@ public:
     bool planar = false;
     } symetry_planes_parameters;
     
+    // Density functional theory section
+    vector <T*> atoms_electron_densities;
+    vector <T*> atoms_spin_densities;
+    vector <T*> atoms_Ksi_densities;
+    vector <T*> atoms_gradients_densities;
+    vector <T> HF_exchange_energies;
+    vector <T> exchange_energies;
+    vector <T> correlation_energies;
+    vector <T> electron_energies;
+    unsigned int PBE_iterations = 1; // Number of iterations of including the correlation energy to main calculations 
+    
+    array<T, 118> Wigner_Seitz_radiuses = {
+    1.7794259739938E-10, 1.85089784636951E-10, 1.73099989649705E-10, 9.88433935284313E-11, 8.82013859640198E-11, 8.06137530478938E-11,
+    1.11120028851942E-10, 9.74549532475575E-11, 8.58972752524277E-11, 1.04004524925882E-10, 2.11090198754033E-10, 1.40427965161849E-10,
+    1.09675312651626E-10, 1.06087905940566E-10, 9.69777732449294E-11, 1.00743770215178E-10, 1.08670994417806E-10, 1.03498633350404E-10,
+    2.59121991588759E-10, 1.72357333264976E-10, 1.25744420684479E-10, 1.01697433727408E-10, 8.7612312122663E-11, 7.82983859721842E-11,
+    7.55431254547781E-11, 7.05893047394917E-11, 6.62965314287656E-11, 6.39025227414756E-11, 6.34893657365994E-11, 6.71073572830079E-11,
+    7.10989839420626E-11, 7.28135314589623E-11, 7.01634901522086E-11, 7.40677258652833E-11, 8.43441641421331E-11, 9.14217630814674E-11,
+    2.80605537309278E-10, 1.87314512234621E-10, 1.37938049287963E-10, 1.11476200596967E-10, 9.50487816563437E-11, 8.50936086726222E-11,
+    7.9584183900951E-11, 7.38757352170976E-11, 7.14589146593838E-11, 7.05101739568561E-11, 7.18053389233462E-11, 7.54140277163509E-11,
+    7.8216443813395E-11, 7.69680510485447E-11, 7.82995640650464E-11, 7.96948671471751E-11, 8.43115896785351E-11, 9.76751547507002E-11,
+    3.01007150707118E-10, 1.97873631293056E-10, 1.43775855407312E-10, 1.27016850712164E-10, 1.18133648359178E-10, 1.10744578030526E-10,
+    1.04158031655681E-10, 9.96605195244992E-11, 1.08303483550119E-10, 9.23782018863133E-11, 8.85894221803847E-11, 8.56353479157359E-11,
+    8.2992288759032E-11, 8.05125469613091E-11, 7.82201170636002E-11, 8.53072299237178E-11, 7.45425334560279E-11, 6.65737100155775E-11,
+    6.09110618935683E-11, 5.73994958045938E-11, 5.5076074987394E-11, 5.33205985200425E-11, 5.27420012606784E-11, 5.31425865053357E-11,
+    5.44770252171394E-11, 6.08907845425743E-11, 6.32464394290588E-11, 6.36973266212036E-11, 6.63291682577297E-11, 6.64627306585628E-11,
+    7.44554338152102E-11, 8.54735529189076E-11, 3.37861036869392E-10, 2.07627303324919E-10, 1.43876019309543E-10, 1.25138071717085E-10,
+    1.0597965475137E-10, 9.38455672697644E-11, 8.68563503438371E-11, 8.47896675065719E-11, 9.18938610003413E-11, 8.9423555928356E-11,
+    8.44225102834228E-11, 8.39530470913391E-11, 9.54076703541614E-11, 9.08051059645699E-11, 8.71255215815781E-11, 8.6399809048525E-11,
+    7.51181602534702E-11, 6.32892809067158E-11, 6.37124243526582E-11, 6.06956641748638E-11, 5.74879645457555E-11, 5.51352496590779E-11,
+    5.02749365992974E-11, 5.55851465462774E-11, 5.36653161612468E-11, 6.76855780795347E-11, 7.05765446808478E-11, 5.70629246965641E-11,
+    6.62931350236222E-11, 6.69320102285978E-11, 8.01313714554136E-11, 7.965320751222E-11};
+    
+    T beta = 0.066725; // scalable argument
+    T gamma = (1 - log(2))/(this->Pi * this->Pi); // equal 0.031091, scalable argument to 0.025
+    T kappa = 8.04;
+    T omega = 0.046644; // scalable argument
+    // End of density functional theory section
+    
 private:
     T Create_index_atoms();
     T Detect_center_of_mass();
     T Detect_dipole_moments(dipole_moment *dipole_moment);
     T Create_crystal_field(central_cations *central_cations);
+    
+    // Density functional theory section
+    T Alocate_densities(unsigned int size_order);
+    T Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end, unsigned int atom_size,
+    vector<T> spins, vector<int> spin_paired, bool spin_density);
+    T Compute_densities(vector<T*> densities, vector<T*> atoms_densities, vector<unsigned int> index,
+    unsigned int size_order, vector<T> spins, vector<int> spin_paired, bool spin_density);
+    T Correct_densities(vector<T*> atoms_densities_list, vector<T>  x, vector <T> y, vector <T> z, unsigned int size_order);
+    T Compute_Ksi_thread(T* spin_density, T* electron_density, T* Ksi_density, unsigned int size_order);
+    T Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order);
+    T Compute_Ksi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
+    vector<T*> atoms_Ksi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
+    
+    T PBE_thread(T* atoms_gradients_density, T* atoms_Ksi_density, T* electron_density,
+    unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius);
+    T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities, vector<T*> electron_densities,
+    unsigned int size_order);
+    // End of density functional theory section
 public:
     T String_to_advanced_parameters(string UI_input, unsigned int size_order,
     bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
+    // Density functional theory section
+    T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+    vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values);
+    // End of density functional theory section
     T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
     vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
     T Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, vector<unsigned int> atom_numbers);
@@ -345,6 +406,1113 @@ T Wavefunction_calculations<T>::Create_crystal_field(central_cations *central_ca
     return(0);
     }
 template <typename T>
+T Wavefunction_calculations<T>::Alocate_densities(unsigned int size_order)
+    {
+    unsigned int i;
+    unsigned int density_size;
+    T* density = nullptr;
+    
+    density_size = (2 * size_order + 1) * (2 * size_order + 1) * (2 * size_order + 1);
+    try
+        {
+        for (i = 0; i < index_atoms.size(); i++)
+            {
+            density = new T[density_size];
+            atoms_spin_densities.push_back(density);
+            }
+        }
+    catch (int)
+        {
+        for (i = 0; i < atoms_spin_densities.size(); i++)
+            delete [] atoms_spin_densities[i];
+        
+        return(-1);
+        }
+    try
+        {
+        for (i = 0; i < index_atoms.size(); i++)
+            {
+            density = new T[density_size * 2];
+            atoms_electron_densities.push_back(density);
+            }
+        }
+    catch (int)
+        {
+        for (i = 0; i < atoms_electron_densities.size(); i++)
+            delete [] atoms_electron_densities[i];
+        
+        return(-1);
+        }
+    try
+        {
+        for (i = 0; i < index_atoms.size(); i++)
+            {
+            density = new T[density_size * 2];
+            atoms_Ksi_densities.push_back(density);
+            }
+        }
+    catch (int)
+        {
+        for (i = 0; i < atoms_Ksi_densities.size(); i++)
+            delete [] atoms_Ksi_densities[i];
+        
+        return(-1);
+        }
+    try
+        {
+        for (i = 0; i < index_atoms.size(); i++)
+            {
+            density = new T[density_size * 2];
+            atoms_gradients_densities.push_back(density);
+            }
+        }
+    catch (int)
+        {
+        for (i = 0; i < atoms_gradients_densities.size(); i++)
+            delete [] atoms_gradients_densities[i];
+        
+        return(-1);
+        }
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end, unsigned int atom_size, vector<T> spins, vector<int> spin_paired, bool spin_density)
+    {
+    unsigned int i, j;
+    T* pointer_to_density;
+
+    // Vectorisation code
+    for (i = 0; i + 7 < atom_size; i++)
+        {
+        atom_density[i] = 0;
+        atom_density[i + 1] = 0;
+        atom_density[i + 2] = 0;
+        atom_density[i + 3] = 0;
+        atom_density[i + 4] = 0;
+        atom_density[i + 5] = 0;
+        atom_density[i + 6] = 0;
+        atom_density[i + 7] = 0;
+        }
+    for (i = atom_size - (atom_size % 8); i < atom_size; i++)
+        {
+        atom_density[i] = 0;
+        }
+    for (i = begin; i <= end; i++)
+        {
+        if (spin_density == false or spin_paired[i] == -1 or spin_paired[i] < begin
+        or spin_paired[i] > end)
+            {
+            pointer_to_density = densities[i]; // Unpaired and bonding electrons are included for spin_paired[i] < begin
+            if (spin_density == true and spins[i] == -0.5) // For spin density map and negative spins
+                {
+                for (j = 0; j + 7 < atom_size; j+=8)
+                    {
+                    atom_density[j] = atom_density[j] - pointer_to_density[j];
+                    atom_density[j + 1] = atom_density[j + 1] - pointer_to_density[j + 1];
+                    atom_density[j + 2] = atom_density[j + 2] - pointer_to_density[j + 2];
+                    atom_density[j + 3] = atom_density[j + 3] - pointer_to_density[j + 3];
+                    atom_density[j + 4] = atom_density[j + 4] - pointer_to_density[j + 4];
+                    atom_density[j + 5] = atom_density[j + 5] - pointer_to_density[j + 5];
+                    atom_density[j + 6] = atom_density[j + 6] - pointer_to_density[j + 6];
+                    atom_density[j + 7] = atom_density[j + 7] - pointer_to_density[j + 7];
+                    }
+                for (j = atom_size - (atom_size % 8); j < atom_size; j++)
+                    {
+                    atom_density[j] = atom_density[j] - pointer_to_density[j];
+                    }
+                }
+            else
+                {
+                for (j = 0; j + 7 < atom_size; j+=8)
+                    {
+                    atom_density[j] = atom_density[j] + pointer_to_density[j];
+                    atom_density[j + 1] = atom_density[j + 1] + pointer_to_density[j + 1];
+                    atom_density[j + 2] = atom_density[j + 2] + pointer_to_density[j + 2];
+                    atom_density[j + 3] = atom_density[j + 3] + pointer_to_density[j + 3];
+                    atom_density[j + 4] = atom_density[j + 4] + pointer_to_density[j + 4];
+                    atom_density[j + 5] = atom_density[j + 5] + pointer_to_density[j + 5];
+                    atom_density[j + 6] = atom_density[j + 6] + pointer_to_density[j + 6];
+                    atom_density[j + 7] = atom_density[j + 7] + pointer_to_density[j + 7];
+                    }
+                for (j = atom_size - (atom_size % 8); j < atom_size; j++)
+                    {
+                    atom_density[j] = atom_density[j] + pointer_to_density[j];
+                    }
+                }
+            }
+        }
+    // End of vectorisation code
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::Compute_densities(vector<T*> densities, vector<T*> atoms_densities,
+vector<unsigned int> index, unsigned int size_order, vector<T> spins, vector<int> spin_paired, bool spin_density)
+    { // Compute densities of wavefunctions/probabilities for atoms in 1 thread for each atoms.
+    unsigned int i, j;
+    unsigned int begin, end;
+    unsigned int count_atoms;
+    unsigned int size_atoms;
+    unsigned int begins_atoms[this->max_atoms];
+    unsigned int ends_atoms[this->max_atoms];
+    T* pointers_to_atoms[this->max_atoms];
+    T* pointers_to_probabilities[this->max_atoms]; 
+
+    thread t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15;
+    bool t9_flag, t10_flag, t11_flag, t12_flag, t13_flag, t14_flag, t15_flag;
+
+    t9_flag = false;
+    t10_flag = false;
+    t11_flag = false;
+    t12_flag = false;
+    t13_flag = false;
+    t14_flag = false;
+    t15_flag = false;
+
+    count_atoms = index.size();
+    if (count_atoms > this->max_atoms) // Control, that avoid throwing an exception.
+        return(-1);
+    size_atoms = (size_order * 2 + 1) * (size_order * 2 + 1) * (size_order * 2 + 1);
+
+    i = 0;
+    while (i < count_atoms) // Filling begins_atoms and ends_atoms array.
+        {
+        begins_atoms[i] = index[i];
+        if (i + 1 < count_atoms)
+            ends_atoms[i] = index[i + 1];
+    
+        else
+            ends_atoms[i] = densities.size() -1;
+        i++;
+       }
+       
+   for (i = 0; i < count_atoms; i++)
+        pointers_to_atoms[i] = atoms_densities[i];
+        
+   for (i = 0; i < densities.size(); i++)
+       {
+       pointers_to_probabilities[i] = densities[i];
+       }
+
+    // Multithreading code 
+    for (i = 0; (i + 7) < count_atoms; i = i + 8)
+            { // multithreading code
+            t1 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i],
+            begins_atoms[i], ends_atoms[i], size_atoms, spins, spin_paired, spin_density);
+            t2 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 1],
+            begins_atoms[i + 1], ends_atoms[i + 1], size_atoms, spins, spin_paired, spin_density);
+            t3 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 2],
+            begins_atoms[i + 2], ends_atoms[i + 2], size_atoms, spins, spin_paired, spin_density);
+            t4 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 3],
+            begins_atoms[i + 3], ends_atoms[i + 3], size_atoms, spins, spin_paired, spin_density);
+            t5 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 4],
+            begins_atoms[i + 4], ends_atoms[i + 4], size_atoms, spins, spin_paired, spin_density);
+            t6 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 5],
+            begins_atoms[i + 5], ends_atoms[i + 5], size_atoms, spins, spin_paired, spin_density);
+            t7 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 6],
+            begins_atoms[i + 6], ends_atoms[i + 6], size_atoms, spins, spin_paired, spin_density);
+            t8 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0], pointers_to_atoms[i + 7],
+            begins_atoms[i + 7], ends_atoms[i + 7], size_atoms, spins, spin_paired, spin_density);
+            t1.join();
+            t2.join();
+            t3.join();
+            t4.join();
+            t5.join();
+            t6.join();
+            t7.join();
+            t8.join();
+            }
+        if (count_atoms % 8 >= 7)
+            {
+            t9 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 7], begins_atoms[count_atoms - 7], ends_atoms[count_atoms - 7],
+            size_atoms, spins, spin_paired, spin_density);
+            t9_flag = true;
+            }
+        if (count_atoms % 8 >= 6)
+            {
+            t10 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 6], begins_atoms[count_atoms - 6], ends_atoms[count_atoms - 6],
+            size_atoms, spins, spin_paired, spin_density);
+            t10_flag = true;
+            }
+        if (count_atoms % 8 >= 5)
+            {
+            t11 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 5], begins_atoms[count_atoms - 5], ends_atoms[count_atoms - 5],
+            size_atoms, spins, spin_paired, spin_density);
+            t11_flag = true;
+            }
+        if (count_atoms % 8 >= 4)
+            {
+            t12 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 4], begins_atoms[count_atoms - 4], ends_atoms[count_atoms - 4],
+            size_atoms, spins, spin_paired, spin_density);
+            t12_flag = true;
+            }
+        if (count_atoms % 8 >= 3)
+            {
+            t13 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 3], begins_atoms[count_atoms - 3], ends_atoms[count_atoms - 3],
+            size_atoms, spins, spin_paired, spin_density);
+            t13_flag = true;
+            }
+        if (count_atoms % 8 >= 2)
+            {
+            t14 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 2], begins_atoms[count_atoms - 2], ends_atoms[count_atoms - 2],
+            size_atoms, spins, spin_paired, spin_density);
+            t14_flag = true;
+            }
+        if (count_atoms % 8 >= 1)
+            {
+            t15 = thread(&Wavefunction_calculations::Compute_density_thread, this, &pointers_to_probabilities[0],
+            pointers_to_atoms[count_atoms - 1], begins_atoms[count_atoms - 1], ends_atoms[count_atoms - 1],
+            size_atoms, spins, spin_paired, spin_density);
+            t15_flag = true;
+            }
+        if (t9_flag == true)
+            {
+            t9.join();
+            t9_flag = false;
+            }
+        if (t10_flag == true)
+            {
+            t10.join();
+            t10_flag = false;
+            }
+        if (t11_flag == true)
+            {
+            t11.join();
+            t11_flag = false;
+            }
+        if (t12_flag == true)
+            {
+            t12.join();
+            t12_flag = false;
+            }
+        if (t13_flag == true)
+            {
+            t13.join();
+            t13_flag = false;
+            }
+        if (t14_flag == true)
+            {
+            t14.join();
+            t14_flag = false;
+            }
+        if (t15_flag == true)
+            {
+            t15.join();
+            t15_flag = false;
+            }
+    // End of multithreading code  
+    return(0);  
+    }
+template <typename T>
+T Wavefunction_calculations<T>::Correct_densities(vector<T*> atoms_densities_list, vector<T>  x, vector <T> y, vector <T> z,
+unsigned int size_order)
+    {
+    unsigned int i, j, k, l, m;
+    unsigned int side;
+    unsigned int x_side, y_side, z_side;
+    unsigned int x_contraction, y_contraction, z_contraction;
+    unsigned int x_1_min, y_1_min, z_1_min;
+    unsigned int x_2_min, y_2_min, z_2_min;
+    unsigned int x_condition, x_condition_2;
+    int X, Y, Z;
+    T* densities_1;
+    T* densities_2;
+    
+    side = (2 * size_order + 1);
+    
+    for (i = 0; i < atoms_densities_list.size(); i++)
+        for (j = 0; j < atoms_densities_list.size(); j++)
+            {
+            densities_1 = atoms_densities_list[i];
+            densities_2 = atoms_densities_list[j];
+            
+            X = (x[index_atoms[j]] - x[index_atoms[i]]) * size_order/this->vector_lenght;
+            Y = (y[index_atoms[j]] - y[index_atoms[i]]) * size_order/this->vector_lenght;
+            Z = (z[index_atoms[j]] - z[index_atoms[i]]) * size_order/this->vector_lenght;
+            x_contraction = abs(X);
+            y_contraction = abs(Y);
+            z_contraction = abs(Z);
+            
+            if (x_contraction > side)
+                x_contraction = side;
+            if (y_contraction > side)
+                y_contraction = side;
+            if (z_contraction > side)
+                z_contraction = side;
+    
+            x_side = side - x_contraction;
+            y_side = side - y_contraction;
+            z_side = side - z_contraction;
+    
+            if (x_contraction >= side or y_contraction >= side or z_contraction >= side)
+                continue;
+        
+            if (X < 0)
+                {
+                x_1_min = 0;
+                x_2_min = x_contraction;
+                }
+            else
+                {
+                x_1_min = x_contraction;
+                x_2_min = 0;
+                }
+            if (Y < 0)
+                {
+                y_1_min = 0;
+                y_2_min = y_contraction;
+                }
+            else
+                {
+                y_1_min = y_contraction;
+                y_2_min = 0;
+                }
+            if (Z < 0)
+                {
+                z_1_min = 0;
+                z_2_min = z_contraction;
+               }
+            else
+                {
+                z_1_min = z_contraction;
+                z_2_min = 0;
+                }
+    
+            x_condition = side - x_contraction;   
+            x_condition_2 = x_condition - (x_condition % 8);
+    
+            // vectorisation code
+            for (k = 0; k < (side - z_contraction); k++)
+                {
+                for (l = 0; l < (side - y_contraction); l++)
+                    {
+                    for (m = 0; m + 7 < x_condition; m+=8)
+                        {
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min)] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min)] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min)];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min)] = 
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min)];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 1] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 1] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 1];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 1] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 1];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 2] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 2] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 2];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 2] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 2];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 3] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 3] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 3];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 3] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 3];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 4] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 4] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 4];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 4] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 4];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 5] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 5] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 5];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 5] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 5];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 6] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 6] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 6];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 6] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 6];
+                        
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 7] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 7] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 7];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min) + 7] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min) + 7];
+                        }
+                    for (m = x_condition_2; m < x_condition; m++)
+                        {
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min)] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min)] +
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min)];
+                        densities_2[((k + z_2_min) * side * side) + ((l + y_2_min) * side) + (m + x_2_min)] =
+                        densities_1[((k + z_1_min) * side * side) + ((l + y_1_min) * side) + (m + x_1_min)];
+                        }
+                    }
+                }
+            }
+    // end of vectorisation code
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::Compute_Ksi_thread(T* spin_density, T* electron_density, T* Ksi_density, unsigned int size_order)
+    {
+    unsigned int i;
+    unsigned int size;
+    T pow_1, pow_2, pow_3, pow_4, pow_5, pow_6, pow_7, pow_8;
+    
+    size = (2 * size_order + 1) * (2 * size_order + 1) * (2 * size_order + 1);
+    // Vectorisation code
+    for (i = 0; i + 7 < size; i+= 8)
+        {
+        pow_1 = spin_density[i]/electron_density[i];
+        pow_2 = spin_density[i + 1]/electron_density[i + 1];
+        pow_3 = spin_density[i + 2]/electron_density[i + 2];
+        pow_4 = spin_density[i + 3]/electron_density[i + 3];
+        pow_5 = spin_density[i + 4]/electron_density[i + 4];
+        pow_6 = spin_density[i + 5]/electron_density[i + 5];
+        pow_7 = spin_density[i + 6]/electron_density[i + 6];
+        pow_8 = spin_density[i + 7]/electron_density[i + 7];
+        Ksi_density[i] = (pow(1 + pow_1, 2.0/3.0) + pow(1 - pow_1, 2.0/3.0))/2;
+        Ksi_density[i + 1] = (pow(1 + pow_2, 2.0/3.0) + pow(1 - pow_2, 2.0/3.0))/2;
+        Ksi_density[i + 2] = (pow(1 + pow_3, 2.0/3.0) + pow(1 - pow_3, 2.0/3.0))/2;
+        Ksi_density[i + 3] = (pow(1 + pow_4, 2.0/3.0) + pow(1 - pow_4, 2.0/3.0))/2;
+        Ksi_density[i + 4] = (pow(1 + pow_5, 2.0/3.0) + pow(1 - pow_5, 2.0/3.0))/2;
+        Ksi_density[i + 5] = (pow(1 + pow_6, 2.0/3.0) + pow(1 - pow_6, 2.0/3.0))/2;
+        Ksi_density[i + 6] = (pow(1 + pow_7, 2.0/3.0) + pow(1 - pow_7, 2.0/3.0))/2;
+        Ksi_density[i + 7] = (pow(1 + pow_8, 2.0/3.0) + pow(1 - pow_8, 2.0/3.0))/2;
+        }
+    for (i = size - (size % 8); i < size; i++)
+        {
+        pow_1 = pow(spin_density[i], 2.0/3.0);
+        Ksi_density[i] = (pow(1 + pow_1, 2.0/3.0) + pow(1 - pow_1, 2.0/3.0))/2;
+        }
+    // End of Vectorisation code
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order)
+    {
+    unsigned int i, j;
+    unsigned int side;
+    unsigned int size;
+    T x_gradient, y_gradient, z_gradient;
+    T pixel_lenght;
+    
+    pixel_lenght = T(this->vector_lenght)/T(size_order);
+    side = (2 * size_order + 1);
+    size = side * side * side;
+    
+    for (i = 0; i < side * side; i++) // Optimalization for pipelining with non sequential reading of memory
+        {
+        if (i >= 1)
+            x_gradient = (electron_density[i + 1] - electron_density[i - 1])/(pixel_lenght * 2);
+        else
+            x_gradient = (electron_density[i + 1] - electron_density[i])/pixel_lenght;
+        
+        if (i >= side)
+            y_gradient = (electron_density[i + side] - electron_density[i - side])/(pixel_lenght * 2);
+        else
+            y_gradient = (electron_density[i + side] - electron_density[i])/pixel_lenght;
+        
+        z_gradient = (electron_density[i + (side * side)] - electron_density[i])/pixel_lenght;
+        gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        }
+    for (i = (side * side); i < size - (side * side); i++)
+        {
+        gradient_density[i - 1] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        x_gradient = (electron_density[i + 1] - electron_density[i - 1])/(pixel_lenght * 2);
+        y_gradient = (electron_density[i + side] - electron_density[i - side])/(pixel_lenght * 2);
+        z_gradient = (electron_density[i + (side * side)] - electron_density[i - (side * side)])/(pixel_lenght * 2);
+        }
+    gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3)/2.00;
+    for (i = size - (side * side); i < size ; i++)
+        {
+        if (size - i > 1)
+            x_gradient = (electron_density[i + 1] - electron_density[i - 1])/(pixel_lenght * 2);
+        else
+            x_gradient = (electron_density[i] - electron_density[i - 1])/pixel_lenght;
+        
+        if (size - i > side)
+            y_gradient = (electron_density[i + side] - electron_density[i - side])/(pixel_lenght * 2);
+        else
+            y_gradient = (electron_density[i] - electron_density[i - side])/pixel_lenght;
+        
+        z_gradient = (electron_density[i] - electron_density[i - (side * side)])/(pixel_lenght);
+        gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        }
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::Compute_Ksi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
+vector<T*> atoms_Ksi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order)
+    {
+    unsigned int i;
+    
+    T* electron_densities[this->max_atoms];
+    T* spin_densities[this->max_atoms];
+    T* Ksi_densities[this->max_atoms];
+    T* gradients_densities[this->max_atoms];
+    
+    
+    thread t31, t32, t33, t34, t35, t36, t37, t38, t39, t40, t41, t42, t43, t44, t45;
+    thread t46, t47, t48, t49, t50, t51, t52, t53, t54, t55, t56, t57, t58, t59, t60;
+    bool t39_flag, t40_flag, t41_flag, t42_flag, t43_flag, t44_flag, t45_flag;
+    bool t54_flag, t55_flag, t56_flag, t57_flag, t58_flag, t59_flag, t60_flag;
+    
+    t39_flag = false;
+    t40_flag = false;
+    t41_flag = false;
+    t42_flag = false;
+    t43_flag = false;
+    t44_flag = false;
+    t45_flag = false;
+    
+    t54_flag = false;
+    t55_flag = false;
+    t56_flag = false;
+    t57_flag = false;
+    t58_flag = false;
+    t59_flag = false;
+    t60_flag = false;
+    
+    for (i = 0; i < count_atoms; i++)
+        {
+        electron_densities[i] = atoms_electron_densities[i];
+        spin_densities[i] = atoms_spin_densities[i];
+        Ksi_densities[i] = atoms_Ksi_densities[i];
+        gradients_densities[i] = atoms_gradients_densities[i];
+        }
+    
+    for (i = 0; (i + 7) < count_atoms; i = i + 8)
+        { // multithreading code
+        t31 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i], electron_densities[i],
+        Ksi_densities[i], size_order);
+        t32 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 1], electron_densities[i + 1],
+        Ksi_densities[i + 1], size_order);
+        t33 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 2], electron_densities[i + 2],
+        Ksi_densities[i + 2], size_order);
+        t34 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 3], electron_densities[i + 3],
+         Ksi_densities[i + 3], size_order);
+        t35 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 4], electron_densities[i + 4],
+         Ksi_densities[i + 4], size_order);
+        t36 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 5], electron_densities[i + 5],
+         Ksi_densities[i + 5], size_order);
+        t37 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 6], electron_densities[i + 6],
+         Ksi_densities[i + 6], size_order);
+        t38 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[i + 7], electron_densities[i + 7],
+         Ksi_densities[i + 7], size_order);
+        t31.join();
+        t32.join();
+        t33.join();
+        t34.join();
+        t35.join();
+        t36.join();
+        t37.join();
+        t38.join();
+        }
+    if (count_atoms % 8 >= 7)
+        {
+        t39 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[count_atoms - 7],
+        electron_densities[count_atoms - 7], Ksi_densities[count_atoms - 7], size_order);
+        t39_flag = true;
+        }
+    if (count_atoms % 8 >= 6)
+        {
+        t40 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this,  spin_densities[count_atoms - 6],
+        electron_densities[count_atoms - 6], Ksi_densities[count_atoms - 6], size_order);
+        t40_flag = true;
+        }
+    if (count_atoms % 8 >= 5)
+        {
+        t41 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[count_atoms - 5],
+        electron_densities[count_atoms - 5], Ksi_densities[count_atoms - 5], size_order);
+        t41_flag = true;
+        }
+    if (count_atoms % 8 >= 4)
+        {
+        t42 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[count_atoms - 4],
+        electron_densities[count_atoms - 4], Ksi_densities[count_atoms - 4], size_order);
+        t42_flag = true;
+        }
+    if (count_atoms % 8 >= 3)
+        {
+        t43 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[count_atoms - 3],
+        electron_densities[count_atoms - 3], Ksi_densities[count_atoms - 3], size_order);
+        t43_flag = true;
+        }
+    if (count_atoms % 8 >= 2)
+        {
+        t44 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[count_atoms - 2],
+        electron_densities[count_atoms - 2], Ksi_densities[count_atoms - 2], size_order);
+        t44_flag = true;
+        }
+    if (count_atoms % 8 >= 1)
+        {
+        t45 = thread(&Wavefunction_calculations::Compute_Ksi_thread, this, spin_densities[count_atoms - 1],
+        electron_densities[count_atoms - 1], Ksi_densities[count_atoms - 1], size_order);
+        t45_flag = true;
+        }
+    if (t39_flag == true)
+        {
+        t39.join();
+        t39_flag = false;
+        }
+    if (t40_flag == true)
+        {
+        t40.join();
+        t40_flag = false;
+        }
+    if (t41_flag == true)
+        {
+        t41.join();
+        t41_flag = false;
+        }
+    if (t42_flag == true)
+        {
+        t42.join();
+        t42_flag = false;
+        }
+    if (t43_flag == true)
+        {
+        t43.join();
+        t43_flag = false;
+        }
+    if (t44_flag == true)
+        {
+        t44.join();
+        t44_flag = false;
+        }
+    if (t45_flag == true)
+        {
+        t45.join();
+        t45_flag = false;
+        }
+    for (i = 0; (i + 7) < count_atoms; i = i + 8)
+        { // multithreading code
+        t46 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i], gradients_densities[i],
+        size_order);
+        t47 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 1], gradients_densities[i + 1],
+        size_order);
+        t48 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 2], gradients_densities[i + 2],
+        size_order);
+        t49 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 3], gradients_densities[i + 3],
+        size_order);
+        t50 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 4], gradients_densities[i + 4],
+        size_order);
+        t51 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 5], gradients_densities[i + 5],
+        size_order);
+        t52 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 6], gradients_densities[i + 6],
+        size_order);
+        t53 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[i + 7], gradients_densities[i + 7],
+        size_order);
+        t46.join();
+        t47.join();
+        t48.join();
+        t49.join();
+        t50.join();
+        t51.join();
+        t52.join();
+        t53.join();
+        }
+    if (count_atoms % 8 >= 7)
+        {
+        t54 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 7],
+        gradients_densities[count_atoms - 7], size_order);
+        t54_flag = true;
+        }
+    if (count_atoms % 8 >= 6)
+        {
+        t55 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 6],
+        gradients_densities[count_atoms - 6], size_order);
+        t55_flag = true;
+        }
+    if (count_atoms % 8 >= 5)
+        {
+        t56 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 5],
+        gradients_densities[count_atoms - 5], size_order);
+        t56_flag = true;
+        }
+    if (count_atoms % 8 >= 4)
+        {
+        t57 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 4],
+        gradients_densities[count_atoms - 4], size_order);
+        t57_flag = true;
+        }
+    if (count_atoms % 8 >= 3)
+        {
+        t58 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 3],
+        gradients_densities[count_atoms - 3], size_order);
+        t58_flag = true;
+        }
+    if (count_atoms % 8 >= 2)
+        {
+        t59 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 2],
+        gradients_densities[count_atoms - 2], size_order);
+        t59_flag = true;
+        }
+    if (count_atoms % 8 >= 1)
+        {
+        t60 = thread(&Wavefunction_calculations::Compute_gradient_thread, this, electron_densities[count_atoms - 1],
+        gradients_densities[count_atoms - 1], size_order);
+        t60_flag = true;
+        }
+    if (t54_flag == true)
+        {
+        t54.join();
+        t54_flag = false;
+        }
+    if (t55_flag == true)
+        {
+        t55.join();
+        t55_flag = false;
+        }
+    if (t56_flag == true)
+        {
+        t56.join();
+        t56_flag = false;
+        }
+    if (t57_flag == true)
+        {
+        t57.join();
+        t57_flag = false;
+        }
+    if (t58_flag == true)
+        {
+        t58.join();
+        t58_flag = false;
+        }
+    if (t59_flag == true)
+        {
+        t59.join();
+        t59_flag = false;
+        }
+    if (t60_flag == true)
+        {
+        t60.join();
+        t60_flag = false;
+        }
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::PBE_thread(T* atoms_gradients_density, T* atoms_Ksi_density, T* electron_density,
+unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius)
+    {
+    unsigned int i, j;
+    unsigned int size;
+    T exchange_integral;
+    T correlation_integral;
+    
+    T n;
+    T k_F;
+    T s;
+    T pre_s;
+    T c; // this is not sppeed of light in this context
+    T X;
+    
+    T e_x_unif;
+    T mi;
+    T F_x;
+    
+    T nl_integral_factor;
+    T s_2;
+    T fi_2;
+    T power;
+    
+    size = (2 * size_order + 1) * (2 * size_order + 1) * (2 * size_order + 1);
+    // Correlation energy computation preparation
+    n = (3 * this->Hartree_lenght * this->Hartree_lenght * this->Hartree_lenght)
+    /(4 * this->Pi * Wigner_Seitz_radius * Wigner_Seitz_radius * Wigner_Seitz_radius);
+    k_F = pow(n * 3 * this->Pi * this->Pi, 1.00/3.00);
+    c = pow((3 * this->Pi * this->Pi)/16, 1.00/3.00);
+    
+    pre_s = 1.00/(2 * k_F);
+    X = (beta/gamma) * c * c * exp(-omega/gamma); // equal 0.72161
+    // Exgchange energy computation preparation
+    e_x_unif = -(3 * this->e * k_F)/(4 * this->Pi);
+    mi = (beta * this->Pi * this->Pi)/3.00;
+    
+    exchange_integral = 0;
+    correlation_integral = 0;
+    for (i = 0; i < size; i++) // Computing corelation_energy
+        {
+        if (electron_density[i] != 0)
+            {
+            s = pre_s * abs(atoms_gradients_density[i])/n;
+            s_2 = s * s;
+            fi_2 = atoms_Ksi_density[i] * atoms_Ksi_density[i];
+            power = pow(X, T(s_2/fi_2));
+            nl_integral_factor = log(1 + 1/(power + (power * power)));
+            if ((not (isnan(nl_integral_factor))) and (not (isinf(nl_integral_factor))))
+                correlation_integral = correlation_integral +
+                (gamma * electron_density[i] * fi_2 * atoms_Ksi_density[i] * nl_integral_factor);
+        
+            exchange_integral = exchange_integral + e_x_unif * (1 + kappa - kappa/(1 + (mi * s_2)/kappa)) * electron_density[i];
+            }
+        }
+    exchange_energy[0] = exchange_integral;
+    correlation_energy[0] = correlation_integral;
+    return(0);
+    }
+template <typename T>
+T Wavefunction_calculations<T>::PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities,
+vector<T*> electron_densities, unsigned int size_order)
+    {
+    unsigned int i, j, k;
+    unsigned int count_orbitals;
+    unsigned int sum_electrons;
+    
+    unsigned int index[this->max_electrons]; // Index of electrons positions forcomputing nuclear atraction integrals
+    
+    T wavefunction_coefficients[this->max_electrons];
+    int bonding[this->max_electrons];
+    int spin_paired[this->max_electrons];
+    T spins[this->max_electrons];
+    T Z[this->max_electrons];
+    
+    T exchange_array[this->max_electrons];
+    T correlation_array[this->max_electrons];
+    T* atoms_gradients_array[this->max_atoms];
+    T* atoms_Ksi_array[this->max_atoms];
+    T* electron_array[this->max_electrons];
+    
+    thread t61, t62, t63, t64, t65, t66, t67, t68, t69, t70, t71, t72, t73, t74, t75;
+    bool restriction;
+    bool t69_flag, t70_flag, t71_flag, t72_flag, t73_flag, t74_flag, t75_flag;
+    
+    t69_flag = false;
+    t70_flag = false;
+    t71_flag = false;
+    t72_flag = false;
+    t73_flag = false;
+    t74_flag = false;
+    t75_flag = false;
+    restriction = true;
+    
+    sum_electrons = this->results.n.size();
+    count_orbitals = 0;
+    
+    if (sum_electrons > this->max_electrons)
+        return(-1);
+        
+    for (i = 0; i < atoms_gradients_densities.size(); i++)
+        atoms_gradients_array[i] = atoms_gradients_densities[i];
+    
+    for (i = 0; i < atoms_Ksi_densities.size(); i++)
+        atoms_Ksi_array[i] = atoms_Ksi_densities[i];
+        
+    for (i = 0; i < electron_densities.size(); i++)
+        electron_array[i] = electron_densities[i];
+    
+    for (i = 0; i < sum_electrons; i++)
+        {
+        wavefunction_coefficients[i] = this->results.wavefunction_coefficients[i];
+        spins[i] = this->results.spins[i];
+        spin_paired[i] = this->results.spin_paired[i];
+        bonding[i] = this->results.bonding[i];
+        Z[i] = this->results.Z[i];
+        }
+    // closed-shell Hartree-Fock method optimalization code
+    for (i = 0; i < sum_electrons ; i++) // for restricted and unrestricted Hartree-Fock method
+        {
+        if (spin_paired[i] == -1)
+            {
+            restriction = false;
+            }
+        }
+    for (i = 0; i < sum_electrons ; i++)
+        if (wavefunction_coefficients[i] != 0)
+            {
+            if (i == 0)
+                {
+                index[count_orbitals] = i;
+                count_orbitals++;
+                }
+            if (i > 0)
+                {
+                if ((spins[i] == 0.5) or (bonding[i] >= 0) or restriction == false)
+                    {
+                    index[count_orbitals] = i;
+                    count_orbitals++;
+                    }
+                }
+            }
+    i = 0;
+    j = 1;
+    
+    // multithreading code
+    for (i = 0; (i + 7) < count_orbitals; i = i + 8)
+        {
+        t61 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i]]],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i]]], electron_array[index[i]],
+        size_order, &exchange_array[index[i]], &correlation_array[index[i]], Wigner_Seitz_radiuses[Z[index[i]] - 1]);
+        t62 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 1]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 1]] - 1], electron_array[index[i + 1]],
+        size_order, &exchange_array[index[i + 1]], &correlation_array[index[i + 1]], Wigner_Seitz_radiuses[Z[index[i + 1]] - 1]);
+        t63 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 2]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 2]] - 1], electron_array[index[i + 2]],
+        size_order, &exchange_array[index[i + 2]], &correlation_array[index[i + 2]], Wigner_Seitz_radiuses[Z[index[i + 2]] - 1]);
+        t64 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 3]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 3]] - 1], electron_array[index[i + 3]],
+        size_order, &exchange_array[index[i + 3]], &correlation_array[index[i + 3]], Wigner_Seitz_radiuses[Z[index[i + 3]] - 1]);
+        t65 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 4]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 4]] - 1], electron_array[index[i + 4]],
+        size_order, &exchange_array[index[i + 4]], &correlation_array[index[i + 4]], Wigner_Seitz_radiuses[Z[index[i + 4]] - 1]);
+        t66 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 5]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 5]] - 1], electron_array[index[i + 5]],
+        size_order, &exchange_array[index[i + 5]], &correlation_array[index[i + 5]], Wigner_Seitz_radiuses[Z[index[i + 5]] - 1]);
+        t67 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 6]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 6]] - 1], electron_array[index[i + 6]],
+        size_order, &exchange_array[index[i + 6]], &correlation_array[index[i + 6]], Wigner_Seitz_radiuses[Z[index[i + 6]] - 1]);
+        t68 = thread(&Wavefunction_calculations::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 7]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[i + 7]] - 1], electron_array[index[i + 7]],
+        size_order, &exchange_array[index[i + 7]], &correlation_array[index[i + 7]], Wigner_Seitz_radiuses[Z[index[i + 7]] - 1]);
+        
+        t61.join();
+        t62.join();
+        t63.join();
+        t64.join();
+        t65.join();
+        t66.join();
+        t67.join();
+        t68.join();
+        }
+    if (count_orbitals % 8 >= 7)
+        {
+        t69 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 7]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 7]] - 1],
+        electron_array[index[count_orbitals - 7]],
+        size_order, &exchange_array[index[count_orbitals - 7]], &correlation_array[index[count_orbitals - 7]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 7]] - 1]);
+        t69_flag = true;
+        }
+    if (count_orbitals % 8 >= 6)
+        {
+        t70 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 6]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 6]] - 1],
+        electron_array[index[count_orbitals - 6]],
+        size_order, &exchange_array[index[count_orbitals - 6]], &correlation_array[index[count_orbitals - 6]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 6]] - 1]);
+        t70_flag = true;
+        }
+    if (count_orbitals % 8 >= 5)
+        {
+        t71 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 5]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 5]] - 1],
+        electron_array[index[count_orbitals - 5]],
+        size_order, &exchange_array[index[count_orbitals - 5]], &correlation_array[index[count_orbitals - 5]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 5]] - 1]);
+        t71_flag = true;
+        }
+    if (count_orbitals % 8 >= 4)
+        {
+        t72 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 4]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 4]] - 1],
+        electron_array[index[count_orbitals - 4]],
+        size_order, &exchange_array[index[count_orbitals - 4]], &correlation_array[index[count_orbitals - 4]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 4]] - 1]);
+        t72_flag = true;
+        }
+    if (count_orbitals % 8 >= 3)
+        {
+        t73 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 3]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 3]] - 1],
+        electron_array[index[count_orbitals - 3]],
+        size_order, &exchange_array[index[count_orbitals - 3]], &correlation_array[index[count_orbitals - 3]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 3]] - 1]);
+        t73_flag = true;
+        }
+    if (count_orbitals % 8 >= 2)
+        {
+        t74 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 2]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 2]] - 1],
+        electron_array[index[count_orbitals - 2]],
+        size_order, &exchange_array[index[count_orbitals - 2]], &correlation_array[index[count_orbitals - 2]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 2]] - 1]);
+        t74_flag = true;
+        }
+   if (count_orbitals % 8 >= 1)
+        {
+        t75 = thread(&Wavefunction_calculations::PBE_thread, this,
+        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 1]] - 1],
+        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 1]] - 1],
+        electron_array[index[count_orbitals - 1]],
+        size_order, &exchange_array[index[count_orbitals - 1]], &correlation_array[index[count_orbitals - 1]],
+        Wigner_Seitz_radiuses[Z[index[count_orbitals - 1]] - 1]);
+        t75_flag = true;
+        }
+    if (t69_flag == true)
+        {
+        t69.join();
+        t69_flag = false;
+        }
+    if (t70_flag == true)
+        {
+        t70.join();
+        t70_flag = false;
+        }
+    if (t71_flag == true)
+        {
+        t71.join();
+        t71_flag = false;
+        }
+    if (t72_flag == true)
+        {
+        t72.join();
+        t72_flag = false;
+        }
+    if (t73_flag == true)
+        {
+        t73.join();
+        t73_flag = false;
+        }
+    if (t74_flag == true)
+        {
+        t74.join();
+        t74_flag = false;
+        }
+    if (t75_flag == true)
+        {
+        t75.join();
+        t75_flag = false;
+        }
+        // end of multithreading code
+                
+        // subtract previous values in the row
+    
+    // closed-shell Hartree-Fock method optimalization code
+    if (restriction == true) // copying values in restricted basis_set_method
+        for (i = 0; i < sum_electrons; i++)
+            {
+            if (spins[i] == -0.5 and bonding[i] == -1 and spin_paired[i] >= 0)
+                {
+                exchange_array[i] = exchange_array[spin_paired[i]];
+                correlation_array[i] = correlation_array[spin_paired[i]];
+                }
+            }
+    // end closed-shell Hartree-Fock method optimalization code
+    for (i = 0; i < sum_electrons; i++) // including the wavefunctions coefficients for linear combination
+        {
+        exchange_array[i] = exchange_array[i] * wavefunction_coefficients[i] * wavefunction_coefficients[i];
+        correlation_array[i] = correlation_array[i] * wavefunction_coefficients[i] * wavefunction_coefficients[i];
+        }
+    exchange_energies.clear();
+    correlation_energies.clear();
+    for (i = 0; i < sum_electrons; i++) // copy values into vectors
+        {
+        exchange_energies.push_back(exchange_array[i]);
+        correlation_energies.push_back(-correlation_array[i]* this->Hartree_energy_constant);
+        }
+    return(0);
+    }
+template <typename T>
 T Wavefunction_calculations<T>::String_to_advanced_parameters(string UI_input, unsigned int size_order,
     bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     { // kompletně přepsat
@@ -411,6 +1579,125 @@ T Wavefunction_calculations<T>::String_to_advanced_parameters(string UI_input, u
     return(0);
     }
 template <typename T>
+T Wavefunction_calculations<T>::Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate, vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
+    {
+    unsigned int i, j, k;
+    unsigned int matrix_order;
+    T exchange_energy;
+    T Hamiltonian;
+    T electron_energy;
+    vector<T> correction_diagonal;
+    
+    thread t61, t62;
+    
+    energies = values;
+    if (Create_index_atoms() == -1)
+       return(-1);
+    if (Detect_center_of_mass() == -1)
+       return(-1);
+    if (Detect_dipole_moments(&dipoles) == -1)
+       return(-1);
+    if (central_cation_atoms.atom_numbers.size() > 0)
+        Create_crystal_field(&central_cation_atoms);
+    
+    matrix_order = this->results.n.size();
+    for (i = 0; i < matrix_order; i++)
+        correction_diagonal.push_back(this->correction_matrix[i * (matrix_order + 1)]);
+        
+    Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, true, values, spin_density_vector,  spin_values);
+    // Execute HF calculations
+    for (i = 0; i < matrix_order * matrix_order; i++) // avoiding executing PBE for atomic systems
+        {
+        if (this->resonance_integral_matrix[i] != 0)
+            break;
+        
+        if (i == matrix_order * matrix_order -1)
+            return(Hamiltonian);
+        }
+    
+    for (i = 0; i < matrix_order; i++) //
+        {
+        exchange_energy = 0;
+        for (j = 0; j < matrix_order; j++)
+            exchange_energy = exchange_energy + this->resonance_integral_matrix[(i * matrix_order) + j];
+        
+        HF_exchange_energies.push_back(exchange_energy); // Copy HF exchange energies to vector
+        }
+    
+    if (Alocate_densities(size_order) == -1)
+        return(-1);
+    
+    // compute electron and spin densities
+    t61 = thread(&Wavefunction_calculations::Compute_densities, this, this->results.probabilities, atoms_electron_densities,
+    index_atoms, size_order, this->results.spins, this->results.spin_paired, false);
+    t62 = thread(&Wavefunction_calculations::Compute_densities, this, this->results.probabilities, atoms_spin_densities,
+    index_atoms, size_order, this->results.spins, this->results.spin_paired, true);
+        
+    t61.join();
+    t62.join();
+        
+    // correct electron and spin densities
+    Correct_densities(atoms_electron_densities, this->results.x, this->results.y, this->results.z, size_order);
+    Correct_densities(atoms_spin_densities, this->results.x, this->results.y, this->results.z, size_order);
+        
+    correlation_energies.clear();
+    exchange_energies.clear();
+    electron_energies.clear();
+        
+    // run PBE method over electron and spin densities
+        
+    Compute_Ksi_and_gradients(atoms_electron_densities, atoms_spin_densities, atoms_Ksi_densities, atoms_gradients_densities,
+    size_order);
+    PBE_compute(atoms_gradients_densities, atoms_Ksi_densities, this->results.probabilities, size_order);
+    
+    for (i = 0; i < PBE_iterations; i++)
+        {
+        // repeat calculation with computed electron correlation energies
+        for (j = 0; j < matrix_order; j++)
+            this->correction_matrix[j * (matrix_order + 1)] = correlation_energies[j] + exchange_energies[j] + correction_diagonal[j];
+    
+        Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, false, values, spin_density_vector,  spin_values);
+        // Execute HF calculations
+        matrix_order = this->results.n.size();
+    
+        for (i = 0; i < matrix_order; i++) //
+            {
+            exchange_energy = 0;
+            for (j = 0; j < matrix_order; j++)
+                exchange_energy = exchange_energy + this->resonance_integral_matrix[(i * matrix_order) + j];
+        
+            HF_exchange_energies.push_back(exchange_energy); // Copy HF exchange energies to vector
+        }
+    
+        // compute electron and spin densities
+        t61 = thread(&Wavefunction_calculations::Compute_densities, this, this->results.probabilities, atoms_electron_densities,
+        index_atoms, size_order, this->results.spins, this->results.spin_paired, false);
+        t62 = thread(&Wavefunction_calculations::Compute_densities, this, this->results.probabilities, atoms_spin_densities,
+        index_atoms, size_order, this->results.spins, this->results.spin_paired, true);
+        
+        t61.join();
+        t62.join();
+        
+        // correct electron and spin densities
+        Correct_densities(atoms_electron_densities, this->results.x, this->results.y, this->results.z, size_order);
+        Correct_densities(atoms_spin_densities, this->results.x, this->results.y, this->results.z, size_order);
+        
+        correlation_energies.clear();
+        exchange_energies.clear();
+        electron_energies.clear();
+        
+        // run PBE method over electron and spin densities
+        
+        Compute_Ksi_and_gradients(atoms_electron_densities, atoms_spin_densities, atoms_Ksi_densities, atoms_gradients_densities,
+        size_order);
+        PBE_compute(atoms_gradients_densities, atoms_Ksi_densities, this->results.probabilities, size_order);
+        }
+    if (dealocate == true) // Dealocate atom electron aand spin densities
+        Clear();
+        
+    return(Hamiltonian);
+    }
+template <typename T>
 T Wavefunction_calculations<T>::Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order,
 bool dealocate, vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     {
@@ -427,8 +1714,10 @@ bool dealocate, vector<T>* values, vector<T>* spin_density_vector,  vector<T>* s
     if (central_cation_atoms.atom_numbers.size() > 0)
         Create_crystal_field(&central_cation_atoms);
        
-    Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, dealocate, values, spin_density_vector,
-    spin_values);
+    Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, true, values, spin_density_vector, spin_values);
+    if (dealocate == true) // Dealocate atom electron aand spin densities
+        Clear();
+    
     return(Hamiltonian);
     }
 template <typename T>
@@ -1144,6 +2433,8 @@ T Wavefunction_calculations<T>::D3_vector_multiply(T* a, T* b, T* c)
 template <typename T>
 T Wavefunction_calculations<T>::Clear()
     {
+    unsigned int i;
+    
     count_atoms = 0;
     x_center_of_mass = 0;
     y_center_of_mass = 0;
@@ -1174,11 +2465,81 @@ T Wavefunction_calculations<T>::Clear()
     symetry_planes_parameters.b.clear();
     symetry_planes_parameters.c.clear();
     symetry_planes_parameters.d.clear();
+    // density functional theory section
+    for (i = 0; i < atoms_spin_densities.size(); i++)
+        {
+        if (atoms_spin_densities[i] != nullptr)
+            delete[] atoms_spin_densities[i];
+        }
+    for (i = 0; i < atoms_electron_densities.size(); i++)
+        {
+        if (atoms_electron_densities[i] != nullptr)
+            delete[] atoms_electron_densities[i];
+        }
+    for (i = 0; i < atoms_Ksi_densities.size(); i++)
+        {
+        if (atoms_Ksi_densities[i] != nullptr)
+            delete[] atoms_Ksi_densities[i];
+        }
+    for (i = 0; i < atoms_gradients_densities.size(); i++)
+        {
+        if (atoms_gradients_densities[i] != nullptr)
+            delete[] atoms_gradients_densities[i];
+        }
+    atoms_electron_densities.clear();
+    atoms_spin_densities.clear();
+    atoms_spin_densities.clear();
+    correlation_energies.clear();
+    exchange_energies.clear();
+    HF_exchange_energies.clear();
+    electron_energies.clear();
+    // end of density functional theory section
     return(0);
     }
 template <typename T>
 Wavefunction_calculations<T>::~Wavefunction_calculations(){
     Clear();}
+/*
+basis_set_orbital version 1.11
+1. The program allows simulations with the inclusion of previous valence layers by entering atoms of noble gas elements just before the simulated atom in molecule and correct overlaps from internal valence layers by entering the correction potentials (large waavefunction set).
+
+2. The program uses the Laguerre-based wave function basis set and include physical models of influence of the electron shielding 
+and new fast and accurate variational generation of wavefunction for next iteration.
+
+3. The program is accurate only for the calculation of simple systems of and bond lengths and no physicaly unexplained internal empirical
+coefficients are used in the Hartree-Fock procedure calculation process.
+
+4. If program generate energy levels upper vacuum level (+ values), the energy levels are in reality shifted down.
+
+5. If you simulate polar compound or polar crystalic compounds, you must correct the influence of local charges to obtain true Hamiltonian
+- subtract sums of potential energies of dipoles.
+
+6. Program chose for open-shell moleculse the open-shell Fartree-Fock method nad for closed-shell molecules
+the closed-shell Fartree-Fock method.
+
+Author of this program strictly forbiden patenting ideas in this program by other person
+and licensed this source code under the The 3-Clause BSD License:
+
+Symetry informations for Hartree-Fock molecular orbital version 2.50
+To construct symetric molecules with program Hartree_Fock_molecular orbital you must:
+1. atoms of the same ellements groups together in input string (function Coulombic_integral(...) depend on the sequence of atoms),
+2. check the spins of electrons and give right sequence of atoms in bonding substrings and right sequence of bonds substrings.
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
   Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
   

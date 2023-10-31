@@ -634,7 +634,35 @@ Vectors with equation parameters parametres of symetry planes a * x + b * y + c 
 bool planar;
 If structure is planar - true, else false;
 } symetry_planes
-    
+
+vector <T*> atoms_electron_densities;
+Pointers to electron densities cubes of atoms
+
+vector <T*> atoms_spin_densities;
+Pointers to spin densities cubes of atoms
+
+vector <T*> atoms_Ksi_densities;
+Pointers to Ksi densities cubes of atoms
+
+vector <T*> atoms_gradients_densities;
+Pointers to gradient densities cubes of atoms
+
+vector <T> HF_exchange_energies;
+Vector of Hartree-Fock exchange energies of electrons
+
+vector <T> exchange_energies;
+Vector of exchange energies of electrons
+
+vector <T> correlation_energies;
+Vector of correlation energies of electrons
+
+vector <T> electron_energies;
+Vector of eigenvectors of electrons
+
+unsigned int PBE_iterations = 1; // Number of iterations of including the correlation energy to main calculations
+Counnt of iterative involving of computed exchange and correlation energies to main computation.
+
+
 private functions:
 
 T Create_index_atoms();
@@ -684,65 +712,3 @@ This function test the center symetry, find symetry axes and symetry planes and 
 T* D3_vector_multiply(T* a, T* b, T* c);
 
 This function returns the vector multiple of three-dimensional vectors pointered by a and b into vector pointered by c.
-//  Density functional theory section
-vector <T*> atoms_electron_densities; - This vector contains electron densities cubes of atoms.
-vector <T*> atoms_spin_densities;- This vector contains spin densities cubes of atoms.
-vector <T*> atoms_Ksi_densities; - This vector contains Ksi densities cubes of atoms.
-vector <T*> atoms_gradients_densities; - This vector contains electron densities cubes of atoms.
-vector <T> HF_exchange_energies; - This vector contains electron exchange energies from integrals.
-vector <T> exchange_energies; - This vector contains electron exchange energies from density functional.
-vector <T> correlation_energies; - This vector contains electron correlation energies from density functional.
-vector <T> electron_energies; - This vector contains total electron energies.
-    
-array<T, 118> Wigner_Seitz_radiuses - This array contains Wigner-Seitz radiuses of elements.
-
-T beta = 0.066725; - scalable argument
-T gamma = (1 - log(2))/(this->Pi * this->Pi); - scalable argument, equal 0.031091, scalable argument to 0.025
-T omega = 0.046644; - scalable argument
-
-T Alocate_densities(unsigned int size_order);
-This function alocate densities cubes.
-
-T Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end, unsigned int atom_size,
-vector<T> spins, vector<int> spin_paired, bool spin_density);
-
-This function compute atom electron densities or atom spin densities cubes from primary electron densities cubes.
-
-T Compute_densities(vector<T*> densities, vector<T*> atoms_densities, vector<unsigned int> index,
-unsigned int size_order, vector<T> spins, vector<int> spin_paired, bool spin_density);
-
-This function compute atom electron densities or atom spin densities cubes from primary electron densities cubes by multithreading.
-
-T Correct_densities(vector<T*> atoms_densities_list, vector<T>  x, vector <T> y, vector <T> z, unsigned int size_order);
-
-This function correct atom electron densities or atom spin densities cubes from primary electron densities cubes by multithreading.
-The correction is by adding overlaping densities from other atoms.
-
-T Compute_Ksi_thread(T* spin_density, T* electron_density, T* Ksi_density, unsigned int size_order);
-
-This function compute atom Ksi density from atom densities cubes.
-
-T Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order);
-
-This function compute atom gradient density from atom densities cubes.
-
-T Compute_Ksi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
-vector<T*> atoms_Ksi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
-
-This function compute atom gradient and Ksi densities from atom densities cubes by multithreading.
-    
-T PBE_thread(T* atoms_gradients_density, T* atoms_Ksi_density, T* electron_density,
-unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius);
-
-This function compute exchange and correction energy for electron with electron density in electron_density.
-
-T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities, vector<T*> electron_densities,
-unsigned int size_order);
-
-This function compute exchange and correction energies by multithreading.
-
-T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
-vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values);
-
-This function execute computation of PBE density functional, equivalent to Execute_calculation.
-//  End of density functional theory section
