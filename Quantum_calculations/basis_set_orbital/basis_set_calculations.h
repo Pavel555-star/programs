@@ -355,7 +355,6 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
         T den;
         T n;
         T d;
-        
         T buffer_s[4096];
         T denominator_s[4096];
         T temp1_s[64];
@@ -475,7 +474,6 @@ inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, 
             }
         det = (det/den) * sign;
         }
-        
     if (order > 64) // Gaussian elimination calculation in triangular form
         {
         unsigned int line_G;
@@ -4370,7 +4368,6 @@ T basis_set_calculations<T>::Wavefunction_multiply(T* wavefunction_1, T* wavefun
     
     side = (2 * lenght_order + 1);
     size = side * side * side;
-    
     // vectorisation code
     for (i = 0; i < (size - 7); i = i + 8) // Multiplying of Wavefunction_1 and Wavefunction_1
         {
@@ -4384,10 +4381,8 @@ T basis_set_calculations<T>::Wavefunction_multiply(T* wavefunction_1, T* wavefun
         probabilities[i + 7] = wavefunction_1[i + 7] * wavefunction_2[i + 7]; 
         }
     for (i = size - (size % 8); i < (size); i++)
-        {
         probabilities[i] = wavefunction_1[i] * wavefunction_2[i];
-        }
-        // end of vectorisation code
+    // end of vectorisation code
     return(0);
     }
 template <typename T>
@@ -4430,7 +4425,6 @@ T basis_set_calculations<T>::Probabilities_lenght(T* probabilities, unsigned int
     lenght = 0.00;
     side = (2 * lenght_order + 1);
     size = side * side * side;
-    
     j = 0;
     k = 0;
     
@@ -4612,7 +4606,7 @@ unsigned int lenght_order, T x, T y, T z)
     
     return(0);
     }
-    template <typename T>
+template <typename T>
 T basis_set_calculations<T>::Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result,
 unsigned int lenght_order, T x, T y, T z) 
     { // Calculate the absolute value of overleap integral for multiplying the energy differences from fock matrix
@@ -4673,8 +4667,7 @@ unsigned int lenght_order, T x, T y, T z)
         overlap[0] = overlap[0] + abs(overlap_array[i]);
         
     overlap_sum = overlap[0] + overlap[1] + overlap[2] + overlap[3] + overlap[4] + overlap[5] + overlap[6] + overlap[7];
-    // end of vectorisation code    
-    
+    // end of vectorisation code
     average_lenght = 0;
     for (k = 0; k < z_side; k++)
         for (j = 0; j < y_side; j++)
@@ -4736,7 +4729,6 @@ unsigned int lenght_order, T x, T y, T z)
     unsigned int i, j, k, l, m, n;
     unsigned int x_contraction, y_contraction, z_contraction, x_side, y_side, z_side;
     int x_shift, y_shift, z_shift;
-
     T constant;
     T radius;
     T point_value_distance;
@@ -6949,17 +6941,24 @@ T x_difference, T y_difference, T z_difference)
                 atom_wavefunctions_2->pi_bonding[indexes_2[i]] = atom_wavefunctions_1->electron_numbers[indexes_1[i]];
                 }
             count_bonds--;
-            polarity = (electronegativity_1 - electronegativity_2)/1.67;
+            polarity = 1 - exp((electronegativity_1 - electronegativity_2)*(electronegativity_1 - electronegativity_2)/4);
+            // Linus Pauling formula
             if ((sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
             /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) > 1) // cut-off function
+                {
                 polarity = polarity * exp(-(sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
                 /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) + 1);
-            if (polarity > 1)
-                polarity = 1;
-            if (polarity < -1)
-                polarity = -1;
-            coefficient_1 = sqrt(1 + polarity);
-            coefficient_2 = sqrt(1 - polarity);
+                }
+            if (electronegativity_1 > electronegativity_2)
+                {
+                coefficient_1 = sqrt(1 + polarity);
+                coefficient_2 = sqrt(1 - polarity);
+                }
+            else
+                {
+                coefficient_1 = sqrt(1 - polarity);
+                coefficient_2 = sqrt(1 + polarity);
+                }
             atom_wavefunctions_1->wavefunction_coefficients[indexes_1[i]] = coefficient_1;
             atom_wavefunctions_2->wavefunction_coefficients[indexes_2[i]] = coefficient_2;
             }
@@ -10222,8 +10221,7 @@ T basis_set_calculations<T>::Clear()
     }
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
-Clear();}
-/*
+Clear();} /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
   
