@@ -18,6 +18,9 @@ unsigned int count_pi_electrons;
 unsigned int lenght_order;
 unsigned int max_iterations;
 unsigned int parameter_size;
+/*
+unsgned int x, y;
+*/
 
 double success;
 double fidelity;
@@ -28,6 +31,9 @@ vector<double> values;
 vector<double> spin_values;
 vector<double> spin_density_matrix;
 double* Huckel_matrix;
+/*
+double* overall_density;
+*/
 unsigned int* Huckel_matrix_order;
 vector<unsigned int> Huckel_electrons_to_atom_numbers;
 
@@ -40,6 +46,9 @@ vector<double> spins;
 
 Wavefunction_calculations<double> Wavefunction_calculations;
 Huckel_calculations<double> Huckel_calculations;
+/*
+Visualization_3D<double> Visualization_3D;
+*/
 
 cout<<"     ...                    ..     (@@@@@@@@@@@@@@(.                                                " <<endl;
 cout<<"                                @@@@@@@@@@@@@@@@@@@@@@@@                                            " <<endl;

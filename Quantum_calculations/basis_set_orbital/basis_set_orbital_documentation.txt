@@ -1,4 +1,4 @@
-basis_set_calculations code documentation version 1.11
+basis_set_calculations code documentation version 1.2
 class basis_set_calculations:
 
 public variables and constants:

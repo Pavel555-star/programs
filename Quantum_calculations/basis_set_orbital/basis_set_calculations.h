@@ -6949,9 +6949,11 @@ T x_difference, T y_difference, T z_difference)
                 atom_wavefunctions_2->pi_bonding[indexes_2[i]] = atom_wavefunctions_1->electron_numbers[indexes_1[i]];
                 }
             count_bonds--;
-            polarity = (electronegativity_1 - electronegativity_2)/1.7;
-            polarity = polarity/sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference);
-            polarity = polarity * (atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]]);
+            polarity = (electronegativity_1 - electronegativity_2)/1.67;
+            if ((sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
+            /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) > 1) // cut-off function
+                polarity = polarity * exp(-(sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
+                /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) + 1);
             if (polarity > 1)
                 polarity = 1;
             if (polarity < -1)

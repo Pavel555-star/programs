@@ -1,15 +1,6 @@
 #include <thread> 
 #include <vector>
 #include <bits/stdc++.h>
-
-/*
-#ifdef __APPLE__
-#include <OpenCL/opencl.h> // -lOpenCL -pthread -ffast-math -fno-finite-math-only -fmove-loop-invariants -O1
-#else
-#include <CL/cl.h>
-#endif
-*/
-
 using namespace std;
 
 template <typename T>
@@ -31,10 +22,6 @@ private:
     T Compute_density_thread(const vector<T*>* densities, T* atom_density, unsigned int begin, unsigned int end, unsigned int atom_size,
     const vector<T>* spins, const vector<int>* spin_paired, bool spin_density);
     T Compute_densities_weights_thread(T* density, T ratio, T* weight_pointer, unsigned int learning_cycles, unsigned int size_order);
-    /*
-    T Compute_densities_weights_OpenCL(const vector<double*>* densities, vector<double>* weights, double ratio,
-    unsigned int training_cycles, unsigned int size_order);
-    */
 public:
     vector<T*> atoms_densities_list;
     vector<array<T, 3>> coordinates;
@@ -47,7 +34,7 @@ public:
     T Generate_coordinates(T side_half_lenght, const vector<T>* x, const vector <T>* y, const vector<T>* z);
     T Compute_densities(const vector<T*>* densities, vector<unsigned int>* index, unsigned int size_order,
     const vector<T>* spins, const vector<int>* spin_paired, bool spin_density);
-    T Compute_densities_weights_95(const vector<T*>* densities, vector<T>* weights, unsigned int size_order, bool OpenCL);
+    T Compute_densities_weights_95(const vector<T*>* densities, vector<T>* weights, unsigned int size_order);
     T Generate_2D_cross_section(unsigned int direction, T coordinate);
     T Clear();
     ~Visualization_3D();
@@ -244,116 +231,6 @@ if (ratio > 0 and ratio < 1)
 weight_pointer[0] = weight;
 return(0);
 }
-/*
-template <typename T> 
-T Visualization_3D<T>::Compute_densities_weights_OpenCL(const vector<double*>* densities, vector<double>* weights, double ratio,
- unsigned int training_cycles, unsigned int size_order)
-{ // perceptron function for values in 2D cross section for probability in weights
-unsigned int i;
-unsigned int size = (2 * size_order + 1) * (2 * size_order + 1) * (2 * size_order + 1);
-T weight;
-T ratio_local;
-unsigned int training_cycles_local;
-ratio_local = ratio;
-training_cycles_local = training_cycles;
-// untested kernel
-string kernel_source =
-    "__kernel void vector_multiple(__global double *density, __global double *weight, __global double *ratio,"
-    "__global unsigned int *density_size, __global unsigned int *training_cycles) {"
-    "unsigned int i;"
-    "double sum, prediction;"
-    "sum = 0;"
-    "unsigned int j = get_global_id(0);" // Get global ID of elements
-    "sum = sum + abs(density[j]);"
-    "weight[0] = sum/density_size[0];"
-    "for (i = 0; i < training_cycles[0]; i++) {"
-    "prediction = 0;"
-    "unsigned int j = get_global_id(0);" // Get global ID of elements
-    "if (density[j] > weight[0]) {prediction = prediction + abs(density[j]);}"
-    "weight[0] = weight[0] + (sum * ratio[0] - prediction)/density_size[0];"
-    "}"
-    "weight[0] = sum;"
-    "}";
-unsigned int  kernel_source_size = kernel_source.length();
-    
-// Load the kernel source code into the array source_str
-char *source_str;
-size_t source_size = kernel_source_size;   
-source_str = &kernel_source[0];
-// Get information about platform and devices
-cl_platform_id platform_id = NULL;
-cl_device_id device_id = NULL;   
-cl_uint ret_num_devices;
-cl_uint ret_num_platforms;
-cl_int ret = clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
-ret = clGetDeviceIDs( platform_id, CL_DEVICE_TYPE_ALL, 1, 
-        &device_id, &ret_num_devices);
-if (ret != 0) // Check for error codes
-    return(-1);
-
-cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret); // Get OpenCL context
-cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, &ret); // Create the command que
-
-cl_mem a_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY, // Create memory buffers for all variables
-        size * sizeof(double), NULL, &ret);
-cl_mem b_mem_obj = clCreateBuffer(context, CL_MEM_READ_ONLY,
-        sizeof(double), NULL, &ret);
-cl_mem c_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
-        sizeof(double), NULL, &ret);
-cl_mem d_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
-        sizeof(unsigned int), NULL, &ret);
-cl_mem e_mem_obj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
-        sizeof(unsigned int), NULL, &ret);
-
-cl_program program = clCreateProgramWithSource(context, 1, // Create program from source kernel
-        (const char **)&source_str, (const size_t *)&source_size, &ret);
-ret = clBuildProgram(program, 1, &device_id, NULL, NULL, NULL); // Build program
-cl_kernel kernel = clCreateKernel(program, "percentil_search", &ret); // Create OpenCL kernel
-
-ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&a_mem_obj); // Set kelnel parameters
-ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&b_mem_obj);
-ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&c_mem_obj);
-ret = clSetKernelArg(kernel, 3, sizeof(cl_mem), (void *)&d_mem_obj);
-ret = clSetKernelArg(kernel, 4, sizeof(cl_mem), (void *)&e_mem_obj);
-    
-ret = clEnqueueWriteBuffer(command_queue, c_mem_obj, CL_TRUE, 0, // Copy data
-        sizeof(double), &ratio_local, 0, NULL, NULL);
-ret = clEnqueueWriteBuffer(command_queue, d_mem_obj, CL_TRUE, 0, 
-        sizeof(unsigned int), &size, 0, NULL, NULL);
-ret = clEnqueueWriteBuffer(command_queue, e_mem_obj, CL_TRUE, 0, 
-        sizeof(unsigned int), &training_cycles_local, 0, NULL, NULL);
-
-if (weights->size() > 0) // 
-    weights->clear();
-for (i = 0; i < densities->size(); i++) // loop of kernel run
-    {
-    // Copy data to video memory
-    ret = clEnqueueWriteBuffer(command_queue, a_mem_obj, CL_TRUE, 0,
-            size * sizeof(double), densities->operator[](i), 0, NULL, NULL);
-    // Run OpenCL kernel on the list
-    size_t global_item_size = size; // Process the entire lists
-    size_t local_item_size = 64; // Process in groups of 64
-    ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_item_size, &local_item_size, 0, NULL, NULL);
-    // Store resultc into weight variable
-    ret = clEnqueueReadBuffer(command_queue, b_mem_obj, CL_TRUE, 0, sizeof(double), &weight, 0, NULL, NULL);
-    
-    weights->push_back(weight);
-    }    
-// Clear the OpenCL device
-ret = clFlush(command_queue);
-ret = clFinish(command_queue);
-ret = clReleaseKernel(kernel);
-ret = clReleaseProgram(program);
-ret = clReleaseMemObject(a_mem_obj);
-ret = clReleaseMemObject(b_mem_obj);
-ret = clReleaseMemObject(c_mem_obj);
-ret = clReleaseMemObject(d_mem_obj);
-ret = clReleaseMemObject(e_mem_obj);
-ret = clReleaseCommandQueue(command_queue);
-ret = clReleaseContext(context);
-return(0);
-}
-*/
 template <typename T>
 T Visualization_3D<T>::Generate_coordinates(T side_half_lenght, const vector<T>* x, const vector <T>* y, const vector<T>* z)
 { // Generate coordinates from x, y and z vectors
@@ -557,8 +434,7 @@ for (i = 0; (i + 7) < count_atoms; i = i + 8)
 return(0);  
 }
 template <typename T>
-T Visualization_3D<T>::Compute_densities_weights_95(const vector<T*>* densities, vector<T>* weights, unsigned int size_order,
-bool OpenCL)
+T Visualization_3D<T>::Compute_densities_weights_95(const vector<T*>* densities, vector<T>* weights, unsigned int size_order)
 {
 unsigned int i;
 unsigned int densities_size;
@@ -581,12 +457,6 @@ for (i = 0; i < densities_size; i++)
     {
     densities_array[i] = densities->operator[](i);
     }
-/*
-if (OpenCL == true and is_same<T, double>::value)
-    {
-    Compute_densities_weights_OpenCL(densities, &weights_95, 0.95, 20, size_order);
-    }
-*/
 if (OpenCL == false or not is_same<T, double>::value or weights_95.size() != densities_size)
     {
     if (weights->size() > 0)
@@ -1016,9 +886,25 @@ z_min = 0;
 x_max = 0;
 y_max = 0;
 z_max = 0;
-
 return(0);
 }
 template <typename T> // Destructor of class instance
 Visualization_3D<T>::~Visualization_3D() {
 Clear();}
+/*
+Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+  
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions
+and the following disclaimerin the documentation and/or other materials provided with the distribution.
+  
+3. Neither the name of the copyright holder nor the names of its contributors may be used
+to endorse or promote products derived from this software without specific prior written permission.
+  
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
