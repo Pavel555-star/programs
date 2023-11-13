@@ -6941,7 +6941,7 @@ T x_difference, T y_difference, T z_difference)
                 atom_wavefunctions_2->pi_bonding[indexes_2[i]] = atom_wavefunctions_1->electron_numbers[indexes_1[i]];
                 }
             count_bonds--;
-            polarity = 1 - exp((electronegativity_1 - electronegativity_2)*(electronegativity_1 - electronegativity_2)/4);
+            polarity = 1 - exp(-(electronegativity_1 - electronegativity_2)*(electronegativity_1 - electronegativity_2)/4);
             // Linus Pauling formula
             if ((sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
             /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) > 1) // cut-off function
