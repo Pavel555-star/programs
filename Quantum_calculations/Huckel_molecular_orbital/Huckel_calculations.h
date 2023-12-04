@@ -26,11 +26,10 @@ public:
     T Huckel_Wavefunction_Coefficient_solver(unsigned int order, T* matrix);
 };
 template <typename T>
-inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_pointer, T* buffer, T* denominator, T* temp1, T* temp2) 
+inline T Huckel_calculations<T>::Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2) 
     { // calculation of determinant matrix (reliable for matrices to 8 * 8 bytes and datetype long long)
     unsigned int i; // pointer, buffer and denominator - order * order dimensions and temp1 and temp2 - order dimensions
-    unsigned int j; // for order > 64, else nullptr 
-    
+    unsigned int j; // for order > 64, else nullptr
     T det = 0;
     T line = 1;
     T matrix[3][5];
@@ -40,20 +39,19 @@ inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_point
         case 0:
             return(-1); // For incorrectly entered matrices return 0
         case 1:
-            return(matrix_pointer[0]); // For first order return value of element
+            return(pointer[0]); // For first order return value of element
         case 2:
-            return((matrix_pointer[0] * matrix_pointer[3])-(matrix_pointer[1] * matrix_pointer[2]));
-            // For second order return determinant of second-order matrix
+            return((pointer[0]*pointer[3])-(pointer[1]*pointer[2])); // For second order return determinant of second-order matrix
         case 3:{ // Calculation by Sarus law
-            matrix[0][0] = matrix_pointer[0]; // Copying of matrix into auxiliary matrix
-            matrix[0][1] = matrix_pointer[1];
-            matrix[0][2] = matrix_pointer[2];
-            matrix[1][0] = matrix_pointer[3];
-            matrix[1][1] = matrix_pointer[4];
-            matrix[1][2] = matrix_pointer[5];
-            matrix[2][0] = matrix_pointer[6];
-            matrix[2][1] = matrix_pointer[7];
-            matrix[2][2] = matrix_pointer[8];
+            matrix[0][0] = pointer[0]; // Copying of matrix into auxiliary matrix
+            matrix[0][1] = pointer[1];
+            matrix[0][2] = pointer[2];
+            matrix[1][0] = pointer[3];
+            matrix[1][1] = pointer[4];
+            matrix[1][2] = pointer[5];
+            matrix[2][0] = pointer[6];
+            matrix[2][1] = pointer[7];
+            matrix[2][2] = pointer[8];
             for (i = 0; i < 3; i++) // Filling of auxiliary lines
                 { 
                 matrix[i][3] = matrix[i][0];
@@ -75,15 +73,14 @@ inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_point
                 det = det - line;
                 line = 1;
                 }
-            return det;
-               }
+        return det;
         }
+    }
     if ((order >= 4) and (order <= 7)) // Calculation by development according to the column
-    {
+        {
         unsigned int x;
         unsigned int subi;
         unsigned int subj;
-        
         int prefactor;
         T* submatrix;
         
@@ -93,60 +90,57 @@ inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_point
             {
             determinant_exception_handle = 1;
             }
-        
         for (x = 0; x < order; x++)
-        {
-        subi = 0;
-        for (i = 1; i < order; i++) 
             {
-            subj = 0;
-            for (j = 0; j < order; j++)
+            subi = 0;
+            for (i = 1; i < order; i++) 
                 {
-                if (j == x)
-                    continue;
-                submatrix[subi+((order-1) * subj)] = matrix_pointer[i + (order * j)];
-                subj++;
+                subj = 0;
+                for (j = 0; j < order; j++)
+                    {
+                    if (j == x)
+                        continue;
+                    submatrix[subi+((order-1) * subj)] = pointer[i + (order * j)];
+                    subj++;
+                    }
+                subi++;
                 }
-            subi++;
+            if (pointer[order * x] != 0)
+                {
+                if (x % 2 == 0)
+                    prefactor = 1;
+                else
+                    prefactor = -1;
+                det = det + (prefactor * pointer[order * x] * this->Determinant(order-1, submatrix,
+                nullptr, nullptr, nullptr,nullptr));
+                }
             }
-        if (matrix_pointer[order * x] != 0)
-            {
-            if (x % 2 == 0)
-                prefactor = 1;
-            else
-                prefactor = -1;
-            det = det + (prefactor * matrix_pointer[order * x] * Determinant(order-1, submatrix,
-            nullptr, nullptr, nullptr,nullptr));
-            }
-        }
         delete[] submatrix;
         }
     // vectorisation code    
-    if (order >= 8 and order <= 32) // Gaussian elimination calculation in triangular form
+    if (order >= 8 and order <= 64) // Gaussian elimination calculation in triangular form
         {
         unsigned int line_G;
         unsigned int k;
         int sign = 1;
         unsigned int red_order;
-        
         T den;
         T n;
         T d;
-        
-        T buffer_s[1024];
-        T denominator_s[1024];
+        T buffer_s[4096];
+        T denominator_s[4096];
         T temp1_s[64];
         T temp2_s[64];
         
         for (i = 0; i < (order * order); i++)
-        {
-            buffer_s[i] = matrix_pointer[i]; // Copying of matrix to modifications
-            denominator_s[i] = 1; // Filling of denominator_s matrix by ones
-        }
-        for (i = 0; i < order; i++)
-        {
-            for (j = i; j < order; j++)
             {
+            buffer_s[i] = pointer[i]; // Copying of matrix to modifications
+            denominator_s[i] = 1; // Filling of denominator_s matrix by ones
+            }
+        for (i = 0; i < order; i++)
+            {
+            for (j = i; j < order; j++)
+                {
                 if (buffer_s[i + (order * j)] != 0) // Finding of first line with non-zero value in the given column
                 {
                 line_G = j;
@@ -154,7 +148,7 @@ inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_point
                 }
                 if ((j == (order-1)) and (buffer_s[i + (order * j)] == 0)) // Zero control
                   return(0);
-            }
+                }
             for (j = i; j < order; j++) // Addition and subtraction of lines
                 {
                 if ((line_G != j) and (buffer_s[i + (order * j)] != 0)) 
@@ -237,7 +231,7 @@ inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_point
                     denominator_s[k + (order * i)] = temp2_s[k];
                     }
                 }
-        }
+            }
         det = 1;
         den = 1;
         for (i = 0; i < order; i++)
@@ -252,20 +246,18 @@ inline T Huckel_calculations<T>::Determinant(unsigned int order, T* matrix_point
             }
         det = (det/den) * sign;
         }
-    if (order > 32) // Gaussian elimination calculation in triangular form
+    if (order > 64) // Gaussian elimination calculation in triangular form
         {
         unsigned int line_G;
         unsigned int k;
         int sign = 1;
         unsigned int red_order;
-        
         T den;
         T n;
         T d;
-        
         for (i = 0; i < (order * order); i++)
             {
-            buffer[i] = matrix_pointer[i]; // Copying of matrix to modifications
+            buffer[i] = pointer[i]; // Copying of matrix to modifications
             denominator[i] = 1; // Filling of denominator matrix by ones
             }
         for (i = 0; i < order; i++)
@@ -845,20 +837,14 @@ T Huckel_calculations<T>::Huckel_Wavefunction_Coefficient_solver(unsigned int or
         }
     return(0);
     }
+
+
+
+
 /*
-Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the 3-Clause BSD License:
+Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions
-and the following disclaimerin the documentation and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors may be used
-to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
 */
