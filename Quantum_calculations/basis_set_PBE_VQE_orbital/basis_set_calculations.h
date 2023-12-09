@@ -7350,9 +7350,16 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     for (i = 0; i < order; i++) // including the wavefunctions coefficients for linear combination
         for (j = 0; j < i; j++)
             {
-            matrix[j + (i * order)] = matrix[j + (i * order)] * wavefunction_coefficients[i] * wavefunction_coefficients[i]
-            * wavefunction_coefficients[j] * wavefunction_coefficients[j];
-            matrix[i + (j * order)] = matrix[j + (i * order)]; // Copy values upper diagonal
+            if (bonding[i] != j)
+                matrix[j + (i * order)] = matrix[j + (i * order)] * wavefunction_coefficients[i] * wavefunction_coefficients[i]
+                * wavefunction_coefficients[j] * wavefunction_coefficients[j];
+            else
+                { // for orbitals with wavefunction_coefficients > 1 are coulombic and exchange energies cancelled
+                if (wavefunction_coefficients[j] > 1)
+                    matrix[j + (i * order)] = matrix[j + (i * order)] * wavefunction_coefficients[i] * wavefunction_coefficients[i];
+                if (wavefunction_coefficients[i] > 1)
+                    matrix[j + (i * order)] = matrix[j + (i * order)] * wavefunction_coefficients[j] * wavefunction_coefficients[j];
+                }
             }
     for (i = 0; i < order; i++) // copy calculated efective_lenghts upper diagonal
         for (j = 0; j < i; j++)
@@ -9981,13 +9988,6 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-
-
-
-
-
-
-
 
 
 

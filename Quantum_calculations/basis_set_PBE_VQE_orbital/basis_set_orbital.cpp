@@ -182,8 +182,8 @@ for  (i = 0; i < count_electrons; i++)
     << ", wavefunction lenght: " << (Wavefunction_calculations.results.efective_radius_base[i]/
     (Wavefunction_calculations.results.wavefunction_lenght_multipliers[i] * Wavefunction_calculations.Hartree_lenght)) << " Bohr radius"
     <<endl;
-    cout << ", wavefunction shielding coefficient: / koeficient stínění vlnových funkcí: / Abschirmkoeffizient von Wellenfunktionen:" <<
-    " / коэффициент экранирования волновых функций: " << Wavefunction_calculations.results.wavefunction_lenght_multipliers[i] <<endl;
+    cout << "shielding coefficient: / koeficient stínění: / Abschirmkoeffizient: / коэффициент экранирования: " <<
+    Wavefunction_calculations.results.wavefunction_lenght_multipliers[i] <<endl;
     }
 cout <<endl;
 

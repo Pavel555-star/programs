@@ -1851,7 +1851,6 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
         previous_correlation_energies.push_back(correlation_energies[i]);
         previous_exchange_energies.push_back(exchange_energies[i]);
         }
-    
     allocation_memory = false;
     for (i = 0; i < matrix_order; i++)
         this->results.wavefunction_lenght_multipliers[i] = pre_PBE_wavefunction_lenght_multipliers[i];
@@ -1872,7 +1871,6 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
         {
         if (VQE_Eigenvectors_1 < VQE_Eigenvectors_2)
             VQE_correlation_energy_sign.push_back(true);
-            
         else
             VQE_correlation_energy_sign.push_back(false);
         }
@@ -1918,13 +1916,18 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
                 (abs(VQE_Hamiltonian/VQE_previous_Hamiltonian) > minimal_fidelity) and (VQE_Hamiltonian/VQE_previous_Hamiltonian > 0))
                 break;
             
-            VQE_ansatz.clear();    
+            max_PBE_difference = 0;
+            for (i = 0; i < matrix_order; i++) // Calculating new ansatz vector
+                {
+                if (abs(values->operator[](i) - VQE_Eigenvectors_1[i]) > abs(max_PBE_difference))
+                    max_PBE_difference = values->operator[](i) - VQE_Eigenvectors_1[i];
+                }
             for (i = 0; i < matrix_order; i++) // Calculating new ansatz vector
                 {
                 if (VQE_correlation_energy_sign[i] == true) // Second model - more lower energies
-                    VQE_ansatz.push_back(0.5 + 0.5 * (VQE_Eigenvectors_2[i] - VQE_Eigenvectors_1[i])/max_PBE_difference);
+                    VQE_ansatz[i] = (0.5 + 0.5 * (values->operator[](i) - VQE_Eigenvectors_1[i])/max_PBE_difference);
                 else // First model - more lower energies
-                    VQE_ansatz.push_back(0.5 - 0.5 * (VQE_Eigenvectors_1[i] - VQE_Eigenvectors_2[i])/max_PBE_difference);
+                    VQE_ansatz[i] = (0.5 - 0.5 * (VQE_Eigenvectors_1[i] - values->operator[](i))/max_PBE_difference);
                 }
             VQE_iterations = VQE_iterations + 1;
             }
@@ -2697,15 +2700,12 @@ T Wavefunction_calculations<T>::Clear()
     for (i = 0; i < atoms_spin_densities.size(); i++)
         if (atoms_spin_densities[i] != nullptr)
             delete[] atoms_spin_densities[i];
-    
     for (i = 0; i < atoms_electron_densities.size(); i++)
         if (atoms_electron_densities[i] != nullptr)
             delete[] atoms_electron_densities[i];
-    
     for (i = 0; i < atoms_Ksi_densities.size(); i++)
         if (atoms_Ksi_densities[i] != nullptr)
             delete[] atoms_Ksi_densities[i];
-    
     for (i = 0; i < atoms_gradients_densities.size(); i++)
         if (atoms_gradients_densities[i] != nullptr)
             delete[] atoms_gradients_densities[i];
@@ -2742,7 +2742,7 @@ T Wavefunction_calculations<T>::Clear()
     }
 template <typename T>
 Wavefunction_calculations<T>::~Wavefunction_calculations(){
-    Clear();}/*
+    Clear();} /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 
 Apache License
