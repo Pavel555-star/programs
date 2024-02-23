@@ -1,0 +1,14 @@
+Atoms Pi electrons diagonal additions non-diagonal additions  bond
+C     1                     0         1                       aromatic
+C     1                     0         0.9                     one
+C     1                     0         1.1                     double
+N     1                     0.4-0.5   1                       aromatic
+N     2                     1-1.5       0.8-0.9               one
+O     1                     2.0       0.8-0.9                 one
+O     2                     1.0-1.2   1-2                     two  
+F     2                     1.5-5     0.2-0.7                 one
+Cl    2                     1-2.5     0.2-0.8                 one
+Br    2                     1.5       0.3                     one
+CH3   2                     1.4-3     0.7                     one
+
+overlap integral (from benzene spectroscopic data): 0.055
