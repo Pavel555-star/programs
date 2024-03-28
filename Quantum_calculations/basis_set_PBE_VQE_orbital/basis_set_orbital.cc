@@ -187,7 +187,7 @@ for  (i = 0; i < count_electrons; i++)
     }
 cout <<endl;
 
-cout << "Z, " << "N, " << "C, " << "n, " << "l, " << "m, " << "s, " << "E_eff/Z" <<endl;
+cout << "Z, " << "N, " << "C, " << "n, " << "l, " << "m, " << "s, " << "Z_eff/Z" <<endl;
 for  (i = 0; i < count_electrons; i++)
     {
     cout<< basis_set_calculations_DFT.results.Z[i] << ", " << basis_set_calculations_DFT.results.count_electrons[i] << ", "

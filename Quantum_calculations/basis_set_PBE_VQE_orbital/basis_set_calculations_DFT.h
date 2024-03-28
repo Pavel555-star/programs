@@ -105,7 +105,7 @@ public:
     unsigned int VQE_iterations = 0;
     unsigned int VQE_max_iterations = 2;
     unsigned int VQE_shots = 1; // Simulator settings
-    unsigned int VQE_max_connections = 10;
+    unsigned int VQE_max_connections = 16;
     T VQE_interconnection_distance = 5;
     bool Bravyi_Kitaev = false;
     vector<pair<unsigned int, unsigned int>> VQE_gates; // Qiskit circuit code

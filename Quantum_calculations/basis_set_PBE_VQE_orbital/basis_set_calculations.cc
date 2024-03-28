@@ -1,6 +1,5 @@
 #include "basis_set_calculations.h"
 using namespace std;
-
 template <typename T>
 inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2) 
     { // calculation of determinant matrix (reliable for matrices to 8 * 8 bytes and datetype long long)
@@ -5133,6 +5132,15 @@ T basis_set_calculations<T>::Atoms_to_valence_orbitals(string atom, atom_orbital
         atom_orbitals_PTR->reduced_Z = 11;
         atom_orbitals_PTR->electronegativity = 1.93;
         }
+    if (atom == "Cd") // 5s1 4d10
+        {
+        Quantum_numbers_to_orbitals(5, 0, 2, atom_orbitals_PTR);
+        Quantum_numbers_to_orbitals(4, 2, 10, atom_orbitals_PTR);
+        
+        atom_orbitals_PTR->Z = 47;
+        atom_orbitals_PTR->reduced_Z = 11;
+        atom_orbitals_PTR->electronegativity = 1.93;
+        }
     if (atom == "In") // 5s2 5p1 4d10
         {
         Quantum_numbers_to_orbitals(5, 0, 2, atom_orbitals_PTR);
@@ -5669,7 +5677,7 @@ T basis_set_calculations<T>::Atoms_to_valence_orbitals(string atom, atom_orbital
         atom_orbitals_PTR->reduced_Z = 18;
         atom_orbitals_PTR->electronegativity = 0;
         }
-    if (atom == "Du") // 7s2 6d3 5f14
+    if (atom == "Db") // 7s2 6d3 5f14
         {
         Quantum_numbers_to_orbitals(7, 0, 2, atom_orbitals_PTR);
         Quantum_numbers_to_orbitals(6, 2, 3, atom_orbitals_PTR);
@@ -9575,16 +9583,13 @@ T basis_set_calculations<T>::Clear()
     unsigned int i, j;
     unsigned int order = results.n.size();
     bool previous_deleted;
-    
-    for (i = 0; i < results.wavefunctions.size(); i++)
-            {
+    for (i = 0; i < results.wavefunctions.size(); i++) {
             previous_deleted = false; // avoid double delete
             for (j = 0; j < i; j++)
                 if (results.wavefunctions[i] == results.wavefunctions[j])
                     previous_deleted = true;
             
-            if (previous_deleted == false)
-                {
+            if (previous_deleted == false) {
                 delete[] results.wavefunctions[i];
                 delete[] results.probabilities[i];
                 delete[] results.Laplacians[i];
@@ -9662,7 +9667,6 @@ T basis_set_calculations<T>::Clear()
     atoms.wavefunction_coefficients.clear();
     atoms.bonding.clear();
     atoms.paired_with_previous.clear();
-    
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
@@ -9687,7 +9691,6 @@ T basis_set_calculations<T>::Clear()
     results.x.clear();
     results.y.clear();
     results.z.clear();
-    
     small_results.lenghts.clear();
     small_results.wavefunctions.clear();
     small_results.probabilities.clear();
@@ -9700,7 +9703,6 @@ T basis_set_calculations<T>::Clear()
     small_results.l.clear();
     small_results.m.clear();
     small_results.Z.clear();
-    
     electron_number = 0;
     iterations = 0;
     determinant_exception_handle = 0;
@@ -9711,10 +9713,8 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-template class basis_set_calculations<double>;
-/*
+template class basis_set_calculations<double>; /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-*/
+                        http://www.apache.org/licenses/ */

@@ -1829,7 +1829,7 @@ vector<unsigned int> atom_numbers)
             if (j != i and electron_to_atom_numbers[index_pi_electrons[i]] != electron_to_atom_numbers[index_pi_electrons[j]])
                 Huckel_matrix[(i * count_pi_electrons) + j] = Huckel_matrix[(i * count_pi_electrons) + j]
                 + abs(this->resonance_integral_matrix[(index_pi_electrons[i] * matrix_order) +  index_pi_electrons[j]]);
-        }
+        } /*
     for (i = 0; i < count_pi_electrons; i++) // Copying nuclear_atraction and coulombic integrals
         {
         ionization_energy = this->nuclear_atraction_integral_matrix[index_pi_electrons[i] * (matrix_order + 1)]; 
@@ -1852,7 +1852,7 @@ vector<unsigned int> atom_numbers)
     average_diagonal = average_diagonal/count_pi_electrons; 
     for (i = 0; i < count_pi_electrons; i++) // diagonal shift
         Huckel_matrix[i * (count_pi_electrons + 1)] = Huckel_matrix[i * (count_pi_electrons + 1)] - average_diagonal;
-            
+            */
     if (beta != 0) // non-diagonal transition to shape beta/beta max
         for (i = 0; i < count_pi_electrons; i++)
             for (j = 0; j < count_pi_electrons; j++)
