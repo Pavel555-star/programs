@@ -553,7 +553,7 @@ T Huckel_calculations<T>::Huckel_Determinant_solver(unsigned int order, T* matri
             
     for (i = 1; i < 63999; i++)
         {
-        if ((determinant_values[i] * determinant_values[i] <= determinant_max * 0.01)
+        if ((determinant_values[i] * determinant_values[i] <= determinant_max * 0.1)
         and (determinant_values[i] * determinant_values[i] <  determinant_values[i + 1] * determinant_values[i + 1])
         and (determinant_values[i] * determinant_values[i] < determinant_values[i - 1] * determinant_values[i - 1]))
             determinants.push_back((T(i)/(8000/r_m)) -(4.00 * r_m));
