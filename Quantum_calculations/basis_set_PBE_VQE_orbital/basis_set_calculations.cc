@@ -5906,7 +5906,7 @@ T basis_set_calculations<T>::Create_atomic_wavefunctions(atom_orbitals *atom_orb
         atom_wavefunctions->x.push_back(x);
         atom_wavefunctions->y.push_back(y);
         atom_wavefunctions->z.push_back(z);
-        atom_wavefunctions->wavefunction_lenght_multipliers.push_back(1.00/Get_relative_Hartree_length(atom_orbitals_PTR->Z,
+        atom_wavefunctions->wavefunction_lenght_multipliers.push_back(Get_relative_Hartree_length(atom_orbitals_PTR->Z,
         atom_orbitals_PTR->n[i]));
         electron_number++;
         }
@@ -8270,7 +8270,7 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
             {
             multiplier = pow(wavefunction_lenght_multipliers[i], 1 - new_old_iteration_ratio[Z[i] - charge[i]]) *
             pow(sqrt(abs(Rydberg_energy(Z[i], n[i]) /Eigenvectors[i] * multiplier_constant)), new_old_iteration_ratio[Z[i] - charge[i]])
-            * 1.00/Get_relative_Hartree_length(Z[i], n[i]);
+            * Get_relative_Hartree_length(Z[i], n[i]);
             if (multiplier > 1.00/1024 and multiplier < 1024)
                 wavefunction_lenght_multipliers[i] = multiplier;
             }
