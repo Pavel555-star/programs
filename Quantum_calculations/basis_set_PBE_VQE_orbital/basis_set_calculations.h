@@ -15,10 +15,8 @@ public:
     vector<T> determinants;
     vector<T> spectra_EPR;
     vector<T> electron_spectra;
-    
     const T Phi = (1.00 + sqrt(5))/2.00; // The golden ratio
     const T Pi = 4.00/sqrt(Phi); // Pi constant derived from Phi
-    
     T E0 = 8.8541878128E-12; // F·m^-1, m^-3·kg^-1·s^4·A^2
     T h = 6.62607015E-34; // J·s , kg·m^2/s
     T vacuum_permeability = 1.25663706212E-6; // N·A^−2, kg·m·s^-2·A^−2
@@ -29,7 +27,6 @@ public:
     T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
     T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
     T hyperfine_structure_constant = (e * e)/(2 * E0 * h * c);
-    
     const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
     unsigned int electron_number = 0;
@@ -99,6 +96,7 @@ public:
     vector<unsigned int> electron_numbers;
     vector<unsigned int> lenght_orders;
     vector<T*> lenghts;
+    vector<T*> relative_lenghts;
     vector<T*> wavefunctions;
     vector<T*> probabilities;
     vector<T> x;
@@ -117,6 +115,7 @@ T basis_set_Determinant_solver(unsigned int order, T* pointer);
 private:
 // Section 2 - generating the wavefunctions
 T Wavefunction_lenghts_generate(T* lenghts, unsigned int lenght_order);
+
 T Wavefunction_1s_generate(T* wavefunction, T* lenghts, int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_2s_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_3s_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -219,6 +218,7 @@ T Get_relative_Hartree_length(unsigned int Z, unsigned int n);
 unsigned int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
 unsigned int lenght_order, T d_x, T d_y, T d_z);
 T Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities, unsigned int lenght_order);
+T Wavefunction_relative_lenghts_generate(T* lenghts, unsigned int lenght_order);
 T Wavefunction_square(T* wavefunction_1, T* probabilities, unsigned int lenght_order);
 T Probabilities_lenght(T* Probabilities, unsigned int lenght_order, int x, int y, int z);
 T Probabilities_thread(T* Probabilities, unsigned int lenght_order, T* lenght);
@@ -227,7 +227,7 @@ T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order)
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integral_coulombic(T radius_1, T radius_2, T distance, T* result, bool spin_bonded);
-T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z);
+T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z, T* relative_leghts);
 T Integral_nucleus_atraction(T probabilities_lenght, T multiplier, T* result, T* lenght, unsigned int Z);
 T Integrate_Integral_nucleus_atraction(T* probabilities,
 T* result, T* lenght, unsigned int lenght_order, T lenght_x, T lenght_y, T lenght_z, unsigned int Z);

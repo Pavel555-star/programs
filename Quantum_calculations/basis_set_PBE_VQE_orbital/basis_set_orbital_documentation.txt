@@ -1,4 +1,4 @@
-basis_set_calculations code documentation version 1.6
+basis_set_calculations code documentation version 1.7
 
 class basis_set_calculations:
 public variables and constants:
@@ -323,6 +323,11 @@ T Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities, 
 
 This function multiply wavefunction_1 and wavefunction_2 array cube into probabilities array, lenght_order is
 number of pixels between center and surface of wavefunction_1 and wavefunction_2 cubes.
+
+
+
+T Wavefunction_relative_lenghts_generate(T* lenghts, unsigned int lenght_order);
+This function internally generate lenghts array for double integrating of 3D cubes with the same coordinates.
 
 T Wavefunction_square(T* wavefunction_1, T* probabilities, unsigned int lenght_order)
 
