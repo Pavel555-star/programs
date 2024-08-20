@@ -44,11 +44,14 @@ Hartree energy
 const T vector_lenght = 10.00;
 Count of pixels in memory equivalent for Hartree Lenght 
 
-const unsigned int max_electrons = 256;
+const unsigned int max_electrons = 1024;
 Maximal number of electrons for Hartree-Fock calculations
 
-const unsigned int max_atoms = 64;
+const unsigned int max_atoms = 125;
 Maximal number of atoms for Hartree-Fock calculations
+
+size_ratio = 1.5
+Parameter size_ratio is for wavefunction image size for two-electron integrals
 
 unsigned int electron_number = 0;
 Counter of electrons
@@ -509,11 +512,11 @@ T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions)
 This functions return sum of nucleus repulsive energies in molecule in atom_wavefunctions.
 
 T Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
-unsigned int size_order, bool alocate)
+unsigned int size_order, unsigned int size_ratio bool alocate)
 
 This function generate Lenghts, Wavefunctions and Probabilities cube arrays for atom_wavefunctions and small_atom_wavefunctions.
 Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays
-and alocate is true for initial calling.
+and alocate is true for initial calling. Parameter size_ratio is for wavefunction image size for two-electron integrals
 
 T basis_set_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
     bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
