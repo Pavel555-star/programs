@@ -7856,7 +7856,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
         {
         matrix[i * (1 + order)] = (h * h)/(8 * Pi * Pi * me * Hartree_lenght * Hartree_lenght) *
         (Z[i] * Z[i] * wavefunction_lenght_multipliers[i] * wavefunction_lenght_multipliers[i])/
-        (n[i] * n[i]) * wavefunction_coefficients[i] * wavefunction_coefficients[i];
+        (n[i]) * wavefunction_coefficients[i] * wavefunction_coefficients[i];
         }
     // closed-shell basis set method optimalization code
     for (i = 0; i < count_electrons ; i++)
