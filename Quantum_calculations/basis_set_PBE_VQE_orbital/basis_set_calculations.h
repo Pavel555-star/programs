@@ -29,6 +29,7 @@ public:
     T hyperfine_structure_constant = (e * e)/(2 * E0 * h * c);
     const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
+    T small_wavefunction_ratio = 1.2;
     unsigned int electron_number = 0;
     unsigned int iterations = 0;
     unsigned int determinant_exception_handle = 0;
@@ -226,7 +227,7 @@ T Probabilities_lenght(T* probabilities, unsigned int lenght_order);
 T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order);
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
-T Integral_coulombic(T radius_1, T radius_2, T distance, T* result, bool spin_bonded);
+T Integral_coulombic(T radius_1, T radius_2, T distance, T* result);
 T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z, T* relative_leghts);
 T Integral_nucleus_atraction(T probabilities_lenght, T multiplier, T* result, T* lenght, unsigned int Z);
 T Integrate_Integral_nucleus_atraction(T* probabilities,
@@ -273,8 +274,12 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();};
 #include "basis_set_calculations.cc"
-# endif /* BASIS_SET_CALCULATIONS_H
+# endif
+
+
+/* BASIS_SET_CALCULATIONS_H
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/ */
+                        http://www.apache.org/licenses/
+*/

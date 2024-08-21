@@ -1,4 +1,4 @@
-basis_set_calculations code documentation version 1.7
+basis_set_calculations code documentation version 1.8
 
 class basis_set_calculations:
 public variables and constants:
@@ -49,6 +49,9 @@ Maximal number of electrons for Hartree-Fock calculations
 
 const unsigned int max_atoms = 64;
 Maximal number of atoms for Hartree-Fock calculations
+
+T small_wavefunction_ratio = 1.2
+Determine increasing count pixels per lenght in 
 
 unsigned int electron_number = 0;
 Counter of electrons
