@@ -4079,7 +4079,7 @@ unsigned int lenght_order, T x, T y, T z)
     return(0);
     }
 template <typename T>
-inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T distance,  T* result)
+inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T distance,  T* result, bool spin_bonded)
     { // Calculate the coulombic integral - potential energy of electron to proton of other atoms, aproximate
     T constant;
     T radius;
@@ -4087,12 +4087,20 @@ inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T
     
     constant = e*e/(4*Pi*E0);
     
-    
-    if (radius_1 >= radius_2)
-        radius = radius_1 + (Phi - 1) * radius_2;
+    if (spin_bonded == true)
+        {
+        if (radius_1 >= radius_2)
+            radius = radius_1 + (radius_2 * (Phi + 1)/3.00);
+        else
+            radius = radius_2 + (radius_1 * (Phi + 1)/3.00);
+        }
     else
-        radius = radius_2 + (Phi - 1) * radius_1;
-        
+        {
+        if (radius_1 >= radius_2)
+            radius = radius_1 + (Phi - 1) * radius_2;
+        else
+            radius = radius_2 + (Phi - 1) * radius_1;
+        }
     efective_lenght = sqrt((radius * radius) + (distance * distance));
     if ((not (isnan(constant/efective_lenght))) and (not (isinf(constant/efective_lenght)))) // Check for NaN and inf values
         result[0] = constant/efective_lenght;
@@ -6956,7 +6964,11 @@ small_atom_wavefunctions *small_atom_wavefunctions)
                 radius_2 = efective_radius_base[j] * wavefunction_lenght_multipliers[j];
                 distance = sqrt(((x[j] - x[i]) * (x[j] - x[i])) + ((y[j] - y[i]) * (y[j] - y[i])) + ((z[j] - z[i]) * (z[j] - z[i])))
                 * Hartree_lenght;
-                Integral_coulombic(radius_1, radius_2, distance, matrix + (i + (j * order)));
+                if ((spin_paired[i] == j or (l[i] == 0 and l[j] == 0)) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+                    spin_bonded = true;
+                else
+                    spin_bonded = false;
+                Integral_coulombic(radius_1, radius_2, distance, matrix + (i + (j * order)), spin_bonded);
                 }
         }
     // closed-shell basis set method optimalization code
@@ -7855,8 +7867,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
     for (i = 0; i < count_electrons; i++) // Fill the diagonal one-electron kinetic energies
         {
         matrix[i * (1 + order)] = (h * h)/(8 * Pi * Pi * me * Hartree_lenght * Hartree_lenght) *
-        (Z[i] * Z[i] * wavefunction_lenght_multipliers[i] * wavefunction_lenght_multipliers[i])/
-        (n[i] * n[i]) * wavefunction_coefficients[i] * wavefunction_coefficients[i];
+        (Z[i] * Z[i] * wavefunction_lenght_multipliers[i])/(n[i] * n[i]) * wavefunction_coefficients[i];
         }
     // closed-shell basis set method optimalization code
     for (i = 0; i < count_electrons ; i++)
@@ -8546,7 +8557,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         return(-1);
         
     wavefunction_size = ((2 * size_order) + 1) * ((2 * size_order) + 1) * ((2 * size_order) + 1);
-    small_lenght_order = (sqrt(size_order) * small_wavefunction_ratio);
+    small_lenght_order = (sqrt(size_order) * 1.5);
     small_wavefunction_size = (2 * small_lenght_order + 1) * (2 * small_lenght_order + 1) * (2 * small_lenght_order + 1);
     
     t9_flag = false;
@@ -9645,7 +9656,6 @@ T basis_set_calculations<T>::Clear()
     determinants.clear();
     spectra_EPR.clear();
     electron_spectra.clear();
-    
     atoms.n.clear();
     atoms.l.clear();
     atoms.m.clear();
@@ -9654,7 +9664,6 @@ T basis_set_calculations<T>::Clear()
     atoms.wavefunction_coefficients.clear();
     atoms.bonding.clear();
     atoms.paired_with_previous.clear();
-    
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
@@ -9679,7 +9688,6 @@ T basis_set_calculations<T>::Clear()
     results.x.clear();
     results.y.clear();
     results.z.clear();
-    
     small_results.lenghts.clear();
     small_results.relative_lenghts.clear();
     small_results.wavefunctions.clear();
@@ -9693,7 +9701,6 @@ T basis_set_calculations<T>::Clear()
     small_results.l.clear();
     small_results.m.clear();
     small_results.Z.clear();
-    
     electron_number = 0;
     iterations = 0;
     determinant_exception_handle = 0;
@@ -9705,8 +9712,6 @@ template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
 template class basis_set_calculations<double>;
-
-
 /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
