@@ -29,7 +29,6 @@ public:
     T hyperfine_structure_constant = (e * e)/(2 * E0 * h * c);
     const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
-    T small_wavefunction_ratio = 1.5;
     unsigned int electron_number = 0;
     unsigned int iterations = 0;
     unsigned int determinant_exception_handle = 0;
@@ -65,7 +64,6 @@ public:
     unsigned int Z;
     T electronegativity;
     } atoms;
-    
     struct atom_wavefunctions {
     vector<T*> lenghts;
     vector<T*> wavefunctions;
@@ -93,7 +91,6 @@ public:
     vector<T> y;
     vector<T> z;
     } results;
-    
     struct small_atom_wavefunctions {
     // This structure is for generating small wavefunction vectors for integration lenght of exchange integration
     vector<unsigned int> electron_numbers;
@@ -217,7 +214,6 @@ T Wavefunction_normalize(T* wavefunction_pointer, T normalisation_constant, unsi
 T Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts,
 unsigned int Z, T multiplier);
 T Get_relative_Hartree_length(unsigned int Z, unsigned int n);
-
 // Section 3 - mathematical operations for wavefunctions, probabilities densities and integrals
 unsigned int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
 unsigned int lenght_order, T d_x, T d_y, T d_z);
@@ -230,7 +226,7 @@ T Probabilities_lenght(T* probabilities, unsigned int lenght_order);
 T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order);
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
-T Integral_coulombic(T radius_1, T radius_2, T distance, T* result);
+T Integral_coulombic(T radius_1, T radius_2, T distance, T* result, bool spin_bonded);
 T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z, T* relative_leghts);
 T Integral_nucleus_atraction(T probabilities_lenght, T multiplier, T* result, T* lenght, unsigned int Z);
 T Integrate_Integral_nucleus_atraction(T* probabilities,
@@ -240,7 +236,6 @@ T Rydberg_energy(unsigned int Z, unsigned int n);
 T Orbital_moment_energy(int m, T* B0);
 T Spin_moment_energy(T s, T B0);
 T Orbital_magnetic_field(T potential_energy, T radius, int l);
-
 // Section 4 - generating lists of electrons
 T Quantum_numbers_to_orbitals(unsigned int n, unsigned int l, int fulness, atom_orbitals* atom_orbitals_PTR);
 T Atoms_to_valence_orbitals(string atom, atom_orbitals* atom_orbitals_PTR);
@@ -249,7 +244,6 @@ unsigned int size_order,T x,T y,T z);
 T Create_bond_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2,
 unsigned int count, T electronegativity_1, T electronegativity_2, T x_diference, T y_diference, T z_diference);
 T Sum_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2);
-
 // section 5 - generating matrices of integrals and Fock matrices
 T Create_nuclear_atraction_integral_matrix(T* matrix, T* nucleuses, unsigned int order, atom_wavefunctions *atom_wavefunctions);
 T Create_coulombic_integral_matrix(T* matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
@@ -267,7 +261,6 @@ T Solve_basis_set_matrix(T* basis_set_matrix, T* overlap_integral_matrix, unsign
 vector<T>* values, atom_wavefunctions *atom_wavefunctions);
 T Solve_spin_density_matrix(T* spin_density_matrix, unsigned int order, vector<T>* energetic_levels);
 public:
-
 // section 6 - completing basis set method and user interface handling
 T Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR);
 T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions);
@@ -280,9 +273,8 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();};
 #include "basis_set_calculations.cc"
-# endif  /* BASIS_SET_CALCULATIONS_H
+# endif /* BASIS_SET_CALCULATIONS_H
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-*/
+                        http://www.apache.org/licenses/ */
