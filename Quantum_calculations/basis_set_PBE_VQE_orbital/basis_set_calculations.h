@@ -15,8 +15,10 @@ public:
     vector<T> determinants;
     vector<T> spectra_EPR;
     vector<T> electron_spectra;
+    
     const T Phi = (1.00 + sqrt(5))/2.00; // The golden ratio
     const T Pi = 4.00/sqrt(Phi); // Pi constant derived from Phi
+    
     T E0 = 8.8541878128E-12; // F·m^-1, m^-3·kg^-1·s^4·A^2
     T h = 6.62607015E-34; // J·s , kg·m^2/s
     T vacuum_permeability = 1.25663706212E-6; // N·A^−2, kg·m·s^-2·A^−2
@@ -27,14 +29,17 @@ public:
     T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
     T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
     T hyperfine_structure_constant = (e * e)/(2 * E0 * h * c);
+    
     const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     const unsigned int max_atoms = 128; // constant for maximum atoms in basis set matrix
     unsigned int electron_number = 0;
     unsigned int iterations = 0;
     unsigned int determinant_exception_handle = 0;
     unsigned int overlap_integral_exception_handle = 0;
+    
     bool Helium_correlation_energy = true;
     bool bonded_system = false;
+    
     T vector_lenght = 5.00; // constant for dimension of wavefunction vectors in Hartree lenghts
     T nucleus_repulsive_energy;
     T relative_permitivity = 1;
@@ -50,6 +55,7 @@ public:
     T* correction_matrix = nullptr;
     T* corr_basis_set_matrix = nullptr;
     T* spin_density_matrix = nullptr;
+    
     struct atom_orbitals {
     vector<unsigned int> n;
     vector<unsigned int> l;
@@ -64,6 +70,7 @@ public:
     unsigned int Z;
     T electronegativity;
     } atoms;
+    
     struct atom_wavefunctions {
     vector<T*> lenghts;
     vector<T*> wavefunctions;
@@ -91,6 +98,7 @@ public:
     vector<T> y;
     vector<T> z;
     } results;
+    
     struct small_atom_wavefunctions {
     // This structure is for generating small wavefunction vectors for integration lenght of exchange integration
     vector<unsigned int> electron_numbers;
@@ -273,8 +281,10 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();};
 #include "basis_set_calculations.cc"
-# endif /* BASIS_SET_CALCULATIONS_H
+# endif
+/* BASIS_SET_CALCULATIONS_H
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/ */
+                        http://www.apache.org/licenses/
+*/

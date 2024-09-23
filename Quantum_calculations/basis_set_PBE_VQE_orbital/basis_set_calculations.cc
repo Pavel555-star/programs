@@ -6897,6 +6897,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     unsigned int small_atom_wavefunctions_size;
     unsigned int index[max_electrons];
     unsigned int index_2_array[max_electrons];
+    
     T wavefunction_coefficients[max_electrons];
     T efective_radius_base[max_electrons];
     T wavefunction_lenght_multipliers[max_electrons];
@@ -8182,7 +8183,6 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     unsigned int indexes_2[max_electrons];
     
     T alpha, beta, E;
-    T sum_overlap_integral_oposite_spin, sum_overlap_integral_equal_spin;
     T multiplier_constant, multiplier;
     T Hamiltonian_parts[max_electrons];
     T beta_sum_rows[max_electrons];
@@ -8264,8 +8264,6 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
             beta_sum_rows[i] = beta_sum_rows[i] + basis_set_matrix[(i * order) + j];
         }
     
-    sum_overlap_integral_oposite_spin = 0;
-    sum_overlap_integral_equal_spin = 0;
     basis_set_Determinant_solver(order, basis_set_matrix); // main calculation of determinants array
     for (i = 0; i < order; i++)
         {
@@ -8277,30 +8275,6 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
             
         Eigenvectors[i] = E; // determinants into Eigenvectors sorted  according basis_set matrix rows
         }
-    for (i = 0; i < order; i++) // finding overlaps integrals sets and sums of two electrons integrals
-        {
-        for (j = 0; j < order; j++)
-            {
-            if (atom_wavefunctions->spins[i] != atom_wavefunctions->spins[j])
-                {
-                if (x[i] != x[j] or y[i] != y[j] or z[i] != z[j] or n[i] != n[j] or l[i] != l[j] or m[i] != m[j]) 
-                    sum_overlap_integral_oposite_spin = sum_overlap_integral_oposite_spin + overlap_integral_matrix[(i * order) + j]
-                    * atom_wavefunctions->spins[i] * atom_wavefunctions->spins[j] * 4; // not adding spin-paired orbital
-                }
-            else
-                sum_overlap_integral_equal_spin = sum_overlap_integral_equal_spin + overlap_integral_matrix[(i * order) + j]
-                * atom_wavefunctions->spins[i] * atom_wavefunctions->spins[j] * 4;
-            }
-        if (bonding[i] >= 0)
-            overlaps[i] = (abs(sum_overlap_integral_oposite_spin) + abs(sum_overlap_integral_equal_spin))/2;
-        else
-            overlaps[i] = abs(sum_overlap_integral_oposite_spin);
-        
-        sum_overlap_integral_oposite_spin = 0;
-        sum_overlap_integral_equal_spin = 0;
-        }
-    
-    
     for (i = 0; i < order; i++) // calculating Hamiltonian
         if ((not (isnan(Hamiltonian_parts[i])) and (not isinf(Hamiltonian_parts[i])))) // Check for NaN and inf values
             Hamiltonian = Hamiltonian + Hamiltonian_parts[i];
@@ -8360,22 +8334,26 @@ T basis_set_calculations<T>::Atom_orbitals_generate(string UI_input, atom_orbita
     unsigned int i;
     unsigned int input_size;
     unsigned int element_number;
+    
     int shift, sign, string_position;
     vector<int> positions_to_erase;
     string input, shift_string;
     bool found;
+    
     struct numbers {
     vector<unsigned int> numbers;
     string text;
     } numbers;
     numbers.numbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     numbers.text = {"0123456789"};
+    
     struct signs {
     vector<int> sign;
     string text;
     } signs;
     signs.sign = { 1, -1};
     signs.text = {"+-"};
+    
     struct order_elements {
     vector<unsigned int> numbers;
     vector<string> elements;
@@ -8511,6 +8489,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     int m_i[max_electrons];
     unsigned int Z[max_electrons];
     unsigned int Z_i[max_electrons];
+    
     T* pointers_to_lenghts[1];
     T* pointers_to_wavefunctions[max_electrons];
     T* pointers_to_probabilities[max_electrons];
@@ -8519,15 +8498,16 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     T* pointer_to_wavefunction;
     T* pointer_to_probability;
     T* pointer_to_Laplacian;
-    unsigned int small_lenght_order;
-    unsigned int small_wavefunction_size;
-    unsigned int small_atom_wavefunctions_size;
     T* small_lenghts;
     T* small_relative_lenghts;
     T* small_wavefunctions[max_electrons];
     T* small_probabilities[max_electrons];
+    unsigned int small_lenght_order;
+    unsigned int small_wavefunction_size;
+    unsigned int small_atom_wavefunctions_size;
     unsigned int  small_electron_numbers[max_electrons];
     unsigned int  small_lenght_orders[max_electrons];
+    
     T multiplier;
     unsigned int index[max_electrons + 1];
     T multipliers[max_electrons];
@@ -8538,6 +8518,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     int bonding[max_electrons];
     unsigned int constraints[max_electrons];
     unsigned int electron_numbers[max_electrons];
+    
     bool restriction;
     bool non_s1_system;
     bool t9_flag, t10_flag, t11_flag, t12_flag, t13_flag, t14_flag, t15_flag;
@@ -9513,7 +9494,6 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     {
     unsigned int i, j;
     unsigned int matrix_order;
-    
     T Hamiltonian, last_Hamiltonian;
     
     last_Hamiltonian = 0;
@@ -9573,7 +9553,6 @@ T basis_set_calculations<T>::Clear()
     {
     unsigned int i, j;
     unsigned int order = results.n.size();
-    
     bool previous_deleted;
     
     for (i = 0; i < results.wavefunctions.size(); i++) {
@@ -9664,6 +9643,7 @@ T basis_set_calculations<T>::Clear()
     atoms.wavefunction_coefficients.clear();
     atoms.bonding.clear();
     atoms.paired_with_previous.clear();
+    
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
@@ -9688,6 +9668,7 @@ T basis_set_calculations<T>::Clear()
     results.x.clear();
     results.y.clear();
     results.z.clear();
+    
     small_results.lenghts.clear();
     small_results.relative_lenghts.clear();
     small_results.wavefunctions.clear();
@@ -9701,6 +9682,7 @@ T basis_set_calculations<T>::Clear()
     small_results.l.clear();
     small_results.m.clear();
     small_results.Z.clear();
+    
     electron_number = 0;
     iterations = 0;
     determinant_exception_handle = 0;
@@ -9711,10 +9693,8 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-template class basis_set_calculations<double>;
-/*
+template class basis_set_calculations<double>;/*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-*/
+                        http://www.apache.org/licenses/ */
