@@ -33,7 +33,8 @@ public:
     unsigned int iterations = 0;
     unsigned int determinant_exception_handle = 0;
     unsigned int overlap_integral_exception_handle = 0;
-    
+    bool Helium_correlation_energy = true;
+    bool bonded_system = false;
     T vector_lenght = 5.00; // constant for dimension of wavefunction vectors in Hartree lenghts
     T nucleus_repulsive_energy;
     T relative_permitivity = 1;
@@ -49,7 +50,6 @@ public:
     T* correction_matrix = nullptr;
     T* corr_basis_set_matrix = nullptr;
     T* spin_density_matrix = nullptr;
-    
     struct atom_orbitals {
     vector<unsigned int> n;
     vector<unsigned int> l;

@@ -1,4 +1,4 @@
-basis_set_calculations code documentation version 1.7
+basis_set_calculations code documentation version 1.8
 
 class basis_set_calculations:
 public variables and constants:
@@ -61,6 +61,13 @@ unsigned int determinant_exception_handle = 0;
 
 unsigned int overlap_integral_exception_handle = 0;
 1, if there are exceptions with alocate memory in overlap integral calculations
+
+bool Helium_correlation_energy = true
+If is true, then are to Coulombic integral matrix incorporated generalized Helium correlation energy term
+- coulombic integrals of spin-paired electrons aredecreased in magnitude.
+
+bool bonded_system = false
+If are bonds in system, bonded_system = true.
 
 T nucleus_repulsive energy
 Nucleus_repulsive energy sum

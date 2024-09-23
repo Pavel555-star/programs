@@ -7838,7 +7838,6 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
     t133_flag = false;
     t134_flag = false;
     t135_flag = false;
-    
     count_electrons = atom_wavefunctions->n.size();
     count_orbitals = 0;
     restriction = true;
@@ -7863,11 +7862,12 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
         
     for (i = 0; i < (order * order); i++) // Initializing matrix array
         matrix[i] = 0;
-        
+
     for (i = 0; i < count_electrons; i++) // Fill the diagonal one-electron kinetic energies
         {
         matrix[i * (1 + order)] = (h * h)/(8 * Pi * Pi * me * Hartree_lenght * Hartree_lenght) *
-        (Z[i] * Z[i] * wavefunction_lenght_multipliers[i])/(n[i] * n[i]) * wavefunction_coefficients[i];
+        (Z[i] * Z[i] * wavefunction_lenght_multipliers[i])/(n[i] * n[i]) * wavefunction_coefficients[i] 
+        * wavefunction_coefficients[i];
         }
     // closed-shell basis set method optimalization code
     for (i = 0; i < count_electrons ; i++)
@@ -8266,6 +8266,17 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     
     sum_overlap_integral_oposite_spin = 0;
     sum_overlap_integral_equal_spin = 0;
+    basis_set_Determinant_solver(order, basis_set_matrix); // main calculation of determinants array
+    for (i = 0; i < order; i++)
+        {
+        if (determinants.size() > 0)
+            E = alpha + (determinants[0] * beta) + (beta_sum_rows[i] * beta);
+            
+        else
+            E = alpha + beta_sum_rows[i] * beta;
+            
+        Eigenvectors[i] = E; // determinants into Eigenvectors sorted  according basis_set matrix rows
+        }
     for (i = 0; i < order; i++) // finding overlaps integrals sets and sums of two electrons integrals
         {
         for (j = 0; j < order; j++)
@@ -8288,19 +8299,7 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
         sum_overlap_integral_oposite_spin = 0;
         sum_overlap_integral_equal_spin = 0;
         }
-    basis_set_Determinant_solver(order, basis_set_matrix); // main calculation of determinants array
-    for (i = 0; i < order; i++)
-        {
-        if (determinants.size() > 0)
-            E = alpha + (determinants[0] * beta) + (beta_sum_rows[i] * beta);
-            
-        else
-            E = alpha + beta_sum_rows[i] * beta;
-            
-        Eigenvectors[i] = E; // determinants into Eigenvectors sorted  according basis_set matrix rows
-        }
-    for (i = 0; i < order; i++) // including overlaps integrals
-        Eigenvectors[i] = Eigenvectors[i]/(1 + abs(overlaps[i])); // overlaps integrals increase energy levels
+    
     
     for (i = 0; i < order; i++) // calculating Hamiltonian
         if ((not (isnan(Hamiltonian_parts[i])) and (not isinf(Hamiltonian_parts[i])))) // Check for NaN and inf values
@@ -9396,7 +9395,8 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
                     }
                 else
                     return(-1); // check for right input atoms strings
-                
+        if (count_bonds >= 1)
+            bonded_system = true;
         for (i = 0; i < count_bonds; i++) // convert bonds to list of bonds
             {
             if (i % 3 == 0)
@@ -9534,18 +9534,18 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
         nucleus_repulsive_energy = Nucleus_repulsive_energy(&results);
         Hamiltonian = Hamiltonian + nucleus_repulsive_energy;
         Calculate_spin_density_matrix(overlap_integral_matrix, spin_density_matrix, matrix_order, &results);
-        Solve_spin_density_matrix(spin_density_matrix, matrix_order, spin_values);
-        for (i = 0; i < (matrix_order * matrix_order); i++)
-            spin_density_vector->push_back(spin_density_matrix[i]);
         }
     for (i = 0; i < max_iterations + 1; i++)
         {
         iterations++;
         Create_nuclear_atraction_integral_matrix(nuclear_atraction_integral_matrix, nucleuses_atractions, matrix_order, &results);
         Create_coulombic_integral_matrix(coulombic_integral_matrix, matrix_order, &results, &small_results);
-        Create_overlap_integral_matrix(overlap_integral_matrix, matrix_order, &results);
-        Calculate_resonance_integral_matrix(overlap_integral_matrix, overlap_efective_lenght_integral_matrix,
-        resonance_integral_matrix, matrix_order, &results, &small_results);
+        if (bonded_system == true)
+            {
+            Create_overlap_integral_matrix(overlap_integral_matrix, matrix_order, &results);
+            Calculate_resonance_integral_matrix(overlap_integral_matrix, overlap_efective_lenght_integral_matrix,
+            resonance_integral_matrix, matrix_order, &results, &small_results);
+            }
         Calculate_kinetic_integral_matrix(kinetic_integral_matrix, matrix_order, &results);
         
         Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix, resonance_integral_matrix,
