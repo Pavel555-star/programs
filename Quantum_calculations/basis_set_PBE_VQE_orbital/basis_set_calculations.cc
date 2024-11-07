@@ -3826,7 +3826,8 @@ T basis_set_calculations<T>::Probabilities_lenght(T* probabilities, unsigned int
                 if (l != 0 or m != 0 or n != 0)
                     {
                     rsqrt = 1/sqrt(l + m + n);
-                    lenght = lenght + (rsqrt * T(lenght_order)/T(vector_lenght) * probabilities[(i * side * side) + (j * side) + k]);
+                    lenght = lenght + (rsqrt * T(lenght_order)/T(vector_lenght) * probabilities[(i * side * side) +
+                    (j * side) + k]);
                     }
                 }
             }
@@ -3864,7 +3865,8 @@ T basis_set_calculations<T>::Probabilities_lenght(T* probabilities, unsigned int
                 if (l != 0 or m != 0 or n != 0)
                     {
                     rsqrt = 1/sqrt(l + m + n);
-                    lenght = lenght + (rsqrt * T(lenght_order)/T(vector_lenght) * probabilities[(i * side * side) + (j * side) + k]);
+                    lenght = lenght + (rsqrt * T(lenght_order)/T(vector_lenght) *
+                    probabilities[(i * side * side) + (j * side) + k]);
                     }
                 }
             }
@@ -3905,7 +3907,9 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
             y_gradient = (wavefunction_2[i + side] - wavefunction_2[i])/pixel_lenght;
         
         z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i])/pixel_lenght;
-        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        Laplacian_1[3 * i] = x_gradient/2;
+        Laplacian_1[(3 * i) + 1] = y_gradient/2;
+        Laplacian_1[(3 * i) + 2] = z_gradient/2;
         }
     for (i = (side * side); i < size - (side * side); i++)
         {
@@ -3914,7 +3918,9 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
         y_gradient = (wavefunction_2[i + side] - wavefunction_2[i - side])/(pixel_lenght * 2);
         z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i - (side * side)])/(pixel_lenght * 2);
         }
-    Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3)/2.00;
+    Laplacian_1[3 * i] = x_gradient/2;
+    Laplacian_1[(3 * i) + 1] = y_gradient/2;
+    Laplacian_1[(3 * i) + 2] = z_gradient/2;
     for (i = size - (side * side); i < size ; i++)
         {
         if (size - i > 1)
@@ -3928,7 +3934,9 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
             y_gradient = (wavefunction_2[i] - wavefunction_2[i - side])/pixel_lenght;
         
         z_gradient = (wavefunction_2[i] - wavefunction_2[i - (side * side)])/(pixel_lenght);
-        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        Laplacian_1[3 * i] = x_gradient/2;
+        Laplacian_1[(3 * i) + 1] = y_gradient/2;
+        Laplacian_1[(3 * i) + 2] = z_gradient/2;
         }
     return(0);
     }
@@ -4109,10 +4117,13 @@ inline T basis_set_calculations<T>::Integral_coulombic(T radius_1, T radius_2, T
     }
 template <typename T>
 T basis_set_calculations<T>::Integrate_Integral_coulombic(T* density_1, T* density_2, T* result,
-unsigned int lenght_order, T x, T y, T z, T* relative_leghts) 
+unsigned int lenght_order, T x, T y, T z) 
     { // Calculate the absolute value of overleap integral for multiplying the energy differences from fock matrix
     unsigned int side;
     unsigned int i, j, k, l, m, n;
+    unsigned int i_range, j_range, k_range, l_range, m_range, n_range;
+    unsigned int i_min, j_min, k_min, l_min, m_min, n_min;
+    unsigned int i_max, j_max, k_max, l_max, m_max, n_max;
     unsigned int x_contraction, y_contraction, z_contraction, x_side, y_side, z_side;
     unsigned int pre_index;
     int x_shift, y_shift, z_shift;
@@ -4135,24 +4146,95 @@ unsigned int lenght_order, T x, T y, T z, T* relative_leghts)
     y_side = side;
     z_side = side;
     
+    // detecting a effective x, y and z ranges of integration
+    i_range = 0;
+    j_range = 0;
+    k_range = 0;
+    l_range = 0;
+    m_range = 0;
+    n_range = 0;
+    for (k = 0; k < z_side; k++)
+            for (j = 0; j < y_side; j++)
+                for (i = 0; i < x_side; i++)
+                    {
+                    if (density_1[i + j * x_side + k * x_side * y_side] > 0)
+                        {
+                        if (i > lenght_order)
+                            if (i - lenght_order > i_range)
+                                i_range = i - lenght_order;
+                        else
+                            if (lenght_order - i > i_range)
+                                i_range = lenght_order - i;
+                        if (j > lenght_order)
+                            if (j - lenght_order > j_range)
+                                j_range = j - lenght_order;
+                        else
+                            if (lenght_order - j > j_range)
+                                j_range = lenght_order - j;
+                        if (k > lenght_order)
+                            if (k - lenght_order > k_range)
+                                k_range = k - lenght_order;
+                        else
+                            if (lenght_order - k > k_range)
+                                k_range = lenght_order - k;
+                        }
+                    }
+    for (n = 0; n < z_side; n++)
+            for (m = 0; m < y_side; m++)
+                for (l = 0; l < x_side; l++)
+                    {
+                    if (density_2[l + m * x_side + n * x_side * y_side] > 0)
+                        {
+                        if (l > lenght_order)
+                            if (l - lenght_order > l_range)
+                                l_range = l - lenght_order;
+                        else
+                            if (lenght_order - l > l_range)
+                                l_range = lenght_order - l;
+                        if (m > lenght_order)
+                            if (m - lenght_order > m_range)
+                                m_range = m - lenght_order;
+                        else
+                            if (lenght_order - m > m_range)
+                                m_range = lenght_order - m;
+                        if (n > lenght_order)
+                            if (n - lenght_order > n_range)
+                                n_range = n - lenght_order;
+                        else
+                            if (lenght_order - n > n_range)
+                                n_range = lenght_order - n;
+                        }
+                    }
+    i_max = lenght_order + i_range;
+    j_max = lenght_order + j_range;
+    k_max = lenght_order + k_range;
+    l_max = lenght_order + l_range;
+    m_max = lenght_order + m_range;
+    n_max = lenght_order + n_range;
+    i_min = lenght_order - i_range;
+    j_min = lenght_order - j_range;
+    k_min = lenght_order - k_range;
+    l_min = lenght_order - l_range;
+    m_min = lenght_order - m_range;
+    n_min = lenght_order - n_range;
+    
+    // integration
     average_lenght = 0;
     if (x == 0 and y == 0 and z == 0)
         {
-        
-        for (k = 0; k < z_side; k++)
-            for (j = 0; j < y_side; j++)
-                for (i = 0; i < x_side; i++)
-                    for (n = 0; n < z_side; n++)
+        // optimized integration with zero of coordinate distance
+        for (k = k_min; k < k_max; k++)
+            for (j = j_min; j < j_max; j++)
+                for (i = i_min; i < i_max; i++)
+                    for (n = n_min; n < n_max; n++)
                         {
-                        
-                        pre_index = k * lenght_order * lenght_order * lenght_order * lenght_order * lenght_order +
-                        j * lenght_order * lenght_order * lenght_order * lenght_order + i * lenght_order * lenght_order * lenght_order +
-                        n * lenght_order * lenght_order;
-                        for (m = 0; m < y_side; m++)
-                            for (l = 0; l < x_side; l++)
+                        x_2_y_2 = (int(j) - int(m)) * (int(j) - int(m) - int(y_shift)) +
+                        (int(k) - int(n)) * (int(k) - int(n));
+                        for (m = m_min; m < m_max; m++)
+                            for (l = l_min; l < l_max; l++)
                                 if (i != (l + x_shift) or j != (m + y_shift) or k != (n + z_shift))
                                     {
-                                    point_value_distance = relative_leghts[pre_index + m * lenght_order + m];
+                                    point_value_distance = sqrt((int(i) - int(l)) * (int(i) - int(l)) + x_2_y_2);
                                     point_value = 1/(point_value_distance * vector_lenght/lenght_order) *
                                     density_1[i + j * x_side + k * x_side * y_side] *
                                     density_2[l + m * x_side + n * x_side * y_side];
@@ -4162,16 +4244,16 @@ unsigned int lenght_order, T x, T y, T z, T* relative_leghts)
         average_lenght = 1/average_lenght  * Hartree_lenght;
         }
     else
-        {
-        for (k = 0; k < z_side; k++)
-            for (j = 0; j < y_side; j++)
-                for (i = 0; i < x_side; i++)
-                    for (n = 0; n < z_side; n++)
+        { // standard integration with non-zero of coordinate distance
+        for (k = k_min; k < k_max; k++)
+            for (j = j_min; j < j_max; j++)
+                for (i = i_min; i < i_max; i++)
+                    for (n = n_min; n < n_max; n++)
                         {
                         x_2_y_2 = (int(j) - int(m) - int(y_shift)) * (int(j) - int(m) - int(y_shift)) +
                         (int(k) - int(n) - int(z_shift)) * (int(k) - int(n) - int(z_shift));
-                        for (m = 0; m < y_side; m++)
-                            for (l = 0; l < x_side; l++)
+                        for (m = m_min; m < m_max; m++)
+                            for (l = l_min; l < l_max; l++)
                                 if (i != (l + x_shift) or j != (m + y_shift) or k != (n + z_shift))
                                     {
                                     point_value_distance = sqrt((int(i) - int(l) - int(x_shift)) * (int(i) - int(l) - int(x_shift)) +
@@ -4296,45 +4378,54 @@ T d_x, T d_y, T d_z)
         z_2_min = 0;
         }
     x_condition = side - x_contraction;   
-    x_condition_2 = x_condition - (x_condition % 8);
+    x_condition_2 = x_condition - (x_condition % 3);
     // vectorisation code
     if (d_x != 0 or d_y != 0 or d_z != 0)
         for (i = 0; i < (side - z_contraction); i++)
             {
             for (j = 0; j < (side - y_contraction); j++)
                 {
-                for (k = 0; k + 7 < x_condition; k+=8)
+                for (k = 0; k + 2 < x_condition; k+=3)
                     {
                     result_array[0] = result_array[0] +
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
+                    result_array[0] = result_array[0] +
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 1] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
+                    result_array[0] = result_array[0] +
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 2] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 2];
                     result_array[1] = result_array[1] +
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 1];
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
+                    result_array[1] = result_array[1] +
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1)] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
+                    result_array[1] = result_array[1] +
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2)] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 2];
                     result_array[2] = result_array[2] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 2];
-                    result_array[3] = result_array[3] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 3] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 3];
-                    result_array[4] = result_array[4] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 4] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 4];
-                    result_array[5] = result_array[5] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 5] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 5];
-                    result_array[6] = result_array[6] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 6] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 6];
-                    result_array[7] = result_array[7] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 7] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 7];
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
+                    result_array[2] = result_array[2] + 
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1)] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 1)];
+                    result_array[2] = result_array[2] + 
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2)] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 2)];
                     }
                 for (k = x_condition_2; k < x_condition; k++)
                     {
                     result_array[0] = result_array[0] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
+                    result_array[0] = result_array[0] + 
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 1] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
+                    result_array[0] = result_array[0] + 
+                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 1] *
+                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
                     }
                 }
             }
@@ -4343,29 +4434,35 @@ T d_x, T d_y, T d_z)
             {
             for (j = 0; j < (side); j++)
                 {
-                for (k = 0; k + 7 < x_condition; k+=8)
+                for (k = 0; k + 2 < x_condition; k+=3)
                     {
-                    result_array[0] = result_array[0] + Laplacian_1[(i * side * side) + (j * side) + k] *
-                    Laplacian_2[(i * side * side) + (j * side) + k];
-                    result_array[1] = result_array[1] + Laplacian_1[(i * side * side) + (j * side) + k + 1] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 1];
-                    result_array[2] = result_array[2] + Laplacian_1[(i * side * side) + (j * side) + k + 2] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 2];
-                    result_array[3] = result_array[3] + Laplacian_1[(i * side * side) + (j * side) + k + 3] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 3];
-                    result_array[4] = result_array[4] + Laplacian_1[(i * side * side) + (j * side) + k + 4] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 4];
-                    result_array[5] = result_array[5] + Laplacian_1[(i * side * side) + (j * side) + k + 5] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 5];
-                    result_array[6] = result_array[6] + Laplacian_1[(i * side * side) + (j * side) + k + 6] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 6];
-                    result_array[7] = result_array[7] + Laplacian_1[(i * side * side) + (j * side) + k + 7] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 7];
+                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
+                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 1] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 1];
+                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 2] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 2];
+                    result_array[1] = result_array[1] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
+                    result_array[1] = result_array[1] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 1)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 1)];
+                    result_array[1] = result_array[1] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 2)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 2)];
+                    result_array[2] = result_array[2] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
+                    result_array[2] = result_array[2] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 1)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 1)];
+                    result_array[2] = result_array[2] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 2)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 2)];
                     }
                 for (k = x_condition_2; k < x_condition; k++)
                     {
-                    result_array[0] = result_array[0] + Laplacian_1[(i * side * side) + (j * side) + k] *
-                    Laplacian_2[(i * side * side) + (j * side) + k];
+                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
+                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 1] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 1];
+                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 2] *
+                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 2];
                     }
                 }
             }
@@ -6527,6 +6624,7 @@ atom_wavefunctions *atom_wavefunctions)
     T x[max_electrons];
     T y[max_electrons];
     T z[max_electrons];
+    T n[max_electrons];
     int bonding[max_electrons];
     int spin_paired[max_electrons];
     T spins[max_electrons];
@@ -6563,6 +6661,7 @@ atom_wavefunctions *atom_wavefunctions)
         x[i] = atom_wavefunctions->x[i];
         y[i] = atom_wavefunctions->y[i];
         z[i] = atom_wavefunctions->z[i];
+        n[i] = atom_wavefunctions->n[i];
         spins[i] = atom_wavefunctions->spins[i];
         spin_paired[i] = atom_wavefunctions->spin_paired[i];
         bonding[i] = atom_wavefunctions->bonding[i];
@@ -6615,7 +6714,9 @@ atom_wavefunctions *atom_wavefunctions)
         {
         for (j = 0; (j + 7) < count_orbitals; j = j + 8)
             {
-            if ((x[index[j]] - x[ind_nuc[i]] != 0) or (y[index[j]] - y[ind_nuc[i]] != 0) or (z[index[j]] - z[ind_nuc[i]] != 0))
+            if ((x[index[j]] - x[ind_nuc[i]] != 0) or (y[index[j]] - y[ind_nuc[i]] != 0) or
+            (z[index[j]] - z[ind_nuc[i]] != 0) and ((n[index[j]]/(Z[index[j]] *
+            wavefunction_lenght_multipliers[index[j]])) > (vector_lenght/lenght_orders[index[j]])))
                 t61 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j]],
                 matrix + (index[j] * (1 + order)), nucleuses_distances + (index[j] * order + ind_nuc[i]),lenght_orders[index[j]],
                 x[index[j]] - x[ind_nuc[i]], y[index[j]] - y[ind_nuc[i]], z[index[j]] - z[ind_nuc[i]], Z[ind_nuc[i]]);
@@ -6623,7 +6724,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j]], wavefunction_lenght_multipliers[index[j]],
                 matrix + (index[j] * (1 + order)), nucleuses_distances + (index[j] * order + ind_nuc[i]), Z[ind_nuc[i]]);
             
-            if (x[index[j + 1]] - x[ind_nuc[i]] != 0 or y[index[j + 1]] - y[ind_nuc[i]] != 0 or z[index[j + 1]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 1]] - x[ind_nuc[i]] != 0 or y[index[j + 1]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 1]] - z[ind_nuc[i]] != 0 and ((n[index[j + 1]]/(Z[index[j + 1]] *
+            wavefunction_lenght_multipliers[index[j + 1]])) > (vector_lenght/lenght_orders[index[j + 1]])))
                 t62 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 1]],
                 matrix + (index[j + 1] * (1 + order)), nucleuses_distances + (index[j + 1] * order + ind_nuc[i]),
                 lenght_orders[index[j + 1]], x[index[j + 1]] - x[ind_nuc[i]], y[index[j + 1]] - y[ind_nuc[i]],
@@ -6632,7 +6735,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j + 1]], wavefunction_lenght_multipliers[index[j + 1]],
                 matrix + (index[j + 1] * (1 + order)), nucleuses_distances + (index[j + 1] * order + ind_nuc[i]), Z[ind_nuc[i]]);
                 
-            if (x[index[j + 2]] - x[ind_nuc[i]] != 0 or y[index[j + 2]] - y[ind_nuc[i]] != 0 or z[index[j + 2]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 2]] - x[ind_nuc[i]] != 0 or y[index[j + 2]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 2]] - z[ind_nuc[i]] != 0 and ((n[index[j + 2]]/(Z[index[j + 2]] *
+            wavefunction_lenght_multipliers[index[j + 2]])) > (vector_lenght/lenght_orders[index[j + 2]])))
                 t63 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 2]],
                 matrix + (index[j + 2] * (1 + order)), nucleuses_distances + (index[j + 2] * order + ind_nuc[i]),
                 lenght_orders[index[j + 2]], x[index[j + 2]] - x[ind_nuc[i]], y[index[j + 2]] - y[ind_nuc[i]],
@@ -6641,7 +6746,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j + 2]], wavefunction_lenght_multipliers[index[j + 2]],
                 matrix + (index[j + 2] * (1 + order)), nucleuses_distances + (index[j + 2] * order + ind_nuc[i]), Z[ind_nuc[i]]);
             
-            if (x[index[j + 3]] - x[ind_nuc[i]] != 0 or y[index[j + 3]] - y[ind_nuc[i]] != 0 or z[index[j + 3]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 3]] - x[ind_nuc[i]] != 0 or y[index[j + 3]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 3]] - z[ind_nuc[i]] != 0 and ((n[index[j + 3]]/(Z[index[j + 3]] *
+            wavefunction_lenght_multipliers[index[j + 3]])) > (vector_lenght/lenght_orders[index[j + 3]])))
                 t64 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 3]],
                 matrix + (index[j + 3] * (1 + order)), nucleuses_distances + (index[j + 3] * order + ind_nuc[i]),
                 lenght_orders[index[j + 3]], x[index[j + 3]] - x[ind_nuc[i]], y[index[j + 3]] - y[ind_nuc[i]],
@@ -6650,7 +6757,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j + 3]], wavefunction_lenght_multipliers[index[j + 3]],
                 matrix + (index[j + 3] * (1 + order)), nucleuses_distances + (index[j + 3] * order + ind_nuc[i]), Z[ind_nuc[i]]);
             
-            if (x[index[j + 4]] - x[ind_nuc[i]] != 0 or y[index[j + 4]] - y[ind_nuc[i]] != 0 or z[index[j + 4]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 4]] - x[ind_nuc[i]] != 0 or y[index[j + 4]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 4]] - z[ind_nuc[i]] != 0 and ((n[index[j + 4]]/(Z[index[j + 4]] *
+            wavefunction_lenght_multipliers[index[j + 4]])) > (vector_lenght/lenght_orders[index[j + 4]])))
                 t65 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 4]],
                 matrix + (index[j + 4] * (1 + order)), nucleuses_distances + (index[j + 4] * order + ind_nuc[i]),
                 lenght_orders[index[j + 4]], x[index[j + 4]] - x[ind_nuc[i]], y[index[j + 4]] - y[ind_nuc[i]],
@@ -6659,7 +6768,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j + 4]], wavefunction_lenght_multipliers[index[j + 4]],
                 matrix + (index[j + 4] * (1 + order)), nucleuses_distances + (index[j + 4] * order + ind_nuc[i]), Z[ind_nuc[i]]);
             
-            if (x[index[j + 5]] - x[ind_nuc[i]] != 0 or y[index[j + 5]] - y[ind_nuc[i]] != 0 or z[index[j + 5]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 5]] - x[ind_nuc[i]] != 0 or y[index[j + 5]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 5]] - z[ind_nuc[i]] != 0 and ((n[index[j + 5]]/(Z[index[j + 5]] *
+            wavefunction_lenght_multipliers[index[j + 5]])) > (vector_lenght/lenght_orders[index[j + 5]])))
                 t66 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 5]],
                 matrix + (index[j + 5] * (1 + order)), nucleuses_distances + (index[j + 5] * order + ind_nuc[i]),
                 lenght_orders[index[j + 5]], x[index[j + 5]] - x[ind_nuc[i]], y[index[j + 5]] - y[ind_nuc[i]],
@@ -6668,7 +6779,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j + 5]], wavefunction_lenght_multipliers[index[j + 5]],
                 matrix + (index[j + 5] * (1 + order)), nucleuses_distances + (index[j + 5] * order + ind_nuc[i]), Z[ind_nuc[i]]);
             
-            if (x[index[j + 6]] - x[ind_nuc[i]] != 0 or y[index[j + 6]] - y[ind_nuc[i]] != 0 or z[index[j + 6]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 6]] - x[ind_nuc[i]] != 0 or y[index[j + 6]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 6]] - z[ind_nuc[i]] != 0 and ((n[index[j + 6]]/(Z[index[j + 6]] *
+            wavefunction_lenght_multipliers[index[j + 6]])) > (vector_lenght/lenght_orders[index[j + 6]])))
                 t67 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 6]],
                 matrix + (index[j + 6] * (1 + order)), nucleuses_distances + (index[j + 6] * order + ind_nuc[i]),
                 lenght_orders[index[j + 6]], x[index[j + 6]] - x[ind_nuc[i]], y[index[j + 6]] - y[ind_nuc[i]],
@@ -6677,7 +6790,9 @@ atom_wavefunctions *atom_wavefunctions)
                 Integral_nucleus_atraction(efective_radius_base[index[j + 6]], wavefunction_lenght_multipliers[index[j + 6]],
                 matrix + (index[j + 6] * (1 + order)), nucleuses_distances + (index[j + 6] * order + ind_nuc[i]), Z[ind_nuc[i]]);
             
-            if (x[index[j + 7]] - x[ind_nuc[i]] != 0 or y[index[j + 7]] - y[ind_nuc[i]] != 0 or z[index[j + 7]] - z[ind_nuc[i]] != 0)
+            if (x[index[j + 7]] - x[ind_nuc[i]] != 0 or y[index[j + 7]] - y[ind_nuc[i]] != 0 or
+            z[index[j + 7]] - z[ind_nuc[i]] != 0 and ((n[index[j + 7]]/(Z[index[j + 7]] *
+            wavefunction_lenght_multipliers[index[j + 7]])) > (vector_lenght/lenght_orders[index[j + 7]])))
                 t68 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this, probabilities[index[j + 7]],
                 matrix + (index[j + 7] * (1 + order)), nucleuses_distances + (index[j + 7] * order + ind_nuc[i]),
                 lenght_orders[index[j + 7]], x[index[j + 7]] - x[ind_nuc[i]], y[index[j + 7]] - y[ind_nuc[i]],
@@ -6706,7 +6821,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 7)
             {
             if (x[index[count_orbitals - 7]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 7]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 7]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 7]] - z[ind_nuc[i]] != 0  and ((n[index[count_orbitals - 7]]
+            /(Z[index[count_orbitals - 7]] * wavefunction_lenght_multipliers[index[count_orbitals - 7]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 7]]))) {
                 t69 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 7]], matrix + (index[count_orbitals - 7] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 7] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 7]],
@@ -6722,7 +6839,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 6)
             {
             if (x[index[count_orbitals - 6]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 6]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 6]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 6]] - z[ind_nuc[i]] != 0  and ((n[index[count_orbitals - 6]]
+            /(Z[index[count_orbitals - 6]] * wavefunction_lenght_multipliers[index[count_orbitals - 6]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 6]]))) {
                 t70 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 6]], matrix + (index[count_orbitals - 6] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 6] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 6]],
@@ -6738,7 +6857,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 5)
             {
             if (x[index[count_orbitals - 5]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 5]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 5]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 5]] - z[ind_nuc[i]] != 0  and ((n[index[count_orbitals - 5]]
+            /(Z[index[count_orbitals - 5]] * wavefunction_lenght_multipliers[index[count_orbitals - 5]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 5]]))) {
                 t71 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 5]], matrix + (index[count_orbitals - 5] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 5] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 5]],
@@ -6754,7 +6875,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 4)
             {
             if (x[index[count_orbitals - 4]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 4]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 4]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 4]] - z[ind_nuc[i]] != 0  and ((n[index[count_orbitals - 4]]
+            /(Z[index[count_orbitals - 4]] * wavefunction_lenght_multipliers[index[count_orbitals - 4]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 4]]))) {
                 t72 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 4]], matrix + (index[count_orbitals - 4] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 4] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 4]],
@@ -6770,7 +6893,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 3)
             {
             if (x[index[count_orbitals - 3]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 3]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 3]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 3]] - z[ind_nuc[i]] != 0  and ((n[index[count_orbitals - 3]]
+            /(Z[index[count_orbitals - 3]] * wavefunction_lenght_multipliers[index[count_orbitals - 3]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 3]]))) {
                 t73 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 3]], matrix + (index[count_orbitals - 3] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 3] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 3]],
@@ -6786,7 +6911,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 2)
             {
             if (x[index[count_orbitals - 2]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 2]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 2]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 2]] - z[ind_nuc[i]] != 0  and ((n[index[count_orbitals - 2]]
+            /(Z[index[count_orbitals - 2]] * wavefunction_lenght_multipliers[index[count_orbitals - 2]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 2]]))) {
                 t74 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 2]], matrix + (index[count_orbitals - 2] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 2] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 2]],
@@ -6802,7 +6929,9 @@ atom_wavefunctions *atom_wavefunctions)
         if (count_orbitals % 8 >= 1)
             {
             if (x[index[count_orbitals - 1]] - x[ind_nuc[i]] != 0 or y[index[count_orbitals - 1]] - y[ind_nuc[i]] != 0
-            or z[index[count_orbitals - 1]] - z[ind_nuc[i]] != 0) {
+            or z[index[count_orbitals - 1]] - z[ind_nuc[i]] != 0 and ((n[index[count_orbitals - 1]]
+            /(Z[index[count_orbitals - 1]] * wavefunction_lenght_multipliers[index[count_orbitals - 1]])) >
+            (vector_lenght/lenght_orders[index[count_orbitals - 1]]))) {
                 t75 = thread(&basis_set_calculations::Integrate_Integral_nucleus_atraction, this,
                 probabilities[index[count_orbitals - 1]], matrix + (index[count_orbitals - 1] * (1 + order)),
                 nucleuses_distances + (index[count_orbitals - 1] * order + ind_nuc[i]), lenght_orders[index[count_orbitals - 1]],
@@ -7021,35 +7150,35 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             { // calculate coulombic integrals multithread
             t76 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j]], &matrix[index[i] + (index_2_array[j] * order)], lenght_orders[index_2_array[j]],
-            x[index_2_array[j]] - x[index[i]], y[index_2_array[j]] - y[index[i]], z[index_2_array[j]] - z[index[i]], small_rel_lenghts);
+            x[index_2_array[j]] - x[index[i]], y[index_2_array[j]] - y[index[i]], z[index_2_array[j]] - z[index[i]]);
             t77 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 1]], &matrix[index[i] + (index_2_array[j + 1] * order)],
             lenght_orders[index_2_array[j + 1]], x[index_2_array[j + 1]] - x[index[i]], y[index_2_array[j + 1]] - y[index[i]],
-            z[index_2_array[j + 1]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 1]] - z[index[i]]);
             t78 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 2]], &matrix[index[i] + (index_2_array[j + 2] * order)],
             lenght_orders[index_2_array[j + 2]], x[index_2_array[j + 2]] - x[index[i]], y[index_2_array[j + 2]] - y[index[i]],
-            z[index_2_array[j + 2]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 2]] - z[index[i]]);
             t79 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 3]], &matrix[index[i] + (index_2_array[j + 3] * order)],
             lenght_orders[index_2_array[j + 3]], x[index_2_array[j + 3]] - x[index[i]], y[index_2_array[j + 3]] - y[index[i]],
-            z[index_2_array[j + 3]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 3]] - z[index[i]]);
             t80 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 4]], &matrix[index[i] + (index_2_array[j + 4] * order)],
             lenght_orders[index_2_array[j + 4]], x[index_2_array[j + 4]] - x[index[i]], y[index_2_array[j + 4]] - y[index[i]],
-            z[index_2_array[j + 4]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 4]] - z[index[i]]);
             t81 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 5]], &matrix[index[i] + (index_2_array[j + 5] * order)],
             lenght_orders[index_2_array[j + 5]], x[index_2_array[j + 5]] - x[index[i]], y[index_2_array[j + 5]] - y[index[i]],
-            z[index_2_array[j + 5]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 5]] - z[index[i]]);
             t82 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 6]], &matrix[index[i] + (index_2_array[j + 6] * order)],
             lenght_orders[index_2_array[j + 6]], x[index_2_array[j + 6]] - x[index[i]], y[index_2_array[j + 6]] - y[index[i]],
-            z[index_2_array[j + 6]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 6]] - z[index[i]]);
             t83 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[j + 7]], &matrix[index[i] + (index_2_array[j + 7] * order)],
             lenght_orders[index_2_array[j + 7]], x[index_2_array[j + 7]] - x[index[i]], y[index_2_array[j + 7]] - y[index[i]],
-            z[index_2_array[j + 7]] - z[index[i]], small_rel_lenghts);
+            z[index_2_array[j + 7]] - z[index[i]]);
             
             t76.join();
             t77.join();
@@ -7066,7 +7195,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t84 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 7]], &matrix[index[i] + (index_2_array[index_2_size - 7] * order)],
             lenght_orders[index_2_array[index_2_size - 7]], x[index_2_array[index_2_size - 7]] - x[index[i]],
-            y[index_2_array[index_2_size - 7]] - y[index[i]], z[index_2_array[index_2_size - 7]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 7]] - y[index[i]], z[index_2_array[index_2_size - 7]] - z[index[i]]);
             t84_flag = true;
             }
         if (index_2_size % 8 >= 6)
@@ -7074,7 +7203,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t85 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 6]], &matrix[index[i] + (index_2_array[index_2_size - 6] * order)],
             lenght_orders[index_2_array[index_2_size - 6]], x[index_2_array[index_2_size - 6]] - x[index[i]],
-            y[index_2_array[index_2_size - 6]] - y[index[i]], z[index_2_array[index_2_size - 6]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 6]] - y[index[i]], z[index_2_array[index_2_size - 6]] - z[index[i]]);
             t85_flag = true;
             }
         if (index_2_size % 8 >= 5)
@@ -7082,7 +7211,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t86 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 5]], &matrix[index[i] + (index_2_array[index_2_size - 5] * order)],
             lenght_orders[index_2_array[index_2_size - 5]], x[index_2_array[index_2_size - 5]] - x[index[i]],
-            y[index_2_array[index_2_size - 5]] - y[index[i]], z[index_2_array[index_2_size - 5]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 5]] - y[index[i]], z[index_2_array[index_2_size - 5]] - z[index[i]]);
             t86_flag = true;
             }
         if (index_2_size % 8 >= 4)
@@ -7090,7 +7219,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t87 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 4]], &matrix[index[i] + (index_2_array[index_2_size - 4] * order)],
             lenght_orders[index_2_array[index_2_size - 4]], x[index_2_array[index_2_size - 4]] - x[index[i]],
-            y[index_2_array[index_2_size - 4]] - y[index[i]], z[index_2_array[index_2_size - 4]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 4]] - y[index[i]], z[index_2_array[index_2_size - 4]] - z[index[i]]);
             t87_flag = true;
             }
         if (index_2_size % 8 >= 3)
@@ -7098,7 +7227,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t88 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 3]], &matrix[index[i] + (index_2_array[index_2_size - 3] * order)],
             lenght_orders[index_2_array[index_2_size - 3]], x[index_2_array[index_2_size - 3]] - x[index[i]],
-            y[index_2_array[index_2_size - 3]] - y[index[i]], z[index_2_array[index_2_size - 3]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 3]] - y[index[i]], z[index_2_array[index_2_size - 3]] - z[index[i]]);
             t88_flag = true;
             }
         if (index_2_size % 8 >= 2)
@@ -7106,7 +7235,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t89 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 2]], &matrix[index[i] + (index_2_array[index_2_size - 2] * order)],
             lenght_orders[index_2_array[index_2_size - 2]], x[index_2_array[index_2_size - 2]] - x[index[i]],
-            y[index_2_array[index_2_size - 2]] - y[index[i]], z[index_2_array[index_2_size - 2]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 2]] - y[index[i]], z[index_2_array[index_2_size - 2]] - z[index[i]]);
             t89_flag = true;
             }
         if (index_2_size % 8 >= 1)
@@ -7114,7 +7243,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
             t90 = thread(&basis_set_calculations::Integrate_Integral_coulombic, this, small_probabilities[index[i]],
             small_probabilities[index_2_array[index_2_size - 1]], &matrix[index[i] + (index_2_array[index_2_size - 1] * order)],
             lenght_orders[index_2_array[index_2_size - 1]], x[index_2_array[index_2_size - 1]] - x[index[i]],
-            y[index_2_array[index_2_size - 1]] - y[index[i]], z[index_2_array[index_2_size - 1]] - z[index[i]], small_rel_lenghts);
+            y[index_2_array[index_2_size - 1]] - y[index[i]], z[index_2_array[index_2_size - 1]] - z[index[i]]);
             t90_flag = true;
             }
         if (t84_flag == true)
@@ -8441,9 +8570,7 @@ T basis_set_calculations<T>::Nucleus_repulsive_energy(atom_wavefunctions *atom_w
     {
     unsigned int i, j;
     unsigned int sum_electrons;
-    
     vector<unsigned int> ind_nuc;
-    
     T square_lenght;
     T energy;
     T* x = atom_wavefunctions->x.data();
@@ -8477,7 +8604,7 @@ T basis_set_calculations<T>::Nucleus_repulsive_energy(atom_wavefunctions *atom_w
     }
 template <typename T>
 T basis_set_calculations<T>::Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions,
-small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, bool alocate)
+small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, bool alocate, bool compute_densities)
     { // create or modify atom_wavefunctions list of wavefunctions, probabilities and efective lenghts according to lenght multipliers
     unsigned int i, j, k;
     unsigned int count_orbitals;
@@ -8539,7 +8666,6 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     wavefunction_size = ((2 * size_order) + 1) * ((2 * size_order) + 1) * ((2 * size_order) + 1);
     small_lenght_order = (sqrt(size_order) * 1.5);
     small_wavefunction_size = (2 * small_lenght_order + 1) * (2 * small_lenght_order + 1) * (2 * small_lenght_order + 1);
-    
     t9_flag = false;
     t10_flag = false;
     t11_flag = false;
@@ -8641,7 +8767,6 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
             pointer_to_lenght = new T[wavefunction_size];
             pointers_to_lenghts[0] = pointer_to_lenght;
             atom_wavefunctions->lenghts.push_back(pointers_to_lenghts[0]);
-            
             if (non_s1_system == true)
                 {
                 small_lenghts = new T[small_wavefunction_size];
@@ -8678,7 +8803,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 {
                 pointer_to_wavefunction = new T[wavefunction_size];
                 pointer_to_probability = new T[wavefunction_size];
-                pointer_to_Laplacian = new T[wavefunction_size];
+                pointer_to_Laplacian = new T[3 * wavefunction_size];
                 pointers_to_wavefunctions[index[i]] = pointer_to_wavefunction;
                 pointers_to_probabilities[index[i]] = pointer_to_probability;
                 pointers_to_Laplacians[index[i]] = pointer_to_Laplacian;
@@ -8897,95 +9022,98 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         t15.join();
         t15_flag = false;
         }
-    for (i = 0; (i + 7) < count_orbitals; i = i + 8)
-        { // multithreading generation of probabilities
-        t16 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i]],
-        pointers_to_probabilities[index[i]], size_order);
-        t17 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 1]],
-        pointers_to_probabilities[index[i + 1]], size_order);
-        t18 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 2]],
-        pointers_to_probabilities[index[i + 2]], size_order);
-        t19 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 3]],
-        pointers_to_probabilities[index[i + 3]], size_order);
-        t20 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 4]],
-        pointers_to_probabilities[index[i + 4]], size_order);
-        t21 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 5]],
-        pointers_to_probabilities[index[i + 5]], size_order);
-        t22 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 6]],
-        pointers_to_probabilities[index[i + 6]], size_order);
-        t23 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 7]],
-        pointers_to_probabilities[index[i + 7]], size_order);
-        t16.join();
-        t17.join();
-        t18.join();
-        t19.join();
-        t20.join();
-        t21.join();
-        t22.join();
-        t23.join();
-        }
-    if (count_orbitals % 8 >= 7) {
-        t24 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 7]],
-        pointers_to_probabilities[index[count_orbitals - 7]], size_order);
-        t24_flag = true;
-        }
-    if (count_orbitals % 8 >= 6) {
-        t25 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 6]],
-        pointers_to_probabilities[index[count_orbitals - 6]], size_order);
-        t25_flag = true;
-        }
-    if (count_orbitals % 8 >= 5) {
-        t26 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 5]],
-        pointers_to_probabilities[index[count_orbitals - 5]], size_order);
-        t26_flag = true;
-        }
-    if (count_orbitals % 8 >= 4) {
-        t27 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 4]],
-        pointers_to_probabilities[index[count_orbitals - 4]], size_order);
-        t27_flag = true;
-        }
-    if (count_orbitals % 8 >= 3) {
-        t28 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 3]],
-        pointers_to_probabilities[index[count_orbitals - 3]], size_order);
-        t28_flag = true;
-        }
-    if (count_orbitals % 8 >= 2) {
-        t29 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 2]],
-        pointers_to_probabilities[index[count_orbitals - 2]], size_order);
-        t29_flag = true;
-        }
-    if (count_orbitals % 8 >= 1) {
-        t30 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 1]],
-        pointers_to_probabilities[index[count_orbitals - 1]], size_order);
-        t30_flag = true;
-        }
-    if (t24_flag == true) {
-        t24.join();
-        t24_flag = false;
-        }
-    if (t25_flag == true) {
-        t25.join();
-        t25_flag = false;
-        }
-    if (t26_flag == true) {
-        t26.join();
-        t26_flag = false;
-        }
-    if (t27_flag == true) {
-        t27.join();
-        t27_flag = false;
-        }
-    if (t28_flag == true) {
-        t28.join();
-        t28_flag = false;
-        }
-    if (t29_flag == true) {
-        t29.join();
-        t29_flag = false;
-        }
-    if (t30_flag == true) {
-        t30.join();
-        t30_flag = false;
+    if (compute_densities == true)
+        {
+        for (i = 0; (i + 7) < count_orbitals; i = i + 8)
+            { // multithreading generation of probabilities
+            t16 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i]],
+            pointers_to_probabilities[index[i]], size_order);
+            t17 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 1]],
+            pointers_to_probabilities[index[i + 1]], size_order);
+            t18 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 2]],
+            pointers_to_probabilities[index[i + 2]], size_order);
+            t19 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 3]],
+            pointers_to_probabilities[index[i + 3]], size_order);
+            t20 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 4]],
+            pointers_to_probabilities[index[i + 4]], size_order);
+            t21 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 5]],
+            pointers_to_probabilities[index[i + 5]], size_order);
+            t22 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 6]],
+            pointers_to_probabilities[index[i + 6]], size_order);
+            t23 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[i + 7]],
+            pointers_to_probabilities[index[i + 7]], size_order);
+            t16.join();
+            t17.join();
+            t18.join();
+            t19.join();
+            t20.join();
+            t21.join();
+            t22.join();
+            t23.join();
+            }
+        if (count_orbitals % 8 >= 7) {
+            t24 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 7]],
+            pointers_to_probabilities[index[count_orbitals - 7]], size_order);
+            t24_flag = true;
+            }
+        if (count_orbitals % 8 >= 6) {
+            t25 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 6]],
+            pointers_to_probabilities[index[count_orbitals - 6]], size_order);
+            t25_flag = true;
+            }
+        if (count_orbitals % 8 >= 5) {
+            t26 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 5]],
+            pointers_to_probabilities[index[count_orbitals - 5]], size_order);
+            t26_flag = true;
+            }
+        if (count_orbitals % 8 >= 4) {
+            t27 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 4]],
+            pointers_to_probabilities[index[count_orbitals - 4]], size_order);
+            t27_flag = true;
+            }
+        if (count_orbitals % 8 >= 3) {
+            t28 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 3]],
+            pointers_to_probabilities[index[count_orbitals - 3]], size_order);
+            t28_flag = true;
+            }
+        if (count_orbitals % 8 >= 2) {
+            t29 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 2]],
+            pointers_to_probabilities[index[count_orbitals - 2]], size_order);
+            t29_flag = true;
+            }
+        if (count_orbitals % 8 >= 1) {
+            t30 = thread(&basis_set_calculations::Wavefunction_square, this, pointers_to_wavefunctions[index[count_orbitals - 1]],
+            pointers_to_probabilities[index[count_orbitals - 1]], size_order);
+            t30_flag = true;
+            }
+        if (t24_flag == true) {
+            t24.join();
+            t24_flag = false;
+            }
+        if (t25_flag == true) {
+            t25.join();
+            t25_flag = false;
+            }
+        if (t26_flag == true) {
+            t26.join();
+            t26_flag = false;
+            }
+        if (t27_flag == true) {
+            t27.join();
+            t27_flag = false;
+            }
+        if (t28_flag == true) {
+            t28.join();
+            t28_flag = false;
+            }
+        if (t29_flag == true) {
+            t29.join();
+            t29_flag = false;
+            }
+        if (t30_flag == true) {
+            t30.join();
+            t30_flag = false;
+            }
         }
     if (alocate == true)
         {
@@ -9502,15 +9630,17 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
     if (alocate == true)
-        if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true) == -1)
+        if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true, true) == -1)
             return(-1);
             
     else
         {
-        Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix, resonance_integral_matrix,
+        Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix,
+        resonance_integral_matrix,
         kinetic_integral_matrix, basis_set_matrix, matrix_order, &results);
         Calculate_corr_basis_set_matrix(basis_set_matrix, correction_matrix, corr_basis_set_matrix, matrix_order);
-        Hamiltonian = Solve_basis_set_matrix(corr_basis_set_matrix, overlap_integral_matrix, matrix_order, values, &results);
+        Hamiltonian = Solve_basis_set_matrix(corr_basis_set_matrix, overlap_integral_matrix, matrix_order,
+        values, &results);
         nucleus_repulsive_energy = Nucleus_repulsive_energy(&results);
         Hamiltonian = Hamiltonian + nucleus_repulsive_energy;
         Calculate_spin_density_matrix(overlap_integral_matrix, spin_density_matrix, matrix_order, &results);
@@ -9518,7 +9648,8 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     for (i = 0; i < max_iterations + 1; i++)
         {
         iterations++;
-        Create_nuclear_atraction_integral_matrix(nuclear_atraction_integral_matrix, nucleuses_atractions, matrix_order, &results);
+        Create_nuclear_atraction_integral_matrix(nuclear_atraction_integral_matrix, nucleuses_atractions,
+        matrix_order, &results);
         Create_coulombic_integral_matrix(coulombic_integral_matrix, matrix_order, &results, &small_results);
         if (bonded_system == true)
             {
@@ -9528,16 +9659,18 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
             }
         Calculate_kinetic_integral_matrix(kinetic_integral_matrix, matrix_order, &results);
         
-        Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix, resonance_integral_matrix,
-        kinetic_integral_matrix, basis_set_matrix, matrix_order, &results);
+        Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix,
+        resonance_integral_matrix, kinetic_integral_matrix, basis_set_matrix, matrix_order, &results);
         Calculate_corr_basis_set_matrix(basis_set_matrix, correction_matrix, corr_basis_set_matrix, matrix_order);
-        Hamiltonian = Solve_basis_set_matrix(corr_basis_set_matrix, overlap_integral_matrix, matrix_order, values, &results);
-        if ((abs(Hamiltonian/last_Hamiltonian) < (2 - minimal_fidelity)) and (abs(Hamiltonian/last_Hamiltonian) > minimal_fidelity)
+        Hamiltonian = Solve_basis_set_matrix(corr_basis_set_matrix, overlap_integral_matrix,
+        matrix_order, values, &results);
+        if ((abs(Hamiltonian/last_Hamiltonian) < (2 - minimal_fidelity)) and
+        (abs(Hamiltonian/last_Hamiltonian) > minimal_fidelity)
         and (Hamiltonian/last_Hamiltonian > 0))
             break;
         
         last_Hamiltonian = Hamiltonian;
-        Generate_atomic_wavefunctions(&results, &small_results, size_order, false);
+        Generate_atomic_wavefunctions(&results, &small_results, size_order, false, true);
         }
     nucleus_repulsive_energy = Nucleus_repulsive_energy(&results);
     Hamiltonian = Hamiltonian + nucleus_repulsive_energy;
@@ -9643,7 +9776,6 @@ T basis_set_calculations<T>::Clear()
     atoms.wavefunction_coefficients.clear();
     atoms.bonding.clear();
     atoms.paired_with_previous.clear();
-    
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
@@ -9668,7 +9800,6 @@ T basis_set_calculations<T>::Clear()
     results.x.clear();
     results.y.clear();
     results.z.clear();
-    
     small_results.lenghts.clear();
     small_results.relative_lenghts.clear();
     small_results.wavefunctions.clear();
@@ -9682,7 +9813,6 @@ T basis_set_calculations<T>::Clear()
     small_results.l.clear();
     small_results.m.clear();
     small_results.Z.clear();
-    
     electron_number = 0;
     iterations = 0;
     determinant_exception_handle = 0;
@@ -9693,7 +9823,7 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-template class basis_set_calculations<double>;/*
+template class basis_set_calculations<double>; /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004

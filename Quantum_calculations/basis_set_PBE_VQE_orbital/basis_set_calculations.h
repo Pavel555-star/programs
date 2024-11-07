@@ -235,7 +235,7 @@ T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order)
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integral_coulombic(T radius_1, T radius_2, T distance, T* result, bool spin_bonded);
-T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z, T* relative_leghts);
+T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integral_nucleus_atraction(T probabilities_lenght, T multiplier, T* result, T* lenght, unsigned int Z);
 T Integrate_Integral_nucleus_atraction(T* probabilities,
 T* result, T* lenght, unsigned int lenght_order, T lenght_x, T lenght_y, T lenght_z, unsigned int Z);
@@ -273,7 +273,7 @@ public:
 T Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR);
 T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions);
 T Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
-unsigned int size_order, bool alocate);
+unsigned int size_order, bool alocate, bool compute_densities);
 T String_to_list_electrons(string UI_input, unsigned int size_order,
 bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
 T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool alocate,

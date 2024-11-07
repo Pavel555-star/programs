@@ -1,19 +1,17 @@
-basis_set_orbital version 1.7
+basis_set_orbital version 2.0
 1. The program allows simulations with the inclusion of previous valence layers by entering atoms of noble gas elements just before the simulated atom in molecule and correct overlaps from internal valence layers by entering the correction potentials (large waavefunction set).
 
-2. The program uses the Laguerre-based wave function basis set and include physical models of influence of the electron shielding 
-and new fast and accurate variational generation of wavefunction for next iteration.
+2. The program uses the Laguerre-based wave function basis set and include physical models of influence of the electron shielding and new fast and accurate variational generation of wavefunction for next iteration.
 
-3. The program is accurate only for the calculation of simple systems of and bond lengths and no physicaly unexplained internal empirical
-coefficients are used in the Hartree-Fock procedure calculation process.
+3. The program is accurate only for the calculation of simple systems of and bond lengths and has no physicaly unexplained internal empirical coefficients are used in the Hartree-Fock procedure calculation process.
 
 4. If program generate energy levels upper vacuum level (+ values), the energy levels are in reality shifted down.
 
 5. If you simulate polar compound or polar crystalic compounds, you must correct the influence of local charges to obtain true Hamiltonian
 - subtract sums of potential energies of dipoles.
 
-6. Program chose for open-shell moleculse the open-shell Fartree-Fock method nad for closed-shell molecules
-the closed-shell Fartree-Fock method.
+6. Program chose for open-shell moleculse the open-shell method nad for closed-shell molecules
+the closed-shell method.
 
 Author of this program strictly forbiden patenting ideas in this program by other person
 and licensed this source code under the The 3-Clause BSD License:

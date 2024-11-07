@@ -756,7 +756,7 @@ T basis_set_calculations_DFT<T>::Compute_gradient_thread(T* electron_density, T*
         y_gradient = (electron_density[i + side] - electron_density[i - side])/(pixel_lenght * 2);
         z_gradient = (electron_density[i + (side * side)] - electron_density[i - (side * side)])/(pixel_lenght * 2);
         }
-    gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3)/2.00;
+    gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient)))/2.00;
     for (i = size - (side * side); i < size ; i++)
         {
         if (size - i > 1)
@@ -770,7 +770,7 @@ T basis_set_calculations_DFT<T>::Compute_gradient_thread(T* electron_density, T*
             y_gradient = (electron_density[i] - electron_density[i - side])/pixel_lenght;
         
         z_gradient = (electron_density[i] - electron_density[i - (side * side)])/(pixel_lenght);
-        gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        gradient_density[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient)));
         }
     return(0);
     }
