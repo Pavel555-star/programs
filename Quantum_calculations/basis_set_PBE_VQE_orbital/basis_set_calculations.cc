@@ -8464,8 +8464,7 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
         if (Eigenvectors[i] != 0 and -correction_matrix[i * (1 + order)] != Rydberg_energy(reduced_Z[i], n[i]) and constraints[i] == 0)
             {
             multiplier = pow(wavefunction_lenght_multipliers[i], 1 - new_old_iteration_ratio[Z[i] - charge[i]]) *
-            pow(sqrt((abs(Rydberg_energy(reduced_Z[i], n[i]) * wavefunction_coefficients[i])/
-            Eigenvectors[i] * multiplier_constant)), new_old_iteration_ratio[Z[i] - charge[i]])
+            pow(sqrt(abs((Rydberg_energy(reduced_Z[i], n[i]) * wavefunction_coefficients[i])/Eigenvectors[i] * multiplier_constant)), new_old_iteration_ratio[Z[i] - charge[i]])
             * Get_relative_Hartree_length(Z[i], n[i]);
             if (multiplier > 1.00/1024 and multiplier < 1024)
                 wavefunction_lenght_multipliers[i] = multiplier;
