@@ -6476,25 +6476,8 @@ T x_difference, T y_difference, T z_difference)
                 }
             count_bonds--;
             polarity = 1 - exp(-(electronegativity_1 - electronegativity_2)*(electronegativity_1 - electronegativity_2)/4);
-            // Linus Pauling formula
-            if ((sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
-            /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) > 1) // cut-off function
-                {
-                polarity = polarity * exp(-(sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
-                /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) + 1);
-                }
-            if (electronegativity_1 > electronegativity_2)
-                {
-                coefficient_1 = sqrt(1 + polarity);
-                coefficient_2 = sqrt(1 - polarity);
-                }
-            else
-                {
-                coefficient_1 = sqrt(1 - polarity);
-                coefficient_2 = sqrt(1 + polarity);
-                }
-            atom_wavefunctions_1->wavefunction_coefficients[indexes_1[i]] = coefficient_1;
-            atom_wavefunctions_2->wavefunction_coefficients[indexes_2[i]] = coefficient_2;
+            atom_wavefunctions_1->wavefunction_coefficients[indexes_1[i]] = 1;
+            atom_wavefunctions_2->wavefunction_coefficients[indexes_2[i]] = 1;
             }
         switch (preferred_m)
             {
