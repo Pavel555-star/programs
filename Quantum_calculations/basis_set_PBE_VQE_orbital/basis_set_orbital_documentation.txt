@@ -1,4 +1,4 @@
-basis_set_calculations code documentation version 1.7
+basis_set_calculations code documentation version 2.1
 
 class basis_set_calculations:
 public variables and constants:
@@ -59,8 +59,12 @@ Counter of iterations
 unsigned int determinant_exception_handle = 0;
 1, if there are exceptions with alocate memory in determinant calculations
 
-unsigned int overlap_integral_exception_handle = 0;
-1, if there are exceptions with alocate memory in overlap integral calculations
+bool Helium_correlation_energy = true;
+If is true, is applicated a generalized Helium correlation energy
+bool bonded_system = false;
+Is true for systems with chemical bonds
+bool partial_overlap_matrix = true;
+If is true, are computed overlaps only for bonding electrons.
 
 T nucleus_repulsive energy
 Nucleus_repulsive energy sum
@@ -106,6 +110,15 @@ Pointer to post_Hartree-Fock matrix (count_electrons * count_electrons)
 
 T* spin_density_matrix;
 Pointer to spin density matrix matrix (count_electrons * count_electrons)
+
+vector <unsigned int> electron_to_atom_numbers;
+This vector contait atom number for each electron.
+
+vector <unsigned int> index_atoms;
+This vector contain position of first electron in results.
+
+vector <T> additive_atom_overlaps;
+This vector contain additions to effective numbers of electrons on atoms from overlap integrals from other atoms. 
 
 struct atom_orbitals {
 vector<unsigned int> n;
@@ -509,11 +522,11 @@ T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions)
 This functions return sum of nucleus repulsive energies in molecule in atom_wavefunctions.
 
 T Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
-unsigned int size_order, bool alocate)
+unsigned int size_order, bool alocate, bool compute_densities)
 
 This function generate Lenghts, Wavefunctions and Probabilities cube arrays for atom_wavefunctions and small_atom_wavefunctions.
-Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays
-and alocate is true for initial calling.
+Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays,
+ alocate is true for initial calling and compute densities is true, when you want to recompute electron densities.
 
 T basis_set_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
     bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
@@ -547,12 +560,6 @@ public variables:
 
 unsigned int count_atoms;
 In this variable is information about count atoms in results
-
-vector <unsigned int> electron_to_atom_numbers;
-This vector contait atom number for each electron
-
-vector <unsigned int> index_atoms;
-This vector contain position of first electron in results
     
 vector<T>* energies = nullptr;
 Vector for energies to d-orbitals, currently unused

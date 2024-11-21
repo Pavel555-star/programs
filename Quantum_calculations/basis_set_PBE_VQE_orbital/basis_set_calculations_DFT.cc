@@ -2,31 +2,6 @@
 using namespace std;
 
 template <typename T>
-T basis_set_calculations_DFT<T>::Create_index_atoms()
-    {
-    unsigned int i;
-    unsigned int sum_electrons = this->results.n.size();
-    unsigned int count_bonds;
-    T* x = this->results.x.data();
-    T* y = this->results.y.data();
-    T* z = this->results.z.data();
-
-    i = 0;
-    count_atoms = 1;
-    index_atoms.push_back(0);
-    electron_to_atom_numbers.push_back(count_atoms);
-    for (i = 1; i < sum_electrons; i++)
-        {
-        if (x[i] != x[i-1] or y[i] != y[i-1] or z[i] != z[i-1])
-            {
-            index_atoms.push_back(i);
-            count_atoms++;
-            }
-        electron_to_atom_numbers.push_back(count_atoms);
-        }
-    return(0);
-    }
-template <typename T>
 T basis_set_calculations_DFT<T>::Detect_center_of_mass()
     {
     unsigned int i;
@@ -36,13 +11,14 @@ T basis_set_calculations_DFT<T>::Detect_center_of_mass()
     T sum_y = 0;
     T sum_z = 0;
     
+    count_atoms = this->index_atoms.size();
     for (i = 0; i < count_atoms; i++)
         {
-        Z = this->results.Z[index_atoms[i]];
+        Z = this->results.Z[this->index_atoms[i]];
         sum_Z = sum_Z + Z;
-        sum_x = sum_x + (this->results.x[index_atoms[i]] * Z);
-        sum_y = sum_y + (this->results.y[index_atoms[i]] * Z);
-        sum_z = sum_z + (this->results.z[index_atoms[i]] * Z);
+        sum_x = sum_x + (this->results.x[this->index_atoms[i]] * Z);
+        sum_y = sum_y + (this->results.y[this->index_atoms[i]] * Z);
+        sum_z = sum_z + (this->results.z[this->index_atoms[i]] * Z);
         }
     x_center_of_mass = sum_x/sum_Z;
     y_center_of_mass = sum_y/sum_Z;
@@ -66,12 +42,12 @@ T basis_set_calculations_DFT<T>::Detect_dipole_moments(dipole_moment *dipole_mom
     sum_x_dipole_moment = 0;
     sum_y_dipole_moment = 0;
     sum_z_dipole_moment = 0;
-    count_electrons = electron_to_atom_numbers.size();
+    count_electrons = this->electron_to_atom_numbers.size();
     for (i = 0; i < count_atoms; i++)
         {
-        atom_begin = index_atoms[i];
+        atom_begin = this->index_atoms[i];
         if ((i + 1) < count_atoms)
-            next_atom_begin = index_atoms[i + 1];
+            next_atom_begin = this->index_atoms[i + 1];
         else
             next_atom_begin = count_electrons - 1;
         
@@ -89,9 +65,9 @@ T basis_set_calculations_DFT<T>::Detect_dipole_moments(dipole_moment *dipole_mom
         charge = charge + ion_charge;
         if (charge != 0)
             {
-            x = this->results.x[index_atoms[i]] - x_center_of_mass;
-            y = this->results.y[index_atoms[i]] - y_center_of_mass;
-            z = this->results.z[index_atoms[i]] - z_center_of_mass;
+            x = this->results.x[this->index_atoms[i]] - x_center_of_mass;
+            y = this->results.y[this->index_atoms[i]] - y_center_of_mass;
+            z = this->results.z[this->index_atoms[i]] - z_center_of_mass;
             x_dipole_moment = x * charge;
             y_dipole_moment = y * charge;
             z_dipole_moment = z * charge;
@@ -161,9 +137,9 @@ T basis_set_calculations_DFT<T>::Create_crystal_field(central_cations *central_c
         {
         if (central_cations->atom_numbers[i] > 0)
             {
-            atom_begin = index_atoms[central_cations->atom_numbers[i] -1]; // searching atom range in this->results
+            atom_begin = this->index_atoms[central_cations->atom_numbers[i] -1]; // searching atom range in this->results
             if ((i + 1) < count_atoms)
-                next_atom_begin = index_atoms[central_cations->atom_numbers[i + 1] -1];
+                next_atom_begin = this->index_atoms[central_cations->atom_numbers[i + 1] -1];
             else
                 next_atom_begin = this->results.n.size();
             }
@@ -267,7 +243,7 @@ T basis_set_calculations_DFT<T>::Alocate_densities(unsigned int size_order)
     
     density_size = (2 * size_order + 1) * (2 * size_order + 1) * (2 * size_order + 1);
     try {
-        for (i = 0; i < index_atoms.size(); i++)
+        for (i = 0; i < this->index_atoms.size(); i++)
             {
             density = new T[density_size];
             atoms_spin_densities.push_back(density);
@@ -280,7 +256,7 @@ T basis_set_calculations_DFT<T>::Alocate_densities(unsigned int size_order)
         return(-1);
         }
     try {
-        for (i = 0; i < index_atoms.size(); i++)
+        for (i = 0; i < this->index_atoms.size(); i++)
             {
             density = new T[density_size * 2];
             atoms_electron_densities.push_back(density);
@@ -293,7 +269,7 @@ T basis_set_calculations_DFT<T>::Alocate_densities(unsigned int size_order)
         return(-1);
         }
     try {
-        for (i = 0; i < index_atoms.size(); i++)
+        for (i = 0; i < this->index_atoms.size(); i++)
             {
             density = new T[density_size * 2];
             atoms_Ksi_densities.push_back(density);
@@ -306,7 +282,7 @@ T basis_set_calculations_DFT<T>::Alocate_densities(unsigned int size_order)
         return(-1);
         }
     try {
-        for (i = 0; i < index_atoms.size(); i++)
+        for (i = 0; i < this->index_atoms.size(); i++)
             {
             density = new T[density_size * 2];
             atoms_gradients_densities.push_back(density);
@@ -565,9 +541,9 @@ unsigned int size_order)
             densities_1 = atoms_densities_list[i];
             densities_2 = atoms_densities_list[j];
             
-            X = (x[index_atoms[j]] - x[index_atoms[i]]) * size_order/this->vector_lenght;
-            Y = (y[index_atoms[j]] - y[index_atoms[i]]) * size_order/this->vector_lenght;
-            Z = (z[index_atoms[j]] - z[index_atoms[i]]) * size_order/this->vector_lenght;
+            X = (x[this->index_atoms[j]] - x[this->index_atoms[i]]) * size_order/this->vector_lenght;
+            Y = (y[this->index_atoms[j]] - y[this->index_atoms[i]]) * size_order/this->vector_lenght;
+            Z = (z[this->index_atoms[j]] - z[this->index_atoms[i]]) * size_order/this->vector_lenght;
             x_contraction = abs(X);
             y_contraction = abs(Y);
             z_contraction = abs(Z);
@@ -1086,7 +1062,7 @@ vector<T*> electron_densities, unsigned int size_order)
     unsigned int i, j, k;
     unsigned int count_orbitals;
     unsigned int sum_electrons;
-    unsigned int index[this->max_electrons]; // Index of electrons positions forcomputing nuclear atraction integrals
+    unsigned int index[this->max_electrons];
     T wavefunction_coefficients[this->max_electrons];
     int bonding[this->max_electrons];
     int spin_paired[this->max_electrons];
@@ -1162,29 +1138,29 @@ vector<T*> electron_densities, unsigned int size_order)
     // multithreading code
     for (i = 0; (i + 7) < count_orbitals; i = i + 8)
         {
-        t61 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i]]],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i]]], electron_array[index[i]],
+        t61 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i]] - 1], electron_array[index[i]],
         size_order, &exchange_array[index[i]], &correlation_array[index[i]], Wigner_Seitz_radiuses[Z[index[i]] - 1]);
-        t62 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 1]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 1]] - 1], electron_array[index[i + 1]],
+        t62 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 1]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 1]] - 1], electron_array[index[i + 1]],
         size_order, &exchange_array[index[i + 1]], &correlation_array[index[i + 1]], Wigner_Seitz_radiuses[Z[index[i + 1]] - 1]);
-        t63 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 2]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 2]] - 1], electron_array[index[i + 2]],
+        t63 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 2]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 2]] - 1], electron_array[index[i + 2]],
         size_order, &exchange_array[index[i + 2]], &correlation_array[index[i + 2]], Wigner_Seitz_radiuses[Z[index[i + 2]] - 1]);
-        t64 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 3]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 3]] - 1], electron_array[index[i + 3]],
+        t64 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 3]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 3]] - 1], electron_array[index[i + 3]],
         size_order, &exchange_array[index[i + 3]], &correlation_array[index[i + 3]], Wigner_Seitz_radiuses[Z[index[i + 3]] - 1]);
-        t65 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 4]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 4]] - 1], electron_array[index[i + 4]],
+        t65 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 4]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 4]] - 1], electron_array[index[i + 4]],
         size_order, &exchange_array[index[i + 4]], &correlation_array[index[i + 4]], Wigner_Seitz_radiuses[Z[index[i + 4]] - 1]);
-        t66 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 5]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 5]] - 1], electron_array[index[i + 5]],
+        t66 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 5]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 5]] - 1], electron_array[index[i + 5]],
         size_order, &exchange_array[index[i + 5]], &correlation_array[index[i + 5]], Wigner_Seitz_radiuses[Z[index[i + 5]] - 1]);
-        t67 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 6]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 6]] - 1], electron_array[index[i + 6]],
+        t67 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 6]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 6]] - 1], electron_array[index[i + 6]],
         size_order, &exchange_array[index[i + 6]], &correlation_array[index[i + 6]], Wigner_Seitz_radiuses[Z[index[i + 6]] - 1]);
-        t68 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 7]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[i + 7]] - 1], electron_array[index[i + 7]],
+        t68 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[this->electron_to_atom_numbers[index[i + 7]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[i + 7]] - 1], electron_array[index[i + 7]],
         size_order, &exchange_array[index[i + 7]], &correlation_array[index[i + 7]], Wigner_Seitz_radiuses[Z[index[i + 7]] - 1]);
         
         t61.join();
@@ -1199,8 +1175,8 @@ vector<T*> electron_densities, unsigned int size_order)
     if (count_orbitals % 8 >= 7)
         {
         t69 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 7]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 7]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 7]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 7]] - 1],
         electron_array[index[count_orbitals - 7]],
         size_order, &exchange_array[index[count_orbitals - 7]], &correlation_array[index[count_orbitals - 7]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 7]] - 1]);
@@ -1209,8 +1185,8 @@ vector<T*> electron_densities, unsigned int size_order)
     if (count_orbitals % 8 >= 6)
         {
         t70 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 6]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 6]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 6]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 6]] - 1],
         electron_array[index[count_orbitals - 6]],
         size_order, &exchange_array[index[count_orbitals - 6]], &correlation_array[index[count_orbitals - 6]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 6]] - 1]);
@@ -1219,8 +1195,8 @@ vector<T*> electron_densities, unsigned int size_order)
     if (count_orbitals % 8 >= 5)
         {
         t71 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 5]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 5]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 5]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 5]] - 1],
         electron_array[index[count_orbitals - 5]],
         size_order, &exchange_array[index[count_orbitals - 5]], &correlation_array[index[count_orbitals - 5]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 5]] - 1]);
@@ -1229,8 +1205,8 @@ vector<T*> electron_densities, unsigned int size_order)
     if (count_orbitals % 8 >= 4)
         {
         t72 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 4]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 4]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 4]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 4]] - 1],
         electron_array[index[count_orbitals - 4]],
         size_order, &exchange_array[index[count_orbitals - 4]], &correlation_array[index[count_orbitals - 4]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 4]] - 1]);
@@ -1239,8 +1215,8 @@ vector<T*> electron_densities, unsigned int size_order)
     if (count_orbitals % 8 >= 3)
         {
         t73 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 3]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 3]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 3]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 3]] - 1],
         electron_array[index[count_orbitals - 3]],
         size_order, &exchange_array[index[count_orbitals - 3]], &correlation_array[index[count_orbitals - 3]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 3]] - 1]);
@@ -1249,8 +1225,8 @@ vector<T*> electron_densities, unsigned int size_order)
     if (count_orbitals % 8 >= 2)
         {
         t74 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 2]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 2]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 2]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 2]] - 1],
         electron_array[index[count_orbitals - 2]],
         size_order, &exchange_array[index[count_orbitals - 2]], &correlation_array[index[count_orbitals - 2]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 2]] - 1]);
@@ -1259,8 +1235,8 @@ vector<T*> electron_densities, unsigned int size_order)
    if (count_orbitals % 8 >= 1)
         {
         t75 = thread(&basis_set_calculations_DFT::PBE_thread, this,
-        atoms_gradients_array[electron_to_atom_numbers[index[count_orbitals - 1]] - 1],
-        atoms_Ksi_array[electron_to_atom_numbers[index[count_orbitals - 1]] - 1],
+        atoms_gradients_array[this->electron_to_atom_numbers[index[count_orbitals - 1]] - 1],
+        atoms_Ksi_array[this->electron_to_atom_numbers[index[count_orbitals - 1]] - 1],
         electron_array[index[count_orbitals - 1]],
         size_order, &exchange_array[index[count_orbitals - 1]], &correlation_array[index[count_orbitals - 1]],
         Wigner_Seitz_radiuses[Z[index[count_orbitals - 1]] - 1]);
@@ -1340,30 +1316,30 @@ T basis_set_calculations_DFT<T>::Set_circuit()
     for (i = 0; i < count_atoms; i++) // Adding intraaratom entanglements
         {
         if (i < count_atoms -1)
-            for (j = index_atoms[i] + 1; j < index_atoms[i + 1]; j++)
+            for (j = this->index_atoms[i] + 1; j < this->index_atoms[i + 1]; j++)
                 VQE_gates.push_back(make_pair(j - 1, j));
         else
-            for (j = index_atoms[i] + 1; j < sum_electrons; j++)
+            for (j = this->index_atoms[i] + 1; j < sum_electrons; j++)
                 VQE_gates.push_back(make_pair(j - 1, j));
         }
     for (i = 0; i < count_atoms; i++) // Adding interaratom entanglements
         for (j = i; j < count_atoms; j++)
             {
-            if (sqrt(((this->results.x[index_atoms[i]] - this->results.x[index_atoms[j]]) *
-                      (this->results.x[index_atoms[i]] - this->results.x[index_atoms[i]])) + 
-                     ((this->results.y[index_atoms[i]] - this->results.y[index_atoms[j]]) *
-                      (this->results.y[index_atoms[i]] - this->results.y[index_atoms[i]])) +
-                     ((this->results.z[index_atoms[i]] - this->results.z[index_atoms[j]]) *
-                      (this->results.x[index_atoms[i]] - this->results.z[index_atoms[i]]))) <=
+            if (sqrt(((this->results.x[this->index_atoms[i]] - this->results.x[this->index_atoms[j]]) *
+                      (this->results.x[this->index_atoms[i]] - this->results.x[this->index_atoms[i]])) + 
+                     ((this->results.y[this->index_atoms[i]] - this->results.y[this->index_atoms[j]]) *
+                      (this->results.y[this->index_atoms[i]] - this->results.y[this->index_atoms[i]])) +
+                     ((this->results.z[this->index_atoms[i]] - this->results.z[this->index_atoms[j]]) *
+                      (this->results.x[this->index_atoms[i]] - this->results.z[this->index_atoms[i]]))) <=
                        VQE_interconnection_distance)
                 {
                 if (i < count_atoms - 1)
-                    k = index_atoms[i + 1] - 1;
+                    k = this->index_atoms[i + 1] - 1;
                 else
                     k = sum_electrons - 1;
                 
                 if (j < count_atoms - 1)
-                    l = index_atoms[j + 1] - 1;
+                    l = this->index_atoms[j + 1] - 1;
                 else
                     l = sum_electrons - 1;
                 
@@ -1510,8 +1486,6 @@ bool dealocate, vector<T>* values, vector<T>* spin_density_vector,  vector<T>* s
     bool repetition_flag;
     
     energies = values;
-    if (Create_index_atoms() == -1)
-       return(-1);
     if (Detect_center_of_mass() == -1)
        return(-1);
     if (Detect_dipole_moments(&dipoles) == -1)
@@ -1541,8 +1515,6 @@ T basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations, T mini
     energies = values;
     if (allocation_memory == true)
         {
-        if (Create_index_atoms() == -1)
-           return(-1);
         if (Detect_center_of_mass() == -1)
            return(-1);
         if (Detect_dipole_moments(&dipoles) == -1)
@@ -1564,14 +1536,11 @@ T basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations, T mini
             pre_PBE_wavefunction_lenght_multipliers.push_back(this->results.wavefunction_lenght_multipliers[i]);
         }
     // Execute calculations
-    for (i = 0; i < matrix_order * matrix_order; i++) // avoiding executing PBE for atomic systems
-        {
-        if (this->resonance_integral_matrix[i] != 0)
-            break;
-        
-        if (i == matrix_order * matrix_order -1)
-            return(Hamiltonian);
-        }
+    if (this->bonded_system == false) // avoiding executing PBE and VQE for atomic systems
+        return(Hamiltonian);
+    
+    this->Helium_correlation_energy = false; // is not necessary twice inclusion of correlation energy
+    
     for (i = 0; i < matrix_order; i++) //
         {
         exchange_energy = 0;
@@ -1585,9 +1554,9 @@ T basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations, T mini
             return(-1);
     // compute electron and spin densities
     t61 = thread(&basis_set_calculations_DFT::Compute_densities, this, this->results.probabilities, atoms_electron_densities,
-    index_atoms, size_order, this->results.spins, this->results.spin_paired, false);
+    this->index_atoms, size_order, this->results.spins, this->results.spin_paired, false);
     t62 = thread(&basis_set_calculations_DFT::Compute_densities, this, this->results.probabilities, atoms_spin_densities,
-    index_atoms, size_order, this->results.spins, this->results.spin_paired, true);
+    this->index_atoms, size_order, this->results.spins, this->results.spin_paired, true);
     t61.join();
     t62.join();
     // correct electron and spin densities
@@ -1621,9 +1590,9 @@ T basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations, T mini
             }
         // compute electron and spin densities
         t61 = thread(&basis_set_calculations_DFT::Compute_densities, this, this->results.probabilities, atoms_electron_densities,
-        index_atoms, size_order, this->results.spins, this->results.spin_paired, false);
+        this->index_atoms, size_order, this->results.spins, this->results.spin_paired, false);
         t62 = thread(&basis_set_calculations_DFT::Compute_densities, this, this->results.probabilities, atoms_spin_densities,
-        index_atoms, size_order, this->results.spins, this->results.spin_paired, true);
+        this->index_atoms, size_order, this->results.spins, this->results.spin_paired, true);
         t61.join();
         t62.join();
         // correct electron and spin densities
@@ -1665,14 +1634,11 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
     VQE_Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity, size_order, false, values, spin_density_vector, spin_values);
     matrix_order = this->results.wavefunction_lenght_multipliers.size();
     
-    for (i = 0; i < matrix_order * matrix_order; i++) // avoiding executing PBE and VQE for atomic systems
-        {
-        if (this->resonance_integral_matrix[i] != 0)
-            break;
-        
-        if (i == matrix_order * matrix_order -1)
-            return(VQE_Hamiltonian);
-        }
+    if (this->bonded_system == false) // avoiding executing PBE and VQE for atomic systems
+        return(VQE_Hamiltonian);
+    
+    this->Helium_correlation_energy = false; // is not necessary twice inclusion of correlation energy
+    
     for (i = 0; i < matrix_order; i++) // Filling first wavefunction_lenghts_multipliers and eigenvectors vectors
         {
         VQE_Wavefunction_lenght_multipliers_1.push_back(this->results.wavefunction_lenght_multipliers[i]);
@@ -1826,7 +1792,7 @@ vector<unsigned int> atom_numbers)
     for (i = 0; i < count_pi_electrons; i++) // Copying resonance integrals
         {
         for (j = 0; j < count_pi_electrons; j++)
-            if (j != i and electron_to_atom_numbers[index_pi_electrons[i]] != electron_to_atom_numbers[index_pi_electrons[j]])
+            if (j != i and this->electron_to_atom_numbers[index_pi_electrons[i]] != this->electron_to_atom_numbers[index_pi_electrons[j]])
                 Huckel_matrix[(i * count_pi_electrons) + j] = Huckel_matrix[(i * count_pi_electrons) + j]
                 + abs(this->resonance_integral_matrix[(index_pi_electrons[i] * matrix_order) +  index_pi_electrons[j]]);
         } /*
@@ -1860,7 +1826,7 @@ vector<unsigned int> atom_numbers)
                     Huckel_matrix[i + (j * count_pi_electrons)] = Huckel_matrix[i + (j * count_pi_electrons)]/beta;
     
     for (i = 0; i < count_pi_electrons; i++) // Copying atom_numbers to vector
-        atom_numbers.push_back(electron_to_atom_numbers[index_pi_electrons[i]]);
+        atom_numbers.push_back(this->electron_to_atom_numbers[index_pi_electrons[i]]);
     return(0);
     }
 template <typename T>
@@ -1918,10 +1884,10 @@ T basis_set_calculations_DFT<T>::Detect_symetry_information(symetry_axes *symetr
     
     for (i = 0; i < count_atoms; i++)
         { // Copy coordinates and proton numbers to stack
-        x[i] = this->results.x[index_atoms[i]];
-        y[i] = this->results.y[index_atoms[i]];
-        z[i] = this->results.z[index_atoms[i]];
-        Z[i] = this->results.Z[index_atoms[i]];
+        x[i] = this->results.x[this->index_atoms[i]];
+        y[i] = this->results.y[this->index_atoms[i]];
+        z[i] = this->results.z[this->index_atoms[i]];
+        Z[i] = this->results.Z[this->index_atoms[i]];
         }
     x_center = x_center_of_mass; // For center of mass and lines from center of mass are center parameters center of mass
     y_center = y_center_of_mass;
@@ -2500,8 +2466,6 @@ T basis_set_calculations_DFT<T>::Clear()
     x_center_of_mass = 0;
     y_center_of_mass = 0;
     z_center_of_mass = 0;
-    electron_to_atom_numbers.clear();
-    index_atoms.clear();
     energies = nullptr;
     dipoles.partial_charges.clear();
     dipoles.x.clear();
