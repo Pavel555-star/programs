@@ -17,6 +17,8 @@ class basis_set_calculations_DFT: public basis_set_calculations<T>
 public:
     unsigned int count_atoms = 0;
     bool allocation_memory = true;
+    vector <unsigned int> electron_to_atom_numbers;
+    vector <unsigned int> index_atoms;
     vector<T>* energies = nullptr;
     T x_center_of_mass = 0;
     T y_center_of_mass = 0;
@@ -111,6 +113,7 @@ public:
     QuantumCircuit circuit;
     // End of Qiskit circuit code,  End of VQE section
 private:
+    T Create_index_atoms();
     T Detect_center_of_mass();
     T Detect_dipole_moments(dipole_moment *dipole_moment);
     T Create_crystal_field(central_cations *central_cations);

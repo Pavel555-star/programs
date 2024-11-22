@@ -6,7 +6,6 @@
 #include <thread>
 #include <vector>
 #include <bits/stdc++.h>
-
 using namespace std; // compiler parameters: -pthread -ffast-math -fno-finite-math-only -fmove-loop-invariants -O1
 
 template <typename T>
@@ -40,7 +39,6 @@ public:
     
     bool Helium_correlation_energy = true;
     bool bonded_system = false;
-    bool partial_overlap_matrix = true;
     
     T vector_lenght = 5.00; // constant for dimension of wavefunction vectors in Hartree lenghts
     T nucleus_repulsive_energy;
@@ -57,11 +55,6 @@ public:
     T* correction_matrix = nullptr;
     T* corr_basis_set_matrix = nullptr;
     T* spin_density_matrix = nullptr;
-    
-    vector <unsigned int> index_atoms;
-    vector <unsigned int> electron_to_atom_numbers;
-    vector <T> additive_atom_overlaps;
-    
     
     struct atom_orbitals {
     vector<unsigned int> n;
@@ -98,7 +91,7 @@ public:
     vector<int> m;
     vector<int> charge;
     vector<unsigned int> count_electrons;
-    vector<T> reduced_Z;
+    vector<unsigned int> reduced_Z;
     vector<unsigned int> Z;
     vector<unsigned int> electron_numbers;
     vector<T> x;
@@ -247,7 +240,7 @@ T Integral_nucleus_atraction(T probabilities_lenght, T multiplier, T* result, T*
 T Integrate_Integral_nucleus_atraction(T* probabilities,
 T* result, T* lenght, unsigned int lenght_order, T lenght_x, T lenght_y, T lenght_z, unsigned int Z);
 T Integral_kinetic(T* Laplacian_1, T* Laplacian_2, T* result, unsigned int lenght_order, T d_x, T d_y, T d_z);
-T Rydberg_energy(T Z, unsigned int n);
+T Rydberg_energy(unsigned int Z, unsigned int n);
 T Orbital_moment_energy(int m, T* B0);
 T Spin_moment_energy(T s, T B0);
 T Orbital_magnetic_field(T potential_energy, T radius, int l);
@@ -287,12 +280,9 @@ T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_o
 vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();};
-
 #include "basis_set_calculations.cc"
 # endif
-
 /* BASIS_SET_CALCULATIONS_H
-
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004

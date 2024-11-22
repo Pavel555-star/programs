@@ -1,4 +1,4 @@
-basis_set_calculations code documentation version 2.1
+basis_set_calculations code documentation version 2.0
 
 class basis_set_calculations:
 public variables and constants:
@@ -59,12 +59,8 @@ Counter of iterations
 unsigned int determinant_exception_handle = 0;
 1, if there are exceptions with alocate memory in determinant calculations
 
-bool Helium_correlation_energy = true;
-If is true, is applicated a generalized Helium correlation energy
-bool bonded_system = false;
-Is true for systems with chemical bonds
-bool partial_overlap_matrix = true;
-If is true, are computed overlaps only for bonding electrons.
+unsigned int overlap_integral_exception_handle = 0;
+1, if there are exceptions with alocate memory in overlap integral calculations
 
 T nucleus_repulsive energy
 Nucleus_repulsive energy sum
@@ -110,15 +106,6 @@ Pointer to post_Hartree-Fock matrix (count_electrons * count_electrons)
 
 T* spin_density_matrix;
 Pointer to spin density matrix matrix (count_electrons * count_electrons)
-
-vector <unsigned int> electron_to_atom_numbers;
-This vector contait atom number for each electron.
-
-vector <unsigned int> index_atoms;
-This vector contain position of first electron in results.
-
-vector <T> additive_atom_overlaps;
-This vector contain additions to effective numbers of electrons on atoms from overlap integrals from other atoms. 
 
 struct atom_orbitals {
 vector<unsigned int> n;
@@ -560,6 +547,12 @@ public variables:
 
 unsigned int count_atoms;
 In this variable is information about count atoms in results
+
+vector <unsigned int> electron_to_atom_numbers;
+This vector contait atom number for each electron
+
+vector <unsigned int> index_atoms;
+This vector contain position of first electron in results
     
 vector<T>* energies = nullptr;
 Vector for energies to d-orbitals, currently unused

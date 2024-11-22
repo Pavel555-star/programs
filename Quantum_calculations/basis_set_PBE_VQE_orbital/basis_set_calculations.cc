@@ -4287,7 +4287,7 @@ T basis_set_calculations<T>::Integral_nucleus_atraction(T probabilities_lenght, 
     lenght[0] = radius;
     
     if ((not (isnan(constant * Z/radius))) and (not (isinf(constant * Z/radius))))
-        result[0] += constant * Z/radius; // Check for NaN and inf values
+        result[0] = result[0] + constant * Z/radius; // Check for NaN and inf values
     
     return(0);
     }
@@ -4309,7 +4309,6 @@ T* result, T* lenght, unsigned int lenght_order, T lenght_x, T lenght_y, T lengh
     if ((not (isnan(constant * Z/radius))) and (not (isinf(constant * Z/radius))))
         result[0] = result[0] + constant * Z/radius; // Check for NaN and inf values
     
-    lenght[0] += radius;
     return(0);
     }
 template <typename T>
@@ -4473,7 +4472,7 @@ T d_x, T d_y, T d_z)
     return(0);
     }
 template <typename T>
-T basis_set_calculations<T>::Rydberg_energy(T Z, unsigned int n)
+T basis_set_calculations<T>::Rydberg_energy(unsigned int Z, unsigned int n)
     {
     T energy;
     
@@ -6476,8 +6475,25 @@ T x_difference, T y_difference, T z_difference)
                 }
             count_bonds--;
             polarity = 1 - exp(-(electronegativity_1 - electronegativity_2)*(electronegativity_1 - electronegativity_2)/4);
-            atom_wavefunctions_1->wavefunction_coefficients[indexes_1[i]] = 1;
-            atom_wavefunctions_2->wavefunction_coefficients[indexes_2[i]] = 1;
+            // Linus Pauling formula
+            if ((sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
+            /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) > 1) // cut-off function
+                {
+                polarity = polarity * exp(-(sqrt(x_difference * x_difference + y_difference * y_difference + z_difference * z_difference)
+                /(atom_wavefunctions_1->n[indexes_1[i]] + atom_wavefunctions_2->n[indexes_2[i]])) + 1);
+                }
+            if (electronegativity_1 > electronegativity_2)
+                {
+                coefficient_1 = sqrt(1 + polarity);
+                coefficient_2 = sqrt(1 - polarity);
+                }
+            else
+                {
+                coefficient_1 = sqrt(1 - polarity);
+                coefficient_2 = sqrt(1 + polarity);
+                }
+            atom_wavefunctions_1->wavefunction_coefficients[indexes_1[i]] = coefficient_1;
+            atom_wavefunctions_2->wavefunction_coefficients[indexes_2[i]] = coefficient_2;
             }
         switch (preferred_m)
             {
@@ -6597,8 +6613,7 @@ atom_wavefunctions *atom_wavefunctions)
     unsigned int ind_nuc_size;
     unsigned int index[max_electrons]; // Index of electrons positions forcomputing nuclear atraction integrals
     unsigned int ind_nuc[max_electrons + 1]; // Index of nucleuses
-    T lenght;
-    T distance;
+    
     T* probabilities[max_electrons];
     unsigned int lenght_orders[max_electrons];
     T wavefunction_coefficients[max_electrons];
@@ -6606,7 +6621,6 @@ atom_wavefunctions *atom_wavefunctions)
     T efective_radius_base[max_electrons];
     unsigned int count_electrons[max_electrons];
     unsigned int Z[max_electrons];
-    T reduced_Z[max_electrons];
     T x[max_electrons];
     T y[max_electrons];
     T z[max_electrons];
@@ -6628,8 +6642,10 @@ atom_wavefunctions *atom_wavefunctions)
     t75_flag = false;
     restriction = true;
     matrix_shift = 2;
+    
     sum_electrons = atom_wavefunctions->n.size();
     count_orbitals = 0;
+    
     if (sum_electrons > max_electrons)
         return(-1);
     
@@ -6641,8 +6657,7 @@ atom_wavefunctions *atom_wavefunctions)
         wavefunction_lenght_multipliers[i] = atom_wavefunctions->wavefunction_lenght_multipliers[i];
         efective_radius_base[i] = atom_wavefunctions->efective_radius_base[i];
         count_electrons[i] = atom_wavefunctions->count_electrons[i];
-        Z[i] = atom_wavefunctions->Z[i];
-        reduced_Z[i]= atom_wavefunctions->reduced_Z[i];
+        Z[i] = atom_wavefunctions->reduced_Z[i];
         x[i] = atom_wavefunctions->x[i];
         y[i] = atom_wavefunctions->y[i];
         z[i] = atom_wavefunctions->z[i];
@@ -6999,24 +7014,6 @@ atom_wavefunctions *atom_wavefunctions)
             for (k = ind_nuc[j] + 1; k < ind_nuc[j + 1]; k++)
                 nucleuses_distances[i * order + k] = nucleuses_distances[i * order + ind_nuc[j]];
         }
-    // computing reduced Z from indexes of nucleuses and integrating products
-    // this is computed to substitution the Z to Rydberg formula for next iteration of algorithm
-    for (i = 0; i < sum_electrons; i++) 
-        {
-        reduced_Z[i] = Z[i];
-        lenght = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
-        for (j = 0; j < ind_nuc_size; j++)
-            {
-            if (x[ind_nuc[j]] != x[i] or y[ind_nuc[j]] != y[i] or z[ind_nuc[j]] != z[i])
-                {
-                //distance = sqrt((x[ind_nuc[j]] - x[i]) * (x[ind_nuc[j]] - x[i]) +
-                //(y[ind_nuc[j]] - y[i]) * (y[ind_nuc[j]] - y[i]) + (z[ind_nuc[j]] - z[i]) * (z[ind_nuc[j]] - z[i]));
-                distance = nucleuses_distances[j + i * order];
-                reduced_Z[i] = reduced_Z[i] + (Z[ind_nuc[j]] * lenght/distance);
-                }
-            }
-        atom_wavefunctions->reduced_Z[i] = reduced_Z[i];
-        }
     return(0);
     }
 template <typename T>
@@ -7029,6 +7026,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     unsigned int small_atom_wavefunctions_size;
     unsigned int index[max_electrons];
     unsigned int index_2_array[max_electrons];
+    
     T wavefunction_coefficients[max_electrons];
     T efective_radius_base[max_electrons];
     T wavefunction_lenght_multipliers[max_electrons];
@@ -7112,7 +7110,8 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     for (i = 0; i < count_electrons; i++) // list of electrons for calculation
         if (wavefunction_coefficients[i] != 0)
             {
-            if (restriction == false) {
+            if (restriction == false)
+                {
                 index[count_orbitals] = i;
                 count_orbitals++;
                 }
@@ -7330,6 +7329,7 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
     unsigned int count_orbitals;
     unsigned int index_size;
     unsigned int index_2_size;
+    
     unsigned int index[max_electrons];
     unsigned int index_2_array[max_electrons];
     T* wavefunctions[max_electrons];
@@ -7385,15 +7385,12 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
             {
             if (restriction == false)
                 {
-                if ((bonding[i] >= 0) or (partial_overlap_matrix == false))
-                    {
-                    index[count_orbitals] = i;
-                    count_orbitals++;
-                    }
+                index[count_orbitals] = i;
+                count_orbitals++;
                 }
             else
                 {
-                if ((bonding[i] >= 0) or (spin_paired[i] > i and partial_overlap_matrix == false))
+                if ((bonding[i] >= 0) or spin_paired[i] > i)
                     { // for restricted basis set method only in bonding orbitals both electrons
                     index[count_orbitals] = i;
                     count_orbitals++;
@@ -7624,9 +7621,10 @@ T basis_set_calculations<T>::Calculate_resonance_integral_matrix(T* overlap_matr
 T* resonance_integral_matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
 small_atom_wavefunctions *small_atom_wavefunctions)
     {
-    unsigned int i, j, k, l, m;
+    unsigned int i, j, k;
     unsigned int count_electrons, count_small_wavefunctions;
     unsigned int count_interactions;
+    
     T spins[max_electrons];
     T x[max_electrons];
     T y[max_electrons];
@@ -7651,10 +7649,10 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     T constant;
     T overlap;
     T pow_overrlaps;
-    T additive_atom_overlap;
     
     thread t106, t107, t108, t109, t110, t111, t112, t113, t114, t115, t116, t117, t118, t119, t120;
     bool t114_flag, t115_flag, t116_flag, t117_flag, t118_flag, t119_flag, t120_flag;
+    
     
     t114_flag = false;
     t115_flag = false;
@@ -7928,23 +7926,6 @@ small_atom_wavefunctions *small_atom_wavefunctions)
         for (j = 0; j < i; j++)
             resonance_integral_matrix[(j * order) + i] = resonance_integral_matrix[(i * order) + j];
     
-    // computing additive overlap integrals
-    l = index_atoms.size();
-    for (i = 0; i < l; i++)
-        {
-        additive_atom_overlap = 0;
-        if (i == k - 1)
-            m = order;
-        else
-            m = index_atoms[i + 1];
-            
-        for (j = index_atoms[i]; j < m; j++)
-            for (k = 0; k < order; k++)
-                if (k < index_atoms[i] or k >= m) // excluding the overlaps with electrons in the same atom
-                    additive_atom_overlap += abs(overlap_matrix[j * order + k]);
-        
-        additive_atom_overlaps[i] = additive_atom_overlap;
-        }
     return(0);
     }
 template <typename T>
@@ -8219,6 +8200,7 @@ T* resonance_integral_matrix, T* kinetic_integral_matrix, T* basis_set_matrix,
 unsigned int order, atom_wavefunctions *atom_wavefunctions)
     {
     unsigned int i, j;
+    
     T spin_orbit_energy;
     T B;
     T distance_nucleuses;
@@ -8227,6 +8209,7 @@ unsigned int order, atom_wavefunctions *atom_wavefunctions)
     T efective_radius_base[max_electrons];
     T wavefunction_lenght_multipliers[max_electrons];
     T potential_energy[max_electrons];
+    
     unsigned int Z[max_electrons];
     unsigned int x[max_electrons];
     unsigned int y[max_electrons];
@@ -8327,6 +8310,7 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     {
     unsigned int i, j, k;
     unsigned int indexes_2[max_electrons];
+    
     T alpha, beta, E;
     T multiplier_constant, multiplier;
     T Hamiltonian_parts[max_electrons];
@@ -8356,8 +8340,7 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     T* wavefunction_lenght_multipliers = atom_wavefunctions->wavefunction_lenght_multipliers.data();
     unsigned int* constraints = atom_wavefunctions->wavefunction_constraints.data();
     unsigned int* Z = atom_wavefunctions->Z.data();
-    T* reduced_Z = atom_wavefunctions->reduced_Z.data();
-    T* wavefunction_coefficients = atom_wavefunctions->wavefunction_coefficients.data();
+    unsigned int* reduced_Z = atom_wavefunctions->reduced_Z.data();
     unsigned int* count_electrons = atom_wavefunctions->count_electrons.data();
     int* charge = atom_wavefunctions->charge.data();
     bool restriction;
@@ -8441,13 +8424,12 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     for (i = 0; i < order; i++) // variational generation of new wavefunction lenght coefficients for next iteration from roots of matrix
         {
         if ((Z[i] - charge[i]))
-            multiplier_constant = 1.00/sqrt(Z[i] - charge[i] +
-            additive_atom_overlaps[electron_to_atom_numbers[i] - 1]);
+            multiplier_constant = 1.00/sqrt(Z[i] - charge[i]);
             
-        if (Eigenvectors[i] != 0 and -correction_matrix[i * (1 + order)] != Rydberg_energy(reduced_Z[i], n[i]) and constraints[i] == 0)
+        if (Eigenvectors[i] != 0 and -correction_matrix[i * (1 + order)] != Rydberg_energy(Z[i], n[i]) and constraints[i] == 0)
             {
             multiplier = pow(wavefunction_lenght_multipliers[i], 1 - new_old_iteration_ratio[Z[i] - charge[i]]) *
-            pow(sqrt(abs((Rydberg_energy(reduced_Z[i], n[i]) * wavefunction_coefficients[i])/Eigenvectors[i] * multiplier_constant)), new_old_iteration_ratio[Z[i] - charge[i]])
+            pow(sqrt(abs(Rydberg_energy(Z[i], n[i]) /Eigenvectors[i] * multiplier_constant)), new_old_iteration_ratio[Z[i] - charge[i]])
             * Get_relative_Hartree_length(Z[i], n[i]);
             if (multiplier > 1.00/1024 and multiplier < 1024)
                 wavefunction_lenght_multipliers[i] = multiplier;
@@ -8594,7 +8576,7 @@ T basis_set_calculations<T>::Nucleus_repulsive_energy(atom_wavefunctions *atom_w
     T* x = atom_wavefunctions->x.data();
     T* y = atom_wavefunctions->y.data();
     T* z = atom_wavefunctions->z.data();
-    unsigned int* Z = atom_wavefunctions->Z.data();
+    unsigned int* Z = atom_wavefunctions->reduced_Z.data();
     
     sum_electrons = atom_wavefunctions->n.size();
     energy = 0;
@@ -8634,6 +8616,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     int m_i[max_electrons];
     unsigned int Z[max_electrons];
     unsigned int Z_i[max_electrons];
+    
     T* pointers_to_lenghts[1];
     T* pointers_to_wavefunctions[max_electrons];
     T* pointers_to_probabilities[max_electrons];
@@ -8651,6 +8634,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     unsigned int small_atom_wavefunctions_size;
     unsigned int  small_electron_numbers[max_electrons];
     unsigned int  small_lenght_orders[max_electrons];
+    
     T multiplier;
     unsigned int index[max_electrons + 1];
     T multipliers[max_electrons];
@@ -9338,23 +9322,27 @@ template <typename T>
 T basis_set_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
 bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     {
-    unsigned int i, j, k, l;
+    unsigned int i, j, k;
     unsigned int last_readed_index;
     unsigned int input_size;
     unsigned int matrix_order;
     unsigned int count_atoms, count_coordinates, count_bonds, count_potentials;
+    
     bool read_switch;
     bool previous_deleted;
+    
     string input;
     string character;
     string atoms_string[max_atoms];
     string coordinates_string[max_atoms];
     string bonds_string[max_atoms];
     string potentials_string[max_atoms];
+    
     vector<atom_orbitals> chain;
     vector<atom_wavefunctions> wavefunctions;
     vector<T> x, y, z;
     vector<T> potentials;
+    
     const string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-";
     const string numbers = "+-0123456789.";
     const string begin_brackets = "([{<";
@@ -9381,11 +9369,6 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
             {
             Create_atomic_wavefunctions(&atoms, &results, size_order, 0, 0, 0);
             matrix_order = atoms.n.size();
-            index_atoms.push_back(0);
-            additive_atom_overlaps.push_back(0);
-            l = results.n.size();
-            for (i = 0; i < l; i++)
-                electron_to_atom_numbers.push_back(1);
             }
         else
             return(-1);
@@ -9548,20 +9531,7 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
                 wavefunctions[bond_list.atom_1[i] - 1].z[0] - wavefunctions[bond_list.atom_2[i] - 1].z[0]);
                 }
         for (i = 0; i < count_atoms; i++) // sumarizing wavefunctions
-            {
-            if (results.n.size() == 0 or (results.x.back() != wavefunctions[i].x.front() or
-            results.y.back() != wavefunctions[i].y.front() or results.z.back() != wavefunctions[i].z.front()))
-                {
-                index_atoms.push_back(wavefunctions[i].electron_numbers[0]);
-                additive_atom_overlaps.push_back(0);
-                }
             Sum_atomic_wavefunctions(&results, &wavefunctions[i]);
-            
-            k = wavefunctions[i].electron_numbers.size();
-            l = index_atoms.size();
-            for (j = 0; j < k; j++)
-                electron_to_atom_numbers.push_back(l);
-            }
         }
     try {
         nuclear_atraction_integral_matrix = new T[matrix_order * matrix_order];
@@ -9656,27 +9626,15 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values)
     
     last_Hamiltonian = 0;
     matrix_order = results.n.size();
-    memset(resonance_integral_matrix, 0, matrix_order * matrix_order);
     memset(basis_set_matrix, 0, matrix_order * matrix_order);
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
-    
     if (alocate == true)
         if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true, true) == -1)
             return(-1);
             
     else
         {
-        Create_nuclear_atraction_integral_matrix(nuclear_atraction_integral_matrix, nucleuses_atractions,
-        matrix_order, &results);
-        Create_coulombic_integral_matrix(coulombic_integral_matrix, matrix_order, &results, &small_results);
-        if (bonded_system == true)
-            {
-            Create_overlap_integral_matrix(overlap_integral_matrix, matrix_order, &results);
-            Calculate_resonance_integral_matrix(overlap_integral_matrix, overlap_efective_lenght_integral_matrix,
-            resonance_integral_matrix, matrix_order, &results, &small_results);
-            }
-        Calculate_kinetic_integral_matrix(kinetic_integral_matrix, matrix_order, &results);
         Calculate_basis_set_matrix(nuclear_atraction_integral_matrix, coulombic_integral_matrix,
         resonance_integral_matrix,
         kinetic_integral_matrix, basis_set_matrix, matrix_order, &results);
@@ -9807,13 +9765,9 @@ T basis_set_calculations<T>::Clear()
         delete[] spin_density_matrix;
         spin_density_matrix = nullptr;
         }
-    electron_to_atom_numbers.clear();
-    index_atoms.clear();
-    additive_atom_overlaps.clear();
     determinants.clear();
     spectra_EPR.clear();
     electron_spectra.clear();
-    
     atoms.n.clear();
     atoms.l.clear();
     atoms.m.clear();
@@ -9822,7 +9776,6 @@ T basis_set_calculations<T>::Clear()
     atoms.wavefunction_coefficients.clear();
     atoms.bonding.clear();
     atoms.paired_with_previous.clear();
-    
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
@@ -9847,7 +9800,6 @@ T basis_set_calculations<T>::Clear()
     results.x.clear();
     results.y.clear();
     results.z.clear();
-    
     small_results.lenghts.clear();
     small_results.relative_lenghts.clear();
     small_results.wavefunctions.clear();
@@ -9861,7 +9813,6 @@ T basis_set_calculations<T>::Clear()
     small_results.l.clear();
     small_results.m.clear();
     small_results.Z.clear();
-    
     electron_number = 0;
     iterations = 0;
     determinant_exception_handle = 0;
@@ -9870,15 +9821,10 @@ T basis_set_calculations<T>::Clear()
     return(0);
     }
 template <typename T>
-basis_set_calculations<T>::~basis_set_calculations()
-{
-Clear();
-}
-
-template class basis_set_calculations<double>;
-/*
+basis_set_calculations<T>::~basis_set_calculations(){
+Clear();}
+template class basis_set_calculations<double>; /*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/
-*/
+                        http://www.apache.org/licenses/ */
