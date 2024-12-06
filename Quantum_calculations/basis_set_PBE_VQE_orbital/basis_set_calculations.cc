@@ -3907,20 +3907,15 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
             y_gradient = (wavefunction_2[i + side] - wavefunction_2[i])/pixel_lenght;
         
         z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i])/pixel_lenght;
-        Laplacian_1[3 * i] = x_gradient/2;
-        Laplacian_1[(3 * i) + 1] = y_gradient/2;
-        Laplacian_1[(3 * i) + 2] = z_gradient/2;
+        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         }
     for (i = (side * side); i < size - (side * side); i++)
         {
-        Laplacian_1[i - 1] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - 1])/(pixel_lenght * 2);
         y_gradient = (wavefunction_2[i + side] - wavefunction_2[i - side])/(pixel_lenght * 2);
         z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i - (side * side)])/(pixel_lenght * 2);
+        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         }
-    Laplacian_1[3 * i] = x_gradient/2;
-    Laplacian_1[(3 * i) + 1] = y_gradient/2;
-    Laplacian_1[(3 * i) + 2] = z_gradient/2;
     for (i = size - (side * side); i < size ; i++)
         {
         if (size - i > 1)
@@ -3934,9 +3929,7 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
             y_gradient = (wavefunction_2[i] - wavefunction_2[i - side])/pixel_lenght;
         
         z_gradient = (wavefunction_2[i] - wavefunction_2[i - (side * side)])/(pixel_lenght);
-        Laplacian_1[3 * i] = x_gradient/2;
-        Laplacian_1[(3 * i) + 1] = y_gradient/2;
-        Laplacian_1[(3 * i) + 2] = z_gradient/2;
+        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         }
     return(0);
     }
@@ -4378,54 +4371,45 @@ T d_x, T d_y, T d_z)
         z_2_min = 0;
         }
     x_condition = side - x_contraction;   
-    x_condition_2 = x_condition - (x_condition % 3);
+    x_condition_2 = x_condition - (x_condition % 8);
     // vectorisation code
     if (d_x != 0 or d_y != 0 or d_z != 0)
         for (i = 0; i < (side - z_contraction); i++)
             {
             for (j = 0; j < (side - y_contraction); j++)
                 {
-                for (k = 0; k + 2 < x_condition; k+=3)
+                for (k = 0; k + 7 < x_condition; k += 8)
                     {
                     result_array[0] = result_array[0] +
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
-                    result_array[0] = result_array[0] +
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 1] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
-                    result_array[0] = result_array[0] +
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 2] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 2];
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
                     result_array[1] = result_array[1] +
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
-                    result_array[1] = result_array[1] +
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1)] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
-                    result_array[1] = result_array[1] +
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2)] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 2];
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 1];
                     result_array[2] = result_array[2] + 
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
-                    result_array[2] = result_array[2] + 
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1)] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 1)];
-                    result_array[2] = result_array[2] + 
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2)] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 2)];
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 2];
+                    result_array[3] = result_array[3] + 
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 3] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 3];
+                    result_array[4] = result_array[4] + 
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 4] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 4];
+                    result_array[5] = result_array[5] + 
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 5] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 5];
+                    result_array[6] = result_array[6] + 
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 6] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 6];
+                    result_array[7] = result_array[7] + 
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 7] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 7];
                     }
                 for (k = x_condition_2; k < x_condition; k++)
                     {
                     result_array[0] = result_array[0] + 
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min))] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min))];
-                    result_array[0] = result_array[0] + 
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 1] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
-                    result_array[0] = result_array[0] + 
-                    Laplacian_1[3 * (((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)) + 1] *
-                    Laplacian_2[3 * (((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)) + 1];
+                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
+                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
                     }
                 }
             }
@@ -4434,35 +4418,29 @@ T d_x, T d_y, T d_z)
             {
             for (j = 0; j < (side); j++)
                 {
-                for (k = 0; k + 2 < x_condition; k+=3)
+                for (k = 0; k + 7 < x_condition; k += 8)
                     {
-                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
-                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 1] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 1];
-                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 2] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 2];
-                    result_array[1] = result_array[1] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
-                    result_array[1] = result_array[1] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 1)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 1)];
-                    result_array[1] = result_array[1] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 2)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 2)];
-                    result_array[2] = result_array[2] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
-                    result_array[2] = result_array[2] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 1)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 1)];
-                    result_array[2] = result_array[2] + Laplacian_1[3 * ((i * side * side) + (j * side) + k + 2)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k + 2)];
+                    result_array[0] = result_array[0] + Laplacian_1[(i * side * side) + (j * side) + k] *
+                    Laplacian_2[(i * side * side) + (j * side) + k];
+                    result_array[1] = result_array[1] + Laplacian_1[(i * side * side) + (j * side) + k + 1] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 1];
+                    result_array[2] = result_array[2] + Laplacian_1[(i * side * side) + (j * side) + k + 2] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 2];
+                    result_array[3] = result_array[3] + Laplacian_1[(i * side * side) + (j * side) + k + 3] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 3];
+                    result_array[4] = result_array[3] + Laplacian_1[(i * side * side) + (j * side) + k + 4] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 4];
+                    result_array[5] = result_array[5] + Laplacian_1[(i * side * side) + (j * side) + k + 5] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 5];
+                    result_array[6] = result_array[6] + Laplacian_1[(i * side * side) + (j * side) + k + 6] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 6];
+                    result_array[7] = result_array[7] + Laplacian_1[(i * side * side) + (j * side) + k + 7] *
+                    Laplacian_2[(i * side * side) + (j * side) + k + 7];
                     }
                 for (k = x_condition_2; k < x_condition; k++)
                     {
-                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k)] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k)];
-                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 1] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 1];
-                    result_array[0] = result_array[0] + Laplacian_1[3 * ((i * side * side) + (j * side) + k) + 2] *
-                    Laplacian_2[3 * ((i * side * side) + (j * side) + k) + 2];
+                    result_array[0] = result_array[0] + Laplacian_1[(i * side * side) + (j * side) + k] *
+                    Laplacian_2[(i * side * side) + (j * side) + k];
                     }
                 }
             }
@@ -8803,7 +8781,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 {
                 pointer_to_wavefunction = new T[wavefunction_size];
                 pointer_to_probability = new T[wavefunction_size];
-                pointer_to_Laplacian = new T[3 * wavefunction_size];
+                pointer_to_Laplacian = new T[wavefunction_size];
                 pointers_to_wavefunctions[index[i]] = pointer_to_wavefunction;
                 pointers_to_probabilities[index[i]] = pointer_to_probability;
                 pointers_to_Laplacians[index[i]] = pointer_to_Laplacian;
@@ -9823,8 +9801,10 @@ T basis_set_calculations<T>::Clear()
 template <typename T>
 basis_set_calculations<T>::~basis_set_calculations(){
 Clear();}
-template class basis_set_calculations<double>; /*
+template class basis_set_calculations<double>;
+/*
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/ */
+                        http://www.apache.org/licenses/
+*/
