@@ -87,7 +87,7 @@ T* coulombic_integral_matrix;
 Pointer to coulombic integral matrix (count_electrons * count_electrons)
 
 T* overlap_integral_matrix;
-Pointer to overlap integral matrix (count_electrons * count_electrons)
+Pointer to overlap integral matrix (count_electrons * count_electrons) with a zero diagonal
 
 T* overlap_efective_lenght_integral_matrix;
 Pointer to overlap_efective_lenght_integral_matrix (count_electrons * count_electrons), here are stored calculated efective lenghts
@@ -733,6 +733,10 @@ QuantumCircuit circuit;
 
 This is MicroQiskit QuantumCircuit object
 
+vector<vector<pair<T, T>>> Gaussian_basis;
+
+This contain a exportedd Gaussian basis
+
 private functions:
 
 T Create_index_atoms();
@@ -806,7 +810,6 @@ of atom, size_order means number of pixels between center and edge of 3D density
 exchange_energy and correlation_energy are pointers to save exchange and correlation energy and
 Wigner_Seitz_radius is Wigner-Seitz radius of atom.
 
-// Zde poktačovat !!!
 
 T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities, vector<T*> electron_densities,
 unsigned int size_order);
@@ -869,6 +872,10 @@ in spin_values are spin energy levels.
 Variable UI_input is input string, size_order is the lenght orders (number of pixels between center and surface of lenghts,
 wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
 If generate is true, then wavefunctions are generated.
+
+T Gaussian_quadrature();
+
+This function export basis to Gaussians divided into primitive gaussians pairs of exponents and coefficients.
     
 T Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, T* pi_overlap_integral,
 vector<unsigned int> atom_numbers);

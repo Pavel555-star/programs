@@ -112,7 +112,12 @@ public:
     string circuit_string;
     QuantumCircuit circuit;
     // End of Qiskit circuit code,  End of VQE section
-private:
+    // Gaussian export section
+    vector<vector<pair<T, T>>> Gaussian_basis;
+    // End of Gaussian export section
+    
+    
+protected:
     T Create_index_atoms();
     T Detect_center_of_mass();
     T Detect_dipole_moments(dipole_moment *dipole_moment);
@@ -150,6 +155,10 @@ public:
     T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
     vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values);
     // End of VQE section
+    // Gaussian export section
+    T Gaussian_quadrature();
+    // End of Gaussian export section
+    
     T Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, vector<unsigned int> atom_numbers);
     T Detect_symetry_information(symetry_axes *symetry_axes, symetry_planes *symetry_planes);
     T D3_vector_multiply(T* a, T* b, T* c);

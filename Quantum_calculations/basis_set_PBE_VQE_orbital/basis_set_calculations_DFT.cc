@@ -1678,10 +1678,12 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
         VQE_Wavefunction_lenght_multipliers_1.push_back(this->results.wavefunction_lenght_multipliers[i]);
         VQE_Eigenvectors_1.push_back(values->operator[](i));
         previous_spin_density_vector.push_back(spin_density_vector->operator[](i));
-        previous_spin_values.push_back(spin_values->operator[](i));
         previous_correlation_energies.push_back(correlation_energies[i]);
         previous_exchange_energies.push_back(exchange_energies[i]);
         }
+    for (i = 0; i < spin_values->size(); i++)
+        previous_spin_values.push_back(spin_values->operator[](i));
+    
     allocation_memory = false;
     for (i = 0; i < matrix_order; i++)
         this->results.wavefunction_lenght_multipliers[i] = pre_PBE_wavefunction_lenght_multipliers[i];
@@ -1779,6 +1781,8 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
                 correlation_energies[i] = previous_correlation_energies[i];
                 exchange_energies[i] = previous_exchange_energies[i];
                 }
+            for (i = 0; i < spin_values->size(); i++)
+                spin_values->operator[](i) = previous_spin_values[i];
             }
         if (dealocate == true) // Dealocate atom electron aand spin densities
             Clear();
@@ -1789,6 +1793,147 @@ vector<T>* values, vector<T>* spin_density_vector, vector<T>* spin_values)
         }
     }
 // end of VQE section
+// Gaussian export section
+template <typename T>
+T basis_set_calculations_DFT<T>::Gaussian_quadrature()
+    {
+    unsigned int i, j;
+    unsigned int size;
+    unsigned int nodes;
+    T exponents_multiplier;
+    T exponent;
+    T coefficient;
+    
+    T* wavefunction_lenght_multipliers = this->results.wavefunction_lenght_multipliers.data();
+    unsigned int* n = this->results.n.data();
+    unsigned int* l = this->results.l.data();
+    // Aro 90 basis setas analytical shape for Gaussian Quadrature
+    T Aro_90_s1_exponents[] = {35.523221, 6.513144, 1.822143, 0.625955, 0.243077, 0.100112};
+    T Aro_90_s1_coefficients[] = {0.009164, 0.049361, 0.168538, 0.370563, 0.416492, 0.130334};
+    T Aro_90_s_exponents[] = {0.804524, 0.290399, 0.135201, 0.071840, 0.041270, 0.024899, 0.015522, 0.009899,
+    0.006417, 0.004213, 0.002793, 0.001866, 0.001255, 0.000848, 0.000574, 0.000384, 0.000241, 0.000122, 0.000010};
+    T Aro_90_p_exponents[] = {0.957502, 0.334869, 0.156031, 0.083822, 0.048802, 0.029849, 0.018858, 0.012192,
+    0.008021, 0.005349, 0.003606, 0.002453, 0.001681, 0.001159, 0.000802, 0.000554, 0.000369, 0.000215, 0.000068};
+    T Aro_90_d_exponents[] = {0.533897, 0.201903, 0.099729, 0.056230, 0.034095, 0.021582, 0.014046, 0.009324,
+    0.006283, 0.004285, 0.002952, 0.002050, 0.001433, 0.001008, 0.000709, 0.000487, 0.000302, 0.000124};
+    T Aro_90_f_exponents[] = {0.329197, 0.133383, 0.069204, 0.040519, 0.025300, 0.016391, 0.010876, 0.007342,
+    0.005024, 0.003476, 0.002427, 0.001708, 0.001209, 0.000858, 0.000599, 0.000384, 0.000174};
+    T Aro_90_g_exponents[] = {0.207044, 0.090784, 0.049515, 0.029994, 0.019180, 0.012651, 0.008515, 0.005820,
+    0.004028, 0.002816, 0.001985, 0.001410, 0.001005, 0.000708, 0.000462, 0.000220};
+    T Aro_90_h_exponents[] = {0.153191, 0.069181, 0.038612, 0.023758, 0.015343, 0.010183, 0.006885, 0.004724,
+    0.003279, 0.002299, 0.001625, 0.001155, 0.000814, 0.000534, 0.000254};
+    T Aro_90_i_exponents[] = {0.119421, 0.054816, 0.031022, 0.019236, 0.012456, 0.008269, 0.005587, 0.003829,
+    0.002654, 0.001858, 0.001310, 0.000918, 0.000599, 0.000275};
+    T Aro_90_k_exponents[] = {0.092378, 0.043392, 0.024899, 0.015512, 0.010037, 0.010037, 0.004474, 0.003054,
+    0.002109, 0.001470, 0.001020, 0.000658, 0.000284};
+    T Aro_90_l_exponents[] = {0.071875, 0.034537, 0.020008, 0.012454, 0.008016, 0.005271, 0.003525, 0.002389,
+    0.001638, 0.001121, 0.000711, 0.000275};
+    unsigned int count_nodes[] = {20, 20, 19, 18, 17, 16, 15, 14, 13, 12};
+    // Resetting vector with Gaussians
+    size = Gaussian_basis.size();
+    for (i = 0; i < size; i++) {
+        Gaussian_basis[i].clear();
+        }
+    if (size > 0)
+        Gaussian_basis.clear();
+    // Gaussian quadrature
+    size = this->results.n.size();
+    Gaussian_basis.resize(size);
+    for (i = 0; i < size; i++)
+        {
+        nodes = n[i] - l[i];
+        exponents_multiplier = n[i] * wavefunction_lenght_multipliers[i];
+        for (j = 0; j < 6; j++)
+            {
+            exponent = Aro_90_s1_exponents[j] * exponents_multiplier;
+            coefficient = Aro_90_s1_coefficients[j];
+            Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+            }
+        if (nodes > count_nodes[l[i]])
+            return(-1);
+            // check, if basis available
+        for (j = 0; j + 1 < nodes; j++)
+            {
+            switch (l[i]){
+                case 0: {
+                    exponent = Aro_90_s_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 1: {
+                    exponent = Aro_90_p_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 2: {
+                    exponent = Aro_90_d_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 3: {
+                    exponent = Aro_90_f_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 4: {
+                    exponent = Aro_90_g_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 5: {
+                    exponent = Aro_90_g_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 6: {
+                    exponent = Aro_90_h_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 7: {
+                    exponent = Aro_90_i_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                case 8: {
+                    exponent = Aro_90_k_exponents[j] * exponents_multiplier;
+                    coefficient = 1;
+                    if (j % 2 == 0)
+                        coefficient *= -1;
+                    Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
+                    break;
+                    }
+                }
+                
+            }
+        }
+    return(0);
+    }
+// End of Gaussian export section
 template <typename T>
 T basis_set_calculations_DFT<T>::Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order,
 vector<unsigned int> atom_numbers)
