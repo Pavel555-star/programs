@@ -7589,8 +7589,8 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
         for (j = 0; j < i; j++)
             matrix[(j * order) + i] = matrix[(i * order) + j];
             
-    for (i = 0; i < order; i++) // copying 0 to diagonal
-        matrix[i * (order + 1)] = 0;
+    for (i = 0; i < order; i++) // copying 1 to diagonal
+        matrix[i * (order + 1)] = 1;
 
     return(0);
     }

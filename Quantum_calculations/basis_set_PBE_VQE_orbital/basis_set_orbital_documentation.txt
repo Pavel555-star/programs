@@ -87,7 +87,7 @@ T* coulombic_integral_matrix;
 Pointer to coulombic integral matrix (count_electrons * count_electrons)
 
 T* overlap_integral_matrix;
-Pointer to overlap integral matrix (count_electrons * count_electrons) with a zero diagonal
+Pointer to overlap integral matrix (count_electrons * count_electrons)
 
 T* overlap_efective_lenght_integral_matrix;
 Pointer to overlap_efective_lenght_integral_matrix (count_electrons * count_electrons), here are stored calculated efective lenghts

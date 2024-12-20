@@ -1846,7 +1846,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
         for (j = 0; j < 6; j++)
             {
             exponent = Aro_90_s1_exponents[j] * exponents_multiplier;
-            coefficient = Aro_90_s1_coefficients[j];
+            coefficient = Aro_90_s1_coefficients[j]/exponents_multiplier;
             Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
             }
         if (nodes > count_nodes[l[i]])
@@ -1857,7 +1857,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
             switch (l[i]){
                 case 0: {
                     exponent = Aro_90_s_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1865,7 +1865,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 1: {
                     exponent = Aro_90_p_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1873,7 +1873,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 2: {
                     exponent = Aro_90_d_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1881,7 +1881,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 3: {
                     exponent = Aro_90_f_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1889,7 +1889,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 4: {
                     exponent = Aro_90_g_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1897,7 +1897,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 5: {
                     exponent = Aro_90_g_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1905,7 +1905,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 6: {
                     exponent = Aro_90_h_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1913,7 +1913,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 7: {
                     exponent = Aro_90_i_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));
@@ -1921,7 +1921,7 @@ T basis_set_calculations_DFT<T>::Gaussian_quadrature()
                     }
                 case 8: {
                     exponent = Aro_90_k_exponents[j] * exponents_multiplier;
-                    coefficient = 1;
+                    coefficient = 1/exponents_multiplier;
                     if (j % 2 == 0)
                         coefficient *= -1;
                     Gaussian_basis[i].push_back(pair<T, T>(exponent, coefficient));

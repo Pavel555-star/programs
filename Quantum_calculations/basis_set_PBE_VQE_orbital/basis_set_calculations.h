@@ -120,7 +120,7 @@ public:
 inline T Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2);
 T basis_set_Determinant_set(unsigned int order, T* pointer,unsigned int count, T min, T step, T* output_values);
 T basis_set_Determinant_solver(unsigned int order, T* pointer);
-private:
+protected:
 // Section 2 - generating the wavefunctions
 T Wavefunction_lenghts_generate(T* lenghts, unsigned int lenght_order);
 
@@ -253,6 +253,7 @@ T Create_bond_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, ato
 unsigned int count, T electronegativity_1, T electronegativity_2, T x_diference, T y_diference, T z_diference);
 T Sum_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2);
 // section 5 - generating matrices of integrals and Fock matrices
+protected:
 T Create_nuclear_atraction_integral_matrix(T* matrix, T* nucleuses, unsigned int order, atom_wavefunctions *atom_wavefunctions);
 T Create_coulombic_integral_matrix(T* matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
 small_atom_wavefunctions *small_atom_wavefunctions);
@@ -281,8 +282,7 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();};
 #include "basis_set_calculations.cc"
-# endif
-/* BASIS_SET_CALCULATIONS_H
+# endif /* BASIS_SET_CALCULATIONS_H
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004

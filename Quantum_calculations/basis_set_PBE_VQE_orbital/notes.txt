@@ -1,4 +1,4 @@
-basis_set_orbital version 2.1
+basis_set_orbital version 2.0
 1. The program allows simulations with the inclusion of previous valence layers by entering atoms of noble gas elements just before the simulated atom in molecule and correct overlaps from internal valence layers by entering the correction potentials (large waavefunction set).
 
 2. The program uses the Laguerre-based wave function basis set and include physical models of influence of the electron shielding and new fast and accurate variational generation of wavefunction for next iteration.
