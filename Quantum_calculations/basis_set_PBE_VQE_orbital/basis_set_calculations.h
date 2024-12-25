@@ -187,12 +187,12 @@ T Wavefunction_7dyz_generate(T* wavefunction, T* lenghts, unsigned int Z, T mult
 T Wavefunction_7dxy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
     
 T Wavefunction_4fx_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
- T Wavefunction_4fz_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_4fz_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4fxz2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4fz3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4fyz2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_4fxyz_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
- T Wavefunction_4fy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_4fy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
  
 T Wavefunction_5fx_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_5fz_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
@@ -217,7 +217,37 @@ T Wavefunction_7fz3_generate(T* wavefunction, T* lenghts, unsigned int Z, T mult
 T Wavefunction_7fyz2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7fxyz_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
 T Wavefunction_7fy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
-    
+
+T Wavefunction_5gz4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gz3y_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gz3x_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gz2xy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gz2_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gz_y3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gz_x3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gxy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_5gx4_y4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+
+T Wavefunction_6gz4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gz3y_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gz3x_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gz2xy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gz2_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gz_y3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gz_x3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gxy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_6gx4_y4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+
+T Wavefunction_7gz4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gz3y_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gz3x_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gz2xy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gz2_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gz_y3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gz_x3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gxy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+T Wavefunction_7gx4_y4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order);
+
 T Wavefunction_normalize(T* wavefunction_pointer, T normalisation_constant, unsigned int size);
 T Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts,
 unsigned int Z, T multiplier);
@@ -253,7 +283,6 @@ T Create_bond_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, ato
 unsigned int count, T electronegativity_1, T electronegativity_2, T x_diference, T y_diference, T z_diference);
 T Sum_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2);
 // section 5 - generating matrices of integrals and Fock matrices
-protected:
 T Create_nuclear_atraction_integral_matrix(T* matrix, T* nucleuses, unsigned int order, atom_wavefunctions *atom_wavefunctions);
 T Create_coulombic_integral_matrix(T* matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
 small_atom_wavefunctions *small_atom_wavefunctions);
@@ -282,7 +311,8 @@ vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
 T Clear();
 ~basis_set_calculations();};
 #include "basis_set_calculations.cc"
-# endif /* BASIS_SET_CALCULATIONS_H
+# endif
+/* BASIS_SET_CALCULATIONS_H
 Author of this source code Ing. Pavel Florian Ph.D. licensed this source code under the the Apache License:
 Apache License
                            Version 2.0, January 2004
