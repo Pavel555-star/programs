@@ -1,4 +1,4 @@
-/#include "basis_set_calculations.h"
+#include "basis_set_calculations.h"
 using namespace std;
 template <typename T>
 inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2) 
