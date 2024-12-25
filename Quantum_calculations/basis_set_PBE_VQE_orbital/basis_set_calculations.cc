@@ -1,4 +1,4 @@
-#include "basis_set_calculations.h"
+/#include "basis_set_calculations.h"
 using namespace std;
 template <typename T>
 inline T basis_set_calculations<T>::Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2) 
@@ -2117,7 +2117,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(28224 * sqrt(7 * Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2154,7 +2154,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(28224 * sqrt(1.75 * Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2191,7 +2191,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(28224 * sqrt(21 * Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2227,7 +2227,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(28224 * sqrt(1.75 * Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2264,7 +2264,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(28224 * sqrt(7 * Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2823,7 +2823,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(20736 * sqrt(Pi/2.0)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2860,7 +2860,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(10368 * sqrt(Pi/3.0)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2898,7 +2898,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(20736 * sqrt(Pi/1.2)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2935,7 +2935,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(10368 * sqrt(Pi/0.2)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -2971,7 +2971,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(20736 * sqrt(Pi/1.2)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3008,7 +3008,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(10368 * sqrt(Pi/3.0)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3046,7 +3046,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(20736 * sqrt(Pi/2.0)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/6  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3083,7 +3083,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(141120 * sqrt(Pi/2.4)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3097,7 +3097,7 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){ // 3 cos(theta)^2 -1
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))
                     * (ro * ro * ro * exp(-ro/2)) * (x_i * (x_i * x_i - 3 * y_i * y_i)/(distance * distance * distance));
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
@@ -3120,7 +3120,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(70560 * sqrt(Pi/3.6)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3135,7 +3135,7 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){ // 3 cos(theta)^2 -1
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))
                     * (ro * ro * ro * exp(-ro/2)) * (z_i * (x_i * x_i - y_i * y_i)/(distance * distance * distance));
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
@@ -3158,7 +3158,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(141120 * sqrt(Pi/1.44)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3172,7 +3172,7 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){ // 3 cos(theta)^2 -1
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))
                     * (ro * ro * ro * exp(-ro/2)) * (x_i * ((5 * z_i * z_i) - (distance * distance))/(distance * distance * distance));
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
@@ -3195,7 +3195,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(70560 * sqrt(Pi/0.24)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3208,7 +3208,7 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))* (ro * ro * ro * exp(-ro/2))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))* (ro * ro * ro * exp(-ro/2))
                     * (z_i * ((5 * z_i * z_i) - (3 * distance * distance))/(distance * distance * distance));
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
@@ -3231,7 +3231,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part = 1/(141120 * sqrt(Pi/1.44)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3245,7 +3245,7 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){ // 3 cos(theta)^2 -1
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))
                     * (ro * ro * ro * exp(-ro/2)) * (y_i * ((5 * z_i * z_i) - (distance * distance))/(distance * distance * distance));
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
@@ -3268,7 +3268,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part =1/(70560 * sqrt(Pi/3.6)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3283,7 +3283,7 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){ // 3 cos(theta)^2 -1
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))
                     * (ro * ro * ro * exp(-ro/2)) * (2 * x_i * y_i * z_i)/(distance * distance * distance);
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
@@ -3306,7 +3306,7 @@ unsigned int lenght_order)
     T norm_coeff = 0;
     
     const_part =1/(141120 * sqrt(Pi/2.4)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
-    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
     side = (lenght_order * 2) + 1;
     for (z = 0; z < side; z++)
         {
@@ -3320,8 +3320,1015 @@ unsigned int lenght_order)
                 distance = lenghts[index];
                 ro = ro_0 * distance;
                 if (distance != 0){ // 3 cos(theta)^2 -1
-                    wavefunction[index] = const_part * (720 - (720 * ro) + (30 * ro * ro) - (ro * ro * ro))
+                    wavefunction[index] = const_part * (720 - (270 * ro) + (30 * ro * ro) - (ro * ro * ro))
                     * (ro * ro * ro * exp(-ro/2)) * (y_i * (3 * x_i * x_i - y_i * y_i)/(distance * distance * distance));
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gz4 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(630/256 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * (35 * z_i * z_i * z_i * z_i
+                    - 30 * z_i * z_i * distance * distance + 3 * distance * distance * distance)
+                    /(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz3y_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gz3y orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(98.4375 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * y_i * z_i *
+                    (7 * z_i * z_i - 3 * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz3x_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gz3x orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(98.4375 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * x_i * z_i *
+                    (7 * z_i * z_i - 3 * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz2xy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gz2xy orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(49.21875 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * 2 * x_i * y_i *
+                    (7 * z_i * z_i - distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz2_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gz2(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(49.21875 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * (x_i * x_i - y_i * y_i) *
+                    (7 * z_i * z_i - distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz_y3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gzy3 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(689.0625 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * y_i * z_i *
+                    (3 * x_i * x_i - y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gz_x3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gzx3 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(689.0625 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * x_i * z_i *
+                    (x_i * x_i - 3 * y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gxy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gxy(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(86.1328125 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) * 4 * x_i * y_i *
+                    (x_i * x_i - y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_5gx4_y4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 5gxy(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(900 * sqrt(86.1328125 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/5  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (x_i * x_i * x_i * x_i + y_i * y_i * y_i * y_i - 6 * x_i * x_i * y_i * y_i)/
+                    (distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gz4 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(63/256 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (35 * z_i * z_i * z_i * z_i - 30 * z_i * z_i * distance * distance +
+                    3 * distance * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz3y_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gz3y orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(9.84375 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) * y_i * z_i *
+                    (7 * z_i * z_i - 3 * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz3x_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gz3x orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(9.84375 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) * x_i * z_i *
+                    (7 * z_i * z_i - 3 * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz2xy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gz2xy orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(4.921875 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) * 2 * x_i * y_i *
+                    (7 * z_i * z_i - distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz2_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gz2(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(4.921875 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (x_i * x_i - y_i * y_i) * (7 * z_i * z_i - distance * distance)/
+                    (distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz_y3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gzy3 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(68.90625 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) * y_i * z_i *
+                    (3 * x_i * x_i - y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gz_x3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gzx3 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(68.90625 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) * x_i * z_i *
+                    (x_i * x_i - 3 * y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gxy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gxy(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(8.61328125 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) * 4 * x_i * y_i *
+                    (x_i * x_i - y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_6gx4_y4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 6gxy(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(12960 * sqrt(8.61328125 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = Z/3  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (10 - ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (x_i * x_i * x_i * x_i + y_i * y_i * y_i * y_i - 6 * x_i * x_i * y_i * y_i)/
+                    (distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gz4 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(13860/256 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (35 * z_i * z_i * z_i * z_i - 30 * z_i * z_i * distance * distance +
+                    3 * distance * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz3y_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gz3y orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(216.5625 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    y_i * z_i * (7 * z_i * z_i - 3 * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz3x_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gz3x orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(216.5625 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    x_i * z_i * (7 * z_i * z_i - 3 * distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz2xy_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gz2xy orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(108.28125 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) * 2 *
+                    x_i * y_i * (7 * z_i * z_i - distance * distance)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz2_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gz2(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(108.28125 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (x_i * x_i - y_i * y_i) * (7 * z_i * z_i - distance * distance)/
+                    (distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz_y3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gzy3 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(1515.9375 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    y_i * z_i * (3 * x_i * x_i - y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gz_x3_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gzx3 orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(1515.9375 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    x_i * z_i * (x_i * x_i - 3 * y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gxy_x2_y2_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gxy(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(189.4921875 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) * 4 *
+                    x_i * y_i * (x_i * x_i - y_i * y_i)/(distance * distance * distance * distance);
+                    norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
+                else
+                    wavefunction[index] = 0;
+                }
+            }
+        }
+    return(sqrt(norm_coeff));
+    }
+template <typename T>
+T basis_set_calculations<T>::Wavefunction_7gx4_y4_generate(T* wavefunction, T* lenghts, unsigned int Z, T multiplier, unsigned int lenght_order)
+    { // Generating wavefunction array for 7gxy(x2-y2) orbital
+    unsigned int side;
+    unsigned int index;
+    unsigned int x, y, z;
+    int x_i, y_i, z_i;
+    T ro_0, ro;
+    T distance, const_part;
+    T norm_coeff = 0;
+    
+    const_part =1/(17640 * sqrt(189.4921875 *Pi)) * Z * Z * 1/sqrt(Z); // calculating of constant part of wavefunction
+    ro_0 = 2*Z/7  * multiplier; // Algorithm based on Laguerr polynoms
+    side = (lenght_order * 2) + 1;
+    for (z = 0; z < side; z++)
+        {
+        z_i = (int(z) - int(lenght_order));
+        for (y = 0; y < side; y++)
+            {
+            y_i = (int(y) - int(lenght_order));
+            for (x = 0; x < side; x++)
+                {
+                x_i = (int(x) - int(lenght_order));
+                index = x + (y * side) + (z * side * side);
+                distance = lenghts[index];
+                ro = ro_0 * distance;
+                if (distance != 0){
+                    wavefunction[index] = const_part * (110 - 22 * ro + ro * ro) * (ro * ro * ro * ro * exp(-ro/2)) *
+                    (x_i * x_i * x_i * x_i + y_i * y_i * y_i * y_i - 6 * x_i * x_i * y_i * y_i)/
+                    (distance * distance * distance * distance);
                     norm_coeff = norm_coeff + wavefunction[index] * wavefunction[index];}
                 else
                     wavefunction[index] = 0;
@@ -3492,6 +4499,27 @@ T* wavefunction, T* lenghts, unsigned int Z, T multiplier)
             if (m == -3)
                 normalisation_constant = Wavefunction_5fy_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
             }
+        if (l == 4)
+            {
+            if (m == 4)
+                normalisation_constant = Wavefunction_5gz4_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 3)
+                normalisation_constant = Wavefunction_5gz3y_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 2)
+                normalisation_constant = Wavefunction_5gz3x_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 1)
+                normalisation_constant = Wavefunction_5gz2xy_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 0)
+                normalisation_constant = Wavefunction_5gz2_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -1)
+                normalisation_constant = Wavefunction_5gz_x3_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -2)
+                normalisation_constant = Wavefunction_5gz_x3_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -3)
+                normalisation_constant = Wavefunction_5gxy_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -4)
+                normalisation_constant = Wavefunction_5gx4_y4_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            }
         }
     if (n == 6)
         {
@@ -3537,6 +4565,27 @@ T* wavefunction, T* lenghts, unsigned int Z, T multiplier)
             if (m == -3)
                 normalisation_constant = Wavefunction_6fy_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
             }
+        if (l == 4)
+            {
+            if (m == 4)
+                normalisation_constant = Wavefunction_6gz4_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 3)
+                normalisation_constant = Wavefunction_6gz3y_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 2)
+                normalisation_constant = Wavefunction_6gz3x_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 1)
+                normalisation_constant = Wavefunction_6gz2xy_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 0)
+                normalisation_constant = Wavefunction_6gz2_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -1)
+                normalisation_constant = Wavefunction_6gz_x3_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -2)
+                normalisation_constant = Wavefunction_6gz_x3_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -3)
+                normalisation_constant = Wavefunction_6gxy_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -4)
+                normalisation_constant = Wavefunction_6gx4_y4_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            }
         }
     if (n == 7)
         {
@@ -3581,6 +4630,27 @@ T* wavefunction, T* lenghts, unsigned int Z, T multiplier)
                 normalisation_constant = Wavefunction_7fxyz_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
             if (m == -3)
                 normalisation_constant = Wavefunction_7fy_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            }
+        if (l == 4)
+            {
+            if (m == 4)
+                normalisation_constant = Wavefunction_7gz4_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 3)
+                normalisation_constant = Wavefunction_7gz3y_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 2)
+                normalisation_constant = Wavefunction_7gz3x_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 1)
+                normalisation_constant = Wavefunction_7gz2xy_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == 0)
+                normalisation_constant = Wavefunction_7gz2_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -1)
+                normalisation_constant = Wavefunction_7gz_x3_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -2)
+                normalisation_constant = Wavefunction_7gz_x3_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -3)
+                normalisation_constant = Wavefunction_7gxy_x2_y2_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
+            if (m == -4)
+                normalisation_constant = Wavefunction_7gx4_y4_generate(wavefunction, lenghts, Z, multiplier, lenght_order);
             }
         }
     size = (2 * lenght_order + 1) * (2 * lenght_order + 1) * (2 * lenght_order + 1);
@@ -7589,8 +8659,8 @@ T basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, unsigned 
         for (j = 0; j < i; j++)
             matrix[(j * order) + i] = matrix[(i * order) + j];
             
-    for (i = 0; i < order; i++) // copying 1 to diagonal
-        matrix[i * (order + 1)] = 1;
+    for (i = 0; i < order; i++) // copying 0 to diagonal
+        matrix[i * (order + 1)] = 0;
 
     return(0);
     }
