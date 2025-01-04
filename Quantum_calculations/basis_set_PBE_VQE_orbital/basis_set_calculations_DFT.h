@@ -59,7 +59,7 @@ public:
     // Density functional theory section
     vector <T*> atoms_electron_densities;
     vector <T*> atoms_spin_densities;
-    vector <T*> atoms_Ksi_densities;
+    vector <T*> atoms_Fi_densities;
     vector <T*> atoms_gradients_densities;
     vector <T> pre_PBE_wavefunction_lenght_multipliers;
     vector <T> exchange_energies;
@@ -129,13 +129,13 @@ protected:
     T Compute_densities(vector<T*> densities, vector<T*> atoms_densities, vector<unsigned int> index,
     unsigned int size_order, vector<T> spins, vector<int> spin_paired, bool spin_density);
     T Correct_densities(vector<T*> atoms_densities_list, vector<T>  x, vector <T> y, vector <T> z, unsigned int size_order);
-    T Compute_Ksi_thread(T* spin_density, T* electron_density, T* Ksi_density, unsigned int size_order);
+    T Compute_Fi_thread(T* spin_density, T* electron_density, T* Fi_density, unsigned int size_order);
     T Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order);
-    T Compute_Ksi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
-    vector<T*> atoms_Ksi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
-    T PBE_thread(T* atoms_gradients_density, T* atoms_Ksi_density, T* electron_density,
+    T Compute_Fi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
+    vector<T*> atoms_Fi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
+    T PBE_thread(T* atoms_gradients_density, T* atoms_Fi_density, T* electron_density,
     unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius);
-    T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities, vector<T*> electron_densities,
+    T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Fi_densities, vector<T*> electron_densities,
     unsigned int size_order);
     // End of density functional theory section
     // VQE section

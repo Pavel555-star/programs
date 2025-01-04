@@ -4951,14 +4951,14 @@ T basis_set_calculations<T>::Probabilities_thread(T* Probabilities, unsigned int
     return(0);
     }
 template <typename T>
-T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order)
+T basis_set_calculations<T>::Gradient_thread(T* Gradient_1, T* wavefunction_2, unsigned int lenght_order)
     {
     unsigned int i, j;
     unsigned int side;
     unsigned int size;
     T x_gradient, y_gradient, z_gradient;
     T pixel_lenght;
-    T Laplacian;
+    T Gradient;
     
     side = (2 * lenght_order + 1);
     size = side * side * side;
@@ -4977,14 +4977,14 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
             y_gradient = (wavefunction_2[i + side] - wavefunction_2[i])/pixel_lenght;
         
         z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i])/pixel_lenght;
-        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        Gradient_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         }
     for (i = (side * side); i < size - (side * side); i++)
         {
         x_gradient = (wavefunction_2[i + 1] - wavefunction_2[i - 1])/(pixel_lenght * 2);
         y_gradient = (wavefunction_2[i + side] - wavefunction_2[i - side])/(pixel_lenght * 2);
         z_gradient = (wavefunction_2[i + (side * side)] - wavefunction_2[i - (side * side)])/(pixel_lenght * 2);
-        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        Gradient_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         }
     for (i = size - (side * side); i < size ; i++)
         {
@@ -4999,7 +4999,7 @@ T basis_set_calculations<T>::Laplacian_thread(T* Laplacian_1, T* wavefunction_2,
             y_gradient = (wavefunction_2[i] - wavefunction_2[i - side])/pixel_lenght;
         
         z_gradient = (wavefunction_2[i] - wavefunction_2[i - (side * side)])/(pixel_lenght);
-        Laplacian_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
+        Gradient_1[i] = sqrt(((x_gradient * x_gradient) + (y_gradient * y_gradient) + (z_gradient * z_gradient))/3);
         }
     return(0);
     }
@@ -5375,7 +5375,7 @@ T* result, T* lenght, unsigned int lenght_order, T lenght_x, T lenght_y, T lengh
     return(0);
     }
 template <typename T>
-T basis_set_calculations<T>::Integral_kinetic(T* Laplacian_1, T* Laplacian_2, T* result, unsigned int lenght_order,
+T basis_set_calculations<T>::Integral_kinetic(T* Gradient_1, T* Gradient_2, T* result, unsigned int lenght_order,
 T d_x, T d_y, T d_z)
     {
     unsigned int i, j, k;
@@ -5451,35 +5451,35 @@ T d_x, T d_y, T d_z)
                 for (k = 0; k + 7 < x_condition; k += 8)
                     {
                     result_array[0] = result_array[0] +
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
                     result_array[1] = result_array[1] +
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 1];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 1] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 1];
                     result_array[2] = result_array[2] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 2];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 2] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 2];
                     result_array[3] = result_array[3] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 3] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 3];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 3] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 3];
                     result_array[4] = result_array[4] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 4] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 4];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 4] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 4];
                     result_array[5] = result_array[5] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 5] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 5];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 5] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 5];
                     result_array[6] = result_array[6] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 6] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 6];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 6] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 6];
                     result_array[7] = result_array[7] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 7] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 7];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min) + 7] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min) + 7];
                     }
                 for (k = x_condition_2; k < x_condition; k++)
                     {
                     result_array[0] = result_array[0] + 
-                    Laplacian_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
-                    Laplacian_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
+                    Gradient_1[((i + z_1_min) * side * side) + ((j + y_1_min) * side) + (k + x_1_min)] *
+                    Gradient_2[((i + z_2_min) * side * side) + ((j + y_2_min) * side) + (k + x_2_min)];
                     }
                 }
             }
@@ -5490,27 +5490,27 @@ T d_x, T d_y, T d_z)
                 {
                 for (k = 0; k + 7 < x_condition; k += 8)
                     {
-                    result_array[0] = result_array[0] + Laplacian_1[(i * side * side) + (j * side) + k] *
-                    Laplacian_2[(i * side * side) + (j * side) + k];
-                    result_array[1] = result_array[1] + Laplacian_1[(i * side * side) + (j * side) + k + 1] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 1];
-                    result_array[2] = result_array[2] + Laplacian_1[(i * side * side) + (j * side) + k + 2] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 2];
-                    result_array[3] = result_array[3] + Laplacian_1[(i * side * side) + (j * side) + k + 3] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 3];
-                    result_array[4] = result_array[3] + Laplacian_1[(i * side * side) + (j * side) + k + 4] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 4];
-                    result_array[5] = result_array[5] + Laplacian_1[(i * side * side) + (j * side) + k + 5] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 5];
-                    result_array[6] = result_array[6] + Laplacian_1[(i * side * side) + (j * side) + k + 6] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 6];
-                    result_array[7] = result_array[7] + Laplacian_1[(i * side * side) + (j * side) + k + 7] *
-                    Laplacian_2[(i * side * side) + (j * side) + k + 7];
+                    result_array[0] = result_array[0] + Gradient_1[(i * side * side) + (j * side) + k] *
+                    Gradient_2[(i * side * side) + (j * side) + k];
+                    result_array[1] = result_array[1] + Gradient_1[(i * side * side) + (j * side) + k + 1] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 1];
+                    result_array[2] = result_array[2] + Gradient_1[(i * side * side) + (j * side) + k + 2] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 2];
+                    result_array[3] = result_array[3] + Gradient_1[(i * side * side) + (j * side) + k + 3] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 3];
+                    result_array[4] = result_array[3] + Gradient_1[(i * side * side) + (j * side) + k + 4] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 4];
+                    result_array[5] = result_array[5] + Gradient_1[(i * side * side) + (j * side) + k + 5] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 5];
+                    result_array[6] = result_array[6] + Gradient_1[(i * side * side) + (j * side) + k + 6] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 6];
+                    result_array[7] = result_array[7] + Gradient_1[(i * side * side) + (j * side) + k + 7] *
+                    Gradient_2[(i * side * side) + (j * side) + k + 7];
                     }
                 for (k = x_condition_2; k < x_condition; k++)
                     {
-                    result_array[0] = result_array[0] + Laplacian_1[(i * side * side) + (j * side) + k] *
-                    Laplacian_2[(i * side * side) + (j * side) + k];
+                    result_array[0] = result_array[0] + Gradient_1[(i * side * side) + (j * side) + k] *
+                    Gradient_2[(i * side * side) + (j * side) + k];
                     }
                 }
             }
@@ -8986,7 +8986,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
     unsigned int index_2_array[max_electrons];
     int spin_paired[max_electrons];
     
-    T* Laplacians[max_electrons];
+    T* Gradients[max_electrons];
     T wavefunction_coefficients[max_electrons];
     T efective_radius_base[max_electrons];
     T wavefunction_lenght_multipliers[max_electrons];
@@ -9022,7 +9022,7 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
     
     for (i = 0; i < count_electrons ; i++)
         {
-        Laplacians[i] = atom_wavefunctions->Laplacians[i];
+        Gradients[i] = atom_wavefunctions->Gradients[i];
         wavefunction_coefficients[i] = atom_wavefunctions->wavefunction_coefficients[i];
         efective_radius_base[i] = atom_wavefunctions->efective_radius_base[i];
         wavefunction_lenght_multipliers[i] = atom_wavefunctions->wavefunction_lenght_multipliers[i];
@@ -9094,35 +9094,35 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
         // multithreading code
         for (j = 0; (j + 7) < index_2_size; j = j + 8)
             { // calculate kinetic integrals multithread
-            t121 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j]], &matrix[index[i] + (index_2_array[j] * order)], lenght_orders[index_2_array[j]],
+            t121 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j]], &matrix[index[i] + (index_2_array[j] * order)], lenght_orders[index_2_array[j]],
             x[index_2_array[j]] - x[index[i]], y[index_2_array[j]] - y[index[i]], z[index_2_array[j]] - z[index[i]]);
-            t122 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 1]], &matrix[index[i] + (index_2_array[j + 1] * order)],
+            t122 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 1]], &matrix[index[i] + (index_2_array[j + 1] * order)],
             lenght_orders[index_2_array[j + 1]], x[index_2_array[j + 1]] - x[index[i]], y[index_2_array[j + 1]] - y[index[i]],
             z[index_2_array[j + 1]] - z[index[i]]);
-            t123 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 2]], &matrix[index[i] + (index_2_array[j + 2] * order)],
+            t123 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 2]], &matrix[index[i] + (index_2_array[j + 2] * order)],
             lenght_orders[index_2_array[j + 2]], x[index_2_array[j + 2]] - x[index[i]], y[index_2_array[j + 2]] - y[index[i]],
             z[index_2_array[j + 2]] - z[index[i]]);
-            t124 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 3]], &matrix[index[i] + (index_2_array[j + 3] * order)],
+            t124 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 3]], &matrix[index[i] + (index_2_array[j + 3] * order)],
             lenght_orders[index_2_array[j + 3]], x[index_2_array[j + 3]] - x[index[i]], y[index_2_array[j + 3]] - y[index[i]],
             z[index_2_array[j + 3]] - z[index[i]]);
-            t125 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 4]], &matrix[index[i] + (index_2_array[j + 4] * order)],
+            t125 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 4]], &matrix[index[i] + (index_2_array[j + 4] * order)],
             lenght_orders[index_2_array[j + 4]], x[index_2_array[j + 4]] - x[index[i]], y[index_2_array[j + 4]] - y[index[i]],
             z[index_2_array[j + 4]] - z[index[i]]);
-            t126 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 5]], &matrix[index[i] + (index_2_array[j + 5] * order)],
+            t126 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 5]], &matrix[index[i] + (index_2_array[j + 5] * order)],
             lenght_orders[index_2_array[j + 5]], x[index_2_array[j + 5]] - x[index[i]], y[index_2_array[j + 5]] - y[index[i]],
             z[index_2_array[j + 5]] - z[index[i]]);
-            t127 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 6]], &matrix[index[i] + (index_2_array[j + 6] * order)],
+            t127 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 6]], &matrix[index[i] + (index_2_array[j + 6] * order)],
             lenght_orders[index_2_array[j + 6]], x[index_2_array[j + 6]] - x[index[i]], y[index_2_array[j + 6]] - y[index[i]],
             z[index_2_array[j + 6]] - z[index[i]]);
-            t128 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[j + 7]], &matrix[index[i] + (index_2_array[j + 7] * order)],
+            t128 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[j + 7]], &matrix[index[i] + (index_2_array[j + 7] * order)],
             lenght_orders[index_2_array[j + 7]], x[index_2_array[j + 7]] - x[index[i]], y[index_2_array[j + 7]] - y[index[i]],
             z[index_2_array[j + 7]] - z[index[i]]);
             
@@ -9136,50 +9136,50 @@ T basis_set_calculations<T>::Calculate_kinetic_integral_matrix(T* matrix, unsign
             t128.join();
             }
         if (index_2_size % 8 >= 7) {
-            t129 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 7]], &matrix[index[i] + (index_2_array[index_2_size - 7] * order)],
+            t129 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 7]], &matrix[index[i] + (index_2_array[index_2_size - 7] * order)],
             lenght_orders[index_2_array[index_2_size - 7]], x[index_2_array[index_2_size - 7]] - x[index[i]],
             y[index_2_array[index_2_size - 7]] - y[index[i]], z[index_2_array[index_2_size - 7]] - z[index[i]]);
             t129_flag = true;
             }
         if (index_2_size % 8 >= 6) {
-            t130 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 6]], &matrix[index[i] + (index_2_array[index_2_size - 6] * order)],
+            t130 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 6]], &matrix[index[i] + (index_2_array[index_2_size - 6] * order)],
             lenght_orders[index_2_array[index_2_size - 6]], x[index_2_array[index_2_size - 6]] - x[index[i]],
             y[index_2_array[index_2_size - 6]] - y[index[i]], z[index_2_array[index_2_size - 6]] - z[index[i]]);
             t130_flag = true;
             }
         if (index_2_size % 8 >= 5) {
-            t131 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 5]], &matrix[index[i] + (index_2_array[index_2_size - 5] * order)],
+            t131 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 5]], &matrix[index[i] + (index_2_array[index_2_size - 5] * order)],
             lenght_orders[index_2_array[index_2_size - 5]], x[index_2_array[index_2_size - 5]] - x[index[i]],
             y[index_2_array[index_2_size - 5]] - y[index[i]], z[index_2_array[index_2_size - 5]] - z[index[i]]);
             t131_flag = true;
             }
         if (index_2_size % 8 >= 4) {
-            t132 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 4]], &matrix[index[i] + (index_2_array[index_2_size - 4] * order)],
+            t132 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 4]], &matrix[index[i] + (index_2_array[index_2_size - 4] * order)],
             lenght_orders[index_2_array[index_2_size - 4]], x[index_2_array[index_2_size - 4]] - x[index[i]],
             y[index_2_array[index_2_size - 4]] - y[index[i]], z[index_2_array[index_2_size - 4]] - z[index[i]]);
             t132_flag = true;
             }
         if (index_2_size % 8 >= 3) {
-            t133 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 3]], &matrix[index[i] + (index_2_array[index_2_size - 3] * order)],
+            t133 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 3]], &matrix[index[i] + (index_2_array[index_2_size - 3] * order)],
             lenght_orders[index_2_array[index_2_size - 3]], x[index_2_array[index_2_size - 3]] - x[index[i]],
             y[index_2_array[index_2_size - 3]] - y[index[i]], z[index_2_array[index_2_size - 3]] - z[index[i]]);
             t133_flag = true;
             }
         if (index_2_size % 8 >= 2) {
-            t134 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 2]], &matrix[index[i] + (index_2_array[index_2_size - 2] * order)],
+            t134 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 2]], &matrix[index[i] + (index_2_array[index_2_size - 2] * order)],
             lenght_orders[index_2_array[index_2_size - 2]], x[index_2_array[index_2_size - 2]] - x[index[i]],
             y[index_2_array[index_2_size - 2]] - y[index[i]], z[index_2_array[index_2_size - 2]] - z[index[i]]);
             t134_flag = true;
             }
         if (index_2_size % 8 >= 1) {
-            t135 = thread(&basis_set_calculations::Integral_kinetic, this, Laplacians[index[i]],
-            Laplacians[index_2_array[index_2_size - 1]], &matrix[index[i] + (index_2_array[index_2_size - 1] * order)],
+            t135 = thread(&basis_set_calculations::Integral_kinetic, this, Gradients[index[i]],
+            Gradients[index_2_array[index_2_size - 1]], &matrix[index[i] + (index_2_array[index_2_size - 1] * order)],
             lenght_orders[index_2_array[index_2_size - 1]], x[index_2_array[index_2_size - 1]] - x[index[i]],
             y[index_2_array[index_2_size - 1]] - y[index[i]], z[index_2_array[index_2_size - 1]] - z[index[i]]);
             t135_flag = true;
@@ -9668,11 +9668,11 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     T* pointers_to_lenghts[1];
     T* pointers_to_wavefunctions[max_electrons];
     T* pointers_to_probabilities[max_electrons];
-    T* pointers_to_Laplacians[max_electrons];
+    T* pointers_to_Gradients[max_electrons];
     T* pointer_to_lenght;
     T* pointer_to_wavefunction;
     T* pointer_to_probability;
-    T* pointer_to_Laplacian;
+    T* pointer_to_Gradient;
     T* small_lenghts;
     T* small_relative_lenghts;
     T* small_wavefunctions[max_electrons];
@@ -9802,7 +9802,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 }
             pointers_to_wavefunctions[i] = nullptr;
             pointers_to_probabilities[i] = nullptr;
-            pointers_to_Laplacians[i] = nullptr;
+            pointers_to_Gradients[i] = nullptr;
             small_wavefunctions[i] = nullptr;
             small_probabilities[i] = nullptr;
             }
@@ -9851,16 +9851,16 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 {
                 pointer_to_wavefunction = new T[wavefunction_size];
                 pointer_to_probability = new T[wavefunction_size];
-                pointer_to_Laplacian = new T[wavefunction_size];
+                pointer_to_Gradient = new T[wavefunction_size];
                 pointers_to_wavefunctions[index[i]] = pointer_to_wavefunction;
                 pointers_to_probabilities[index[i]] = pointer_to_probability;
-                pointers_to_Laplacians[index[i]] = pointer_to_Laplacian;
+                pointers_to_Gradients[index[i]] = pointer_to_Gradient;
                 if (restriction == true and (spins[spin_paired[index[i]]] == -0.5)
                     and (bonding[index[i]] == -1 or Z[index[i]] == Z[bonding[index[i]]]))
                     {  // for restricted basis set method
                     pointers_to_wavefunctions[spin_paired[index[i]]] = pointer_to_wavefunction;
                     pointers_to_probabilities[spin_paired[index[i]]] = pointer_to_probability;
-                    pointers_to_Laplacians[spin_paired[index[i]]] = pointer_to_Laplacian;
+                    pointers_to_Gradients[spin_paired[index[i]]] = pointer_to_Gradient;
                     }
                 }
             }
@@ -9882,12 +9882,12 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                     if (spin_paired[i] != -1 and bonding[i] == -1)
                         pointers_to_probabilities[spin_paired[i]] = nullptr;
                     }
-                if (pointers_to_Laplacians[i] != nullptr)
+                if (pointers_to_Gradients[i] != nullptr)
                     {
-                    delete[] pointers_to_Laplacians[i];
-                    pointers_to_Laplacians[i] = nullptr;
+                    delete[] pointers_to_Gradients[i];
+                    pointers_to_Gradients[i] = nullptr;
                     if (spin_paired[i] != -1 and bonding[i] == -1)
-                        pointers_to_Laplacians[spin_paired[i]] = nullptr;
+                        pointers_to_Gradients[spin_paired[i]] = nullptr;
                     }
                 }
             return(-1);
@@ -9946,7 +9946,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
             {
             pointers_to_wavefunctions[i] = atom_wavefunctions->wavefunctions[i];
             pointers_to_probabilities[i] = atom_wavefunctions->probabilities[i];
-            pointers_to_Laplacians[i] = atom_wavefunctions->Laplacians[i];
+            pointers_to_Gradients[i] = atom_wavefunctions->Gradients[i];
             }
         small_atom_wavefunctions_size = small_atom_wavefunctions->n.size();
         
@@ -10258,21 +10258,21 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         }
     for (i = 0; (i + 7) < count_orbitals; i = i + 8)
         {
-        t46 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i]],
+        t46 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i]],
         pointers_to_wavefunctions[index[i]], size_order);
-        t47 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 1]],
+        t47 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 1]],
         pointers_to_wavefunctions[index[i + 1]], size_order);
-        t48 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 2]],
+        t48 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 2]],
         pointers_to_wavefunctions[index[i + 2]], size_order);
-        t49 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 3]],
+        t49 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 3]],
         pointers_to_wavefunctions[index[i + 3]], size_order);
-        t50 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 4]],
+        t50 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 4]],
         pointers_to_wavefunctions[index[i + 4]], size_order);
-        t51 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 5]],
+        t51 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 5]],
         pointers_to_wavefunctions[index[i + 5]], size_order);
-        t52 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 6]],
+        t52 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 6]],
         pointers_to_wavefunctions[index[i + 6]], size_order);
-        t53 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[i + 7]],
+        t53 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[i + 7]],
         pointers_to_wavefunctions[index[i + 7]], size_order);
             
         t46.join();
@@ -10285,37 +10285,37 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         t53.join();
         }
     if (count_orbitals % 8 >= 7) {
-        t54 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 7]],
+        t54 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 7]],
         pointers_to_wavefunctions[index[count_orbitals - 7]], size_order);
         t54_flag = true;
         }
     if (count_orbitals % 8 >= 6) {
-        t55 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 6]],
+        t55 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 6]],
         pointers_to_wavefunctions[index[count_orbitals - 6]], size_order);
         t55_flag = true;
         }
     if (count_orbitals % 8 >= 5) {
-        t56 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 5]],
+        t56 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 5]],
         pointers_to_wavefunctions[index[count_orbitals - 5]], size_order);
         t56_flag = true;
         }
     if (count_orbitals % 8 >= 4) {
-        t57 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 4]],
+        t57 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 4]],
         pointers_to_wavefunctions[index[count_orbitals - 4]], size_order);
         t57_flag = true;
         }
     if (count_orbitals % 8 >= 3) {
-        t58 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 3]],
+        t58 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 3]],
         pointers_to_wavefunctions[index[count_orbitals - 3]], size_order);
         t58_flag = true;
         }
     if (count_orbitals % 8 >= 2) {
-        t59 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 2]],
+        t59 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 2]],
         pointers_to_wavefunctions[index[count_orbitals - 2]], size_order);
         t59_flag = true;
         }
     if (count_orbitals % 8 >= 1) {
-        t60 = thread(&basis_set_calculations::Laplacian_thread, this, pointers_to_Laplacians[index[count_orbitals - 1]],
+        t60 = thread(&basis_set_calculations::Gradient_thread, this, pointers_to_Gradients[index[count_orbitals - 1]],
         pointers_to_wavefunctions[index[count_orbitals - 1]], size_order);
         t60_flag = true;
         }
@@ -10361,7 +10361,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
             atom_wavefunctions->wavefunctions.push_back(pointers_to_wavefunctions[i]);
             atom_wavefunctions->probabilities.push_back(pointers_to_probabilities[i]);
             atom_wavefunctions->efective_radius_base.push_back(efective_radius_base_array[i]);
-            atom_wavefunctions->Laplacians.push_back(pointers_to_Laplacians[i]);
+            atom_wavefunctions->Gradients.push_back(pointers_to_Gradients[i]);
             }
         }
     return(0);
@@ -10745,7 +10745,7 @@ T basis_set_calculations<T>::Clear()
             if (previous_deleted == false) {
                 delete[] results.wavefunctions[i];
                 delete[] results.probabilities[i];
-                delete[] results.Laplacians[i];
+                delete[] results.Gradients[i];
                 }
             }
     for (i = 0; i < results.lenghts.size(); i++)
@@ -10827,7 +10827,7 @@ T basis_set_calculations<T>::Clear()
     results.lenghts.clear();
     results.wavefunctions.clear();
     results.probabilities.clear();
-    results.Laplacians.clear();
+    results.Gradients.clear();
     results.lenght_orders.clear();
     results.wavefunction_coefficients.clear();
     results.wavefunction_lenght_multipliers.clear();

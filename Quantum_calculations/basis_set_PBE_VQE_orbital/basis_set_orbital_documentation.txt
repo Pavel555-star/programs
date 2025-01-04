@@ -158,8 +158,8 @@ Vector of wavefunctions arrays in memory
 vector<T*> probabilities;
 Vector of probabilities arrays in memory
 
-vector<T*> Laplacians;
-Vector of laplacian wavefunction arrays in memory
+vector<T*> Gradients;
+Vector of gradient wavefunction arrays in memory
 
 vector<unsigned int> lenght_orders;
 Vector of lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes)
@@ -353,9 +353,9 @@ T Probabilities_thread(T* Probabilities, unsigned int lenght_order, T* lenght)
 This function load average lenght for Probabilities array and null coordinates to pointer lenght.
 Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
 
-T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order)
+T Gradient_thread(T* Gradient_1, T* wavefunction_2, unsigned int lenght_order)
 
-This function compute the Laplacian from wavefunction_2 3D cube to Laplacian_1 3D vector.
+This function compute the gradient from wavefunction_2 3D cube to Gradient_1 3D vector.
 Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
 
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, , T radius_1, T radius_2, T* result, unsigned int lenght_order, T x, T y, T z,
@@ -391,9 +391,9 @@ Variable lenght_order is number of pixels between center and surface of Probabil
 Variables probabilities_lenght and multiplier are average potential lenght
 and wavefunction_lenght_multiplier for probabilities cube array and Z is count proton in nucleus.
 
-T Integral_kinetic(T* Laplacian_1, T* Laplacian_2, T* result, unsigned int lenght_order, T d_x, T d_y, T d_z)
+T Integral_kinetic(T* Gradient_1, T* Gradient_2, T* result, unsigned int lenght_order, T d_x, T d_y, T d_z)
 
-This function compute interelectron kinetic integral from Laplacian 3D arrays in Laplacian_1 and Laplacian_2 and coordinate difference
+This function compute interelectron kinetic integral from gradient 3D arrays in Gradient_1 and Gradient_2 and coordinate difference
 between these 3D cubes in d_x, d_y and d_z the Kinetic integral aand store it to result.
 Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
 
@@ -650,8 +650,8 @@ Pointers to electron densities cubes of atoms
 vector <T*> atoms_spin_densities;
 Pointers to spin densities cubes of atoms
 
-vector <T*> atoms_Ksi_densities;
-Pointers to Ksi densities cubes of atoms
+vector <T*> atoms_Fi_densities;
+Pointers to Fi densities cubes of atoms
 
 vector <T*> atoms_gradients_densities;
 Pointers to gradient densities cubes of atoms
@@ -781,10 +781,10 @@ atoms_densities_list contain pointers to atoms electron densities or atoms spin 
 Vectors x, y and z contains coordinates of atoms and parameter size_order means number of pixels between center and edge of 
 3D density cube.
 
-T Compute_Ksi_thread(T* spin_density, T* electron_density, T* Ksi_density, unsigned int size_order);
+T Compute_Fi_thread(T* spin_density, T* electron_density, T* Fi_density, unsigned int size_order);
 
-This function compute Ksi density of atom. Parameter spin_density is pointer spin_density 3D cube,
-electron_density is pointer to electron_density 3D cube, Ksi_density is pointer to electron Ksi density 3D cube and
+This function compute Fi density of atom. Parameter spin_density is pointer spin_density 3D cube,
+electron_density is pointer to electron_density 3D cube, Fi_density is pointer to electron Fi density 3D cube and
 size_order means number of pixels between center and edge of 3D cubes.
 
 T Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order);
@@ -793,30 +793,30 @@ This function compute gradient of atom electron density. Parameter electron_dens
 gradient_density is pointer to gradient density 3D cube and size_order means number of pixels between center and edge of 
 3D density cube.
 
-T Compute_Ksi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
-vector<T*> atoms_Ksi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
+T Compute_Fi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
+vector<T*> atoms_Fi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
 
-This function compute Ksi and gradients of atom electron densities. Vector atoms_electron_densities contain pointers to
-electron densities of atoms, vector atoms_spin_densities contain pointers to electron spin of atoms, vector atoms_gradients_densities contain pointers to electron gradients of atoms, vector atoms_Ksi_densities contain pointers to
-Ksi densities of atoms and size_order means number of pixels between center and edge of 
+This function compute Fi and gradients of atom electron densities. Vector atoms_electron_densities contain pointers to
+electron densities of atoms, vector atoms_spin_densities contain pointers to electron spin of atoms, vector atoms_gradients_densities contain pointers to electron gradients of atoms, vector atoms_Fi_densities contain pointers to
+Fi densities of atoms and size_order means number of pixels between center and edge of 
 3D density cubes.
 
-T PBE_thread(T* atoms_gradients_density, T* atoms_Ksi_density, T* electron_density,
+T PBE_thread(T* atoms_gradients_density, T* atoms_Fi_density, T* electron_density,
 unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius);
 
 This function compute PBE correlation and exchange energies. Vector atoms_gradients_densities contain pointers to gradient densities of
-atoms, vector atoms_Ksi_densities contain pointers to Ksi densities of atoms, vector electron_density contain pointer to electron density
+atoms, vector atoms_Fi_densities contain pointers to Fi densities of atoms, vector electron_density contain pointer to electron density
 of atom, size_order means number of pixels between center and edge of 3D density cubes,
 exchange_energy and correlation_energy are pointers to save exchange and correlation energy and
 Wigner_Seitz_radius is Wigner-Seitz radius of atom.
 
 
-T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Ksi_densities, vector<T*> electron_densities,
+T PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Fi_densities, vector<T*> electron_densities,
 unsigned int size_order);
 
 This function compute PBE correlation and exchange energies. Vector electron_densities contain pointers to
-electron densities 3D cubes, vector atoms_Ksi_densities contain pointers to Ksi densities of atoms, vector atoms_gradients_densities
-contain pointers to gradient densities of atoms and size_order means number of pixels between center and edge of 3D density cubes.
+electron densities 3D cubes, vector atoms_Fi_densities contain pointers to Fi densities of atoms, vector atoms_gradients_densities
+contain pointers to gradient densities of atoms and size_order means number of pixels between center and edge of 3D density cubes. The PBE density functional is fitted, when generalized Helium correlation energy is off.
 
 T Set_circuit();
 
@@ -856,7 +856,7 @@ minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
 If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
 In vector values are computed Hartree-Fock energies, in spin_density_vector the spin density matrix and
-in spin_values are spin energy levels.
+in spin_values are spin energy levels. The PBE density functional is fitted, when generalized Helium correlation energy is off.
 
 T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
 vector<T>* values, vector<T>* spin_density_vector,  vector<T>* spin_values);
@@ -871,7 +871,7 @@ in spin_values are spin energy levels.
 
 Variable UI_input is input string, size_order is the lenght orders (number of pixels between center and surface of lenghts,
 wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
-If generate is true, then wavefunctions are generated.
+If generate is true, then wavefunctions are generated. The PBE density functional is fitted, when generalized Helium correlation energy is off.
 
 T Gaussian_quadrature();
 

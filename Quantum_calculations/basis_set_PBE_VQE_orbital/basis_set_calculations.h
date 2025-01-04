@@ -75,7 +75,7 @@ public:
     vector<T*> lenghts;
     vector<T*> wavefunctions;
     vector<T*> probabilities;
-    vector<T*> Laplacians;
+    vector<T*> Gradients;
     vector<unsigned int> lenght_orders;
     vector<T> wavefunction_coefficients;
     vector<T> wavefunction_lenght_multipliers; // coefficient for conversion bohr radius to pixels
@@ -261,7 +261,7 @@ T Wavefunction_square(T* wavefunction_1, T* probabilities, unsigned int lenght_o
 T Probabilities_lenght(T* Probabilities, unsigned int lenght_order, int x, int y, int z);
 T Probabilities_thread(T* Probabilities, unsigned int lenght_order, T* lenght);
 T Probabilities_lenght(T* probabilities, unsigned int lenght_order);
-T Laplacian_thread(T* Laplacian_1, T* wavefunction_2, unsigned int lenght_order);
+T Gradient_thread(T* Gradient_1, T* wavefunction_2, unsigned int lenght_order);
 T Integral_overlap(T* Wavefunction_1, T* Wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z);
 T Integral_coulombic(T radius_1, T radius_2, T distance, T* result, bool spin_bonded);
@@ -269,7 +269,7 @@ T Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned i
 T Integral_nucleus_atraction(T probabilities_lenght, T multiplier, T* result, T* lenght, unsigned int Z);
 T Integrate_Integral_nucleus_atraction(T* probabilities,
 T* result, T* lenght, unsigned int lenght_order, T lenght_x, T lenght_y, T lenght_z, unsigned int Z);
-T Integral_kinetic(T* Laplacian_1, T* Laplacian_2, T* result, unsigned int lenght_order, T d_x, T d_y, T d_z);
+T Integral_kinetic(T* Gradient_1, T* Gradient_2, T* result, unsigned int lenght_order, T d_x, T d_y, T d_z);
 T Rydberg_energy(unsigned int Z, unsigned int n);
 T Orbital_moment_energy(int m, T* B0);
 T Spin_moment_energy(T s, T B0);
