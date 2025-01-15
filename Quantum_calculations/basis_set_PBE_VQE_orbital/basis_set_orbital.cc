@@ -128,7 +128,7 @@ if (success == 0)
         if (spins[i] == 0.5 or spins[i] == -0.5)
             basis_set_calculations_DFT.results.spins[number_electrons[i]] = spins[i];
         
-        basis_set_calculations_DFT.results.spin_paired[number_electrons[i]] = spins[i];
+        basis_set_calculations_DFT.results.spin_paired[number_electrons[i]] = -1;
         }
     Hamiltonian = basis_set_calculations_DFT.Execute_PBE_VQE(max_iterations, fidelity, lenght_order, false,
     &values, &spin_density_matrix, &spin_values);

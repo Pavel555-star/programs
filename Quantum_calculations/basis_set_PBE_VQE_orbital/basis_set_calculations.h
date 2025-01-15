@@ -256,7 +256,7 @@ T Get_relative_Hartree_length(unsigned int Z, unsigned int n);
 unsigned int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
 unsigned int lenght_order, T d_x, T d_y, T d_z);
 T Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities, unsigned int lenght_order);
-T Wavefunction_relative_lenghts_generate(T* lenghts, unsigned int lenght_order);
+T Wavefunction_relative_lenghts_generate(T* reverse_relative_lenghts, unsigned int lenght_order);
 T Wavefunction_square(T* wavefunction_1, T* probabilities, unsigned int lenght_order);
 T Probabilities_lenght(T* Probabilities, unsigned int lenght_order, int x, int y, int z);
 T Probabilities_thread(T* Probabilities, unsigned int lenght_order, T* lenght);

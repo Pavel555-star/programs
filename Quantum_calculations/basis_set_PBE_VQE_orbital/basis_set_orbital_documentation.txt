@@ -330,7 +330,7 @@ number of pixels between center and surface of wavefunction_1 and wavefunction_2
 
 
 
-T Wavefunction_relative_lenghts_generate(T* lenghts, unsigned int lenght_order);
+T Wavefunction_relative_lenghts_generate(T* reverse_relative_lenghts, unsigned int lenght_order);
 This function internally generate lenghts array for double integrating of 3D cubes with the same coordinates.
 
 T Wavefunction_square(T* wavefunction_1, T* probabilities, unsigned int lenght_order)

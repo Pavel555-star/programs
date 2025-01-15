@@ -4811,7 +4811,8 @@ T basis_set_calculations<T>::Wavefunction_multiply(T* wavefunction_1, T* wavefun
     return(0);
     }
 template <typename T>
-T basis_set_calculations<T>::Wavefunction_relative_lenghts_generate(T* relative_lenghts, unsigned int lenght_order)
+T basis_set_calculations<T>::Wavefunction_relative_lenghts_generate(T* reverse_relative_lenghts,
+unsigned int lenght_order)
     { // Generating lenghts 3D cubes for wavefunction calculations
     unsigned int side, i, j, k, l, m ,n, pre_index, index;
     int x_i, y_i, z_i;
@@ -4823,19 +4824,20 @@ T basis_set_calculations<T>::Wavefunction_relative_lenghts_generate(T* relative_
             for (k = 0; k < side; k++)
                 for (l = 0; l < side; l++)
                     {
-                    z_i = (int(l) - int(i));
+                    z_i = (int(l) - int(i)) * (int(l) - int(i));
                     pre_index = (i * lenght_order * lenght_order * lenght_order * lenght_order * lenght_order) +
                     (j * lenght_order * lenght_order * lenght_order * lenght_order) + (k * lenght_order * lenght_order * lenght_order) +
                     (l * lenght_order * lenght_order * lenght_order * lenght_order);
                     for (m = 0; m < side; m++)
                         {
-                        y_i = (int(m) - int(j));
+                        y_i = (int(m) - int(j)) * (int(m) - int(j));
                         for (n = 0; n < side; n++)
                             {
-                            y_i = (int(m) - int(j));
+                            x_i = (int(n) - int(k)) * (int(n) - int(k));
                             index = pre_index + (l * side) + m;
-                            distance = sqrt((x_i * x_i) + (y_i * y_i) + (z_i * z_i));
-                            relative_lenghts[index] = distance;
+                            distance = sqrt(x_i + y_i + z_i);
+                            if (distance != 0)
+                                reverse_relative_lenghts[index] = distance;
                             }
                         }
                     }
@@ -4911,11 +4913,10 @@ T basis_set_calculations<T>::Probabilities_lenght(T* probabilities, unsigned int
     unsigned int side;
     unsigned int size;
     unsigned int i, j, k;
+    unsigned int pre_index;
     T lenght;
-    T l;
-    T m;
-    T n;
     T rsqrt;
+    T* distances = results.lenghts[0];
     
     lenght = 0.00;
     side = (2 * lenght_order + 1);
@@ -4925,23 +4926,21 @@ T basis_set_calculations<T>::Probabilities_lenght(T* probabilities, unsigned int
     
     for (i = 0; i < side; i++)
         {
-        l = (i - lenght_order) * (i - lenght_order);
         for (j = 0; j < side; j++)
             {
-            m = (j - lenght_order) * (j - lenght_order);
             for (k = 0; k < side; k++)
                 {
-                n = (k - lenght_order) * (k - lenght_order);
-                if (l != 0 or m != 0 or n != 0)
+                pre_index = i * side * side + j * side;
+                if (distances[pre_index + k] != 0)
                     {
-                    rsqrt = 1/sqrt(l + m + n);
-                    lenght = lenght + (rsqrt * T(lenght_order)/T(vector_lenght) *
+                    rsqrt = 1/distances[pre_index + k];
+                    lenght = lenght + (rsqrt  *
                     probabilities[(i * side * side) + (j * side) + k]);
                     }
                 }
             }
         }
-    lenght = 1/lenght * Hartree_lenght;
+    lenght = 1/lenght * T(vector_lenght)/T(lenght_order) * Hartree_lenght;
     return(lenght);
     }
 template <typename T>
@@ -5188,7 +5187,7 @@ unsigned int lenght_order, T x, T y, T z)
     unsigned int i_min, j_min, k_min, l_min, m_min, n_min;
     unsigned int i_max, j_max, k_max, l_max, m_max, n_max;
     unsigned int x_contraction, y_contraction, z_contraction, x_side, y_side, z_side;
-    unsigned int pre_index;
+    unsigned int pre_index, pre_index_2;
     int x_shift, y_shift, z_shift;
     int x_2_y_2;
     
@@ -5197,6 +5196,11 @@ unsigned int lenght_order, T x, T y, T z)
     T point_value_distance;
     T point_value;
     T average_lenght;
+    T* reverse_relative_lenghts = nullptr;
+    
+    if (small_results.relative_lenghts.size() > 0 and small_results.lenght_orders.size() > 0)
+        if (small_results.lenght_orders[0] == lenght_order)
+            reverse_relative_lenghts = small_results.relative_lenghts[0];
     
     side = (2 * lenght_order + 1);
     x_shift = x * lenght_order/vector_lenght;
@@ -5283,7 +5287,7 @@ unsigned int lenght_order, T x, T y, T z)
     
     // integration
     average_lenght = 0;
-    if (x == 0 and y == 0 and z == 0)
+    if (x == 0 and y == 0 and z == 0 and reverse_relative_lenghts != nullptr)
         {
         // optimized integration with zero of coordinate distance
         for (k = k_min; k < k_max; k++)
@@ -5291,20 +5295,23 @@ unsigned int lenght_order, T x, T y, T z)
                 for (i = i_min; i < i_max; i++)
                     for (n = n_min; n < n_max; n++)
                         {
-                        x_2_y_2 = (int(j) - int(m)) * (int(j) - int(m) - int(y_shift)) +
-                        (int(k) - int(n)) * (int(k) - int(n));
+                        pre_index = k * lenght_order * lenght_order * lenght_order * lenght_order * lenght_order +
+                        j * lenght_order * lenght_order * lenght_order * lenght_order +
+                        i * lenght_order * lenght_order * lenght_order + n * lenght_order * lenght_order;
                         for (m = m_min; m < m_max; m++)
+                            {
+                            pre_index_2 = m * lenght_order;
                             for (l = l_min; l < l_max; l++)
                                 if (i != (l + x_shift) or j != (m + y_shift) or k != (n + z_shift))
                                     {
-                                    point_value_distance = sqrt((int(i) - int(l)) * (int(i) - int(l)) + x_2_y_2);
-                                    point_value = 1/(point_value_distance * vector_lenght/lenght_order) *
+                                    point_value = reverse_relative_lenghts[pre_index + pre_index_2 + l] *
                                     density_1[i + j * x_side + k * x_side * y_side] *
                                     density_2[l + m * x_side + n * x_side * y_side];
                                     average_lenght = average_lenght + point_value;
                                     }
                             }
-        average_lenght = 1/average_lenght  * Hartree_lenght;
+                        }
+        average_lenght = 1/average_lenght * T(lenght_order)/T(vector_lenght) * Hartree_lenght;
         }
     else
         { // standard integration with non-zero of coordinate distance
