@@ -228,7 +228,7 @@ vector<unsigned int> lenght_orders;
 Vector of lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes)
 
 vector<T*> lenghts;
-Vector of lenghts 3D cubes with lenghts between pixel and center in memory (for fast computing wavefunctions)
+Vector of reverse lenghts 3D cubes with lenghts between pixel and center in memory (for fast computing wavefunctions)
 
 vector<T*> relative_lenghts;
 Vector of lenghts 3D arrays of 3D cubes with lenghts between pixels for each pixel of first and each pixel of second coordinates.
