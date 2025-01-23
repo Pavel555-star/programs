@@ -1205,7 +1205,7 @@ vector<T*> electron_densities, unsigned int size_order)
     for (i = 0; (i + 7) < count_orbitals; i = i + 8)
         {
         t61 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i]] - 1],
-        atoms_Fi_array[electron_to_atom_numbers[index[i]]], electron_array[index[i]],
+        atoms_Fi_array[electron_to_atom_numbers[index[i]] -1], electron_array[index[i]],
         size_order, &exchange_array[index[i]], &correlation_array[index[i]], Wigner_Seitz_radiuses[Z[index[i]] - 1]);
         t62 = thread(&basis_set_calculations_DFT::PBE_thread, this, atoms_gradients_array[electron_to_atom_numbers[index[i + 1]] - 1],
         atoms_Fi_array[electron_to_atom_numbers[index[i + 1]] - 1], electron_array[index[i + 1]],
