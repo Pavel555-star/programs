@@ -5227,22 +5227,22 @@ unsigned int lenght_order, T x, T y, T z)
                     if (density_1[i + j * x_side + k * x_side * y_side] > 0)
                         {
                         if (i > lenght_order)
-                            if (i - lenght_order > i_range)
+                            if (i > i_range + lenght_order)
                                 i_range = i - lenght_order;
                         else
-                            if (lenght_order - i > i_range)
+                            if (lenght_order > i_range + i)
                                 i_range = lenght_order - i;
                         if (j > lenght_order)
-                            if (j - lenght_order > j_range)
+                            if (j > j_range + lenght_order)
                                 j_range = j - lenght_order;
                         else
-                            if (lenght_order - j > j_range)
+                            if (lenght_order > j_range + j)
                                 j_range = lenght_order - j;
                         if (k > lenght_order)
-                            if (k - lenght_order > k_range)
+                            if (k > k_range + lenght_order)
                                 k_range = k - lenght_order;
                         else
-                            if (lenght_order - k > k_range)
+                            if (lenght_order > k_range + k)
                                 k_range = lenght_order - k;
                         }
                     }
@@ -5253,22 +5253,22 @@ unsigned int lenght_order, T x, T y, T z)
                     if (density_2[l + m * x_side + n * x_side * y_side] > 0)
                         {
                         if (l > lenght_order)
-                            if (l - lenght_order > l_range)
+                            if (l > l_range + lenght_order)
                                 l_range = l - lenght_order;
                         else
-                            if (lenght_order - l > l_range)
+                            if (lenght_order > l_range + l)
                                 l_range = lenght_order - l;
                         if (m > lenght_order)
-                            if (m - lenght_order > m_range)
+                            if (m > m_range + lenght_order)
                                 m_range = m - lenght_order;
                         else
-                            if (lenght_order - m > m_range)
+                            if (lenght_order > m_range + m)
                                 m_range = lenght_order - m;
                         if (n > lenght_order)
-                            if (n - lenght_order > n_range)
+                            if (n > n_range + lenght_order)
                                 n_range = n - lenght_order;
                         else
-                            if (lenght_order - n > n_range)
+                            if (lenght_order > n_range + n)
                                 n_range = lenght_order - n;
                         }
                     }
