@@ -8142,7 +8142,7 @@ small_atom_wavefunctions *small_atom_wavefunctions)
         {
         for (j = i + 1; j < count_electrons; j++)
             if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1)
-            and (spin_paired[i] >= 0 and spin_paired[j] >= 0) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+            and (spin_paired[i] >= 0 or spin_paired[j] >= 0) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
             or (spin_paired[i] == j and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
                 {
                 radius_1 = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
@@ -10601,6 +10601,7 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
         correction_matrix = new T[matrix_order * matrix_order];
         corr_basis_set_matrix = new T[matrix_order * matrix_order];
         spin_density_matrix = new T[matrix_order * matrix_order];
+        memset(resonance_integral_matrix, 0, matrix_order * matrix_order);
         }
     catch (int)
         {
