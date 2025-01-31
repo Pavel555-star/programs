@@ -2745,6 +2745,7 @@ T basis_set_calculations_DFT<T>::Clear()
     VQE_Eigenvectors_2.clear();
     VQE_correlation_energy_sign.clear();
     VQE_ansatz.clear();
+    circuit.data.clear();
     T VQE_Hamiltonian = 0;
     T VQE_previous_Hamiltonian = 0;
     VQE_iterations = 0;

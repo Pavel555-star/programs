@@ -10849,6 +10849,7 @@ T basis_set_calculations<T>::Clear()
     results.n.clear();
     results.l.clear();
     results.m.clear();
+    results.charge.clear();
     results.count_electrons.clear();
     results.reduced_Z.clear();
     results.Z.clear();
@@ -10861,7 +10862,7 @@ T basis_set_calculations<T>::Clear()
     small_results.wavefunctions.clear();
     small_results.probabilities.clear();
     small_results.electron_numbers.clear();
-    small_results.electron_numbers.clear();
+    small_results.lenght_orders.clear();
     small_results.x.clear();
     small_results.y.clear();
     small_results.z.clear();
