@@ -5295,12 +5295,11 @@ unsigned int lenght_order, T x, T y, T z)
                 for (i = i_min; i < i_max; i++)
                     for (n = n_min; n < n_max; n++)
                         {
-                        pre_index = k * lenght_order * lenght_order * lenght_order * lenght_order * lenght_order +
-                        j * lenght_order * lenght_order * lenght_order * lenght_order +
-                        i * lenght_order * lenght_order * lenght_order + n * lenght_order * lenght_order;
+                        pre_index = k * side * side * side * side * side + j * side * side * side * side +
+                        i * side * side * side + n * side * side;
                         for (m = m_min; m < m_max; m++)
                             {
-                            pre_index_2 = m * lenght_order;
+                            pre_index_2 = m * side;
                             for (l = l_min; l < l_max; l++)
                                 if (i != (l + x_shift) or j != (m + y_shift) or k != (n + z_shift))
                                     {
@@ -8141,15 +8140,15 @@ small_atom_wavefunctions *small_atom_wavefunctions)
     for (i = 0; i < count_electrons; i++) // Using regression curve for s1 - s1 integrals
         {
         for (j = i + 1; j < count_electrons; j++)
-            if ((n[i] == 1 and n[j] == 1) or ((n[i] == 1 or n[j] == 1)
-            and (spin_paired[i] >= 0 or spin_paired[j] >= 0) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+            if ((n[i] == 1 and n[j] == 1) or
+            ((n[i] == 1 or n[j] == 1) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
             or (spin_paired[i] == j and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0)))
                 {
                 radius_1 = efective_radius_base[i] * wavefunction_lenght_multipliers[i];
                 radius_2 = efective_radius_base[j] * wavefunction_lenght_multipliers[j];
                 distance = sqrt(((x[j] - x[i]) * (x[j] - x[i])) + ((y[j] - y[i]) * (y[j] - y[i])) + ((z[j] - z[i]) * (z[j] - z[i])))
                 * Hartree_lenght;
-                if ((spin_paired[i] == j or (l[i] == 0 and l[j] == 0)) and (x[j] - x[i] == 0 and y[j] - y[i] == 0 and z[j] - z[i] == 0))
+                if (spin_paired[i] == j and Helium_correlation_energy == true)
                     spin_bonded = true;
                 else
                     spin_bonded = false;
