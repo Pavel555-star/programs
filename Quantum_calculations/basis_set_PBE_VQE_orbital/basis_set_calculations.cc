@@ -4825,16 +4825,16 @@ unsigned int lenght_order)
                 for (l = 0; l < side; l++)
                     {
                     z_i = (int(l) - int(i)) * (int(l) - int(i));
-                    pre_index = (i * lenght_order * lenght_order * lenght_order * lenght_order * lenght_order) +
-                    (j * lenght_order * lenght_order * lenght_order * lenght_order) + (k * lenght_order * lenght_order * lenght_order) +
-                    (l * lenght_order * lenght_order * lenght_order * lenght_order);
+                    pre_index = (i * side * side * side * side * side) +
+                    (j * side * side * side * side) + (k * side * side * side) +
+                    (l * side * side);
                     for (m = 0; m < side; m++)
                         {
                         y_i = (int(m) - int(j)) * (int(m) - int(j));
                         for (n = 0; n < side; n++)
                             {
                             x_i = (int(n) - int(k)) * (int(n) - int(k));
-                            index = pre_index + (l * side) + m;
+                            index = pre_index + (m * side) + n;
                             distance = sqrt(x_i + y_i + z_i);
                             if (distance != 0)
                                 reverse_relative_lenghts[index] = distance;

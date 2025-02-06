@@ -24926,19 +24926,21 @@ _ZN22basis_set_calculationsIdE38Wavefunction_relative_lenghts_generateEPdj:
 	pushq	%rbx
 	.cfi_def_cfa_offset 56
 	.cfi_offset 3, -56
-	movq	%rsi, %rbp
-	movl	%edx, %eax
+	movq	%rsi, %r11
 	leal	1(%rdx,%rdx), %esi
-	imull	%edx, %edx
-	movl	%eax, %r12d
-	imull	%edx, %r12d
-	imull	%r12d, %edx
-	imull	%r12d, %eax
-	leal	1(%rax), %r9d
-	addl	%esi, %eax
+	movl	%esi, %eax
+	imull	%esi, %eax
+	movl	%esi, %edx
+	imull	%eax, %edx
+	movl	%esi, %r8d
+	imull	%edx, %r8d
+	movl	%esi, %r9d
+	imull	%r8d, %r9d
+	leal	1(%rdx), %r10d
 	movl	$0, %ecx
-	movl	$0, %r10d
-	movl	%r12d, %edi
+	movl	$0, %r12d
+	movl	%r10d, %edi
+	movl	%r8d, %edx
 	jmp	.L2824
 .L2825:
 	addl	$1, %edi
@@ -24948,32 +24950,31 @@ _ZN22basis_set_calculationsIdE38Wavefunction_relative_lenghts_generateEPdj:
 .L2826:
 	movl	%edi, %ecx
 	imull	%edi, %ecx
-	addl	%r10d, %ecx
+	addl	%r12d, %ecx
 	addl	%r9d, %ecx
 	je	.L2825
 	pxor	%xmm0, %xmm0
 	cvtsi2sdl	%ecx, %xmm0
 	sqrtsd	%xmm0, %xmm0
-	movsd	%xmm0, (%r12)
+	leal	0(%r13,%rdi), %ecx
+	movsd	%xmm0, (%r11,%rcx,8)
 	jmp	.L2825
 .L2838:
-	addl	$1, %r14d
-	leal	(%r14,%r13), %ecx
+	addl	$1, %r15d
+	addl	%esi, %r13d
+	leal	(%r15,%rbp), %ecx
 	cmpl	%esi, %ecx
 	jnb	.L2839
 .L2827:
-	movl	%r14d, %r10d
-	imull	%r14d, %r10d
-	leal	(%r14,%rbx), %ecx
-	leaq	0(%rbp,%rcx,8), %r12
+	movl	%r15d, %r12d
+	imull	%r15d, %r12d
 	movl	%r8d, %edi
 	negl	%edi
 	jmp	.L2826
 .L2839:
 	movl	-20(%rsp), %edi
 	addl	$1, %edi
-	movl	-12(%rsp), %ecx
-	addl	%ecx, %ebx
+	addl	%r10d, %r14d
 	movl	-16(%rsp), %ecx
 	addl	%edi, %ecx
 	cmpl	%esi, %ecx
@@ -24981,55 +24982,57 @@ _ZN22basis_set_calculationsIdE38Wavefunction_relative_lenghts_generateEPdj:
 .L2828:
 	movl	%edi, %r9d
 	imull	%edi, %r9d
-	movl	%r13d, %r14d
-	negl	%r14d
+	movl	%ebp, %r15d
+	negl	%r15d
+	movl	%r14d, %r13d
 	movl	%edi, -20(%rsp)
 	jmp	.L2827
 .L2840:
-	movl	-16(%rsp), %r10d
-	movl	-8(%rsp), %r14d
-	movl	-12(%rsp), %r12d
+	movl	-16(%rsp), %r12d
+	movl	-8(%rsp), %r13d
 	movl	%eax, %ecx
 	movl	-4(%rsp), %eax
 	addl	$1, %r8d
-	addl	%eax, %r14d
+	addl	%eax, %r13d
 	cmpl	%esi, %r8d
 	jnb	.L2829
 .L2831:
-	movl	%r10d, %edi
+	movl	%r12d, %edi
 	negl	%edi
-	movl	%r14d, %ebx
-	movl	%r10d, -16(%rsp)
-	movl	%r14d, -8(%rsp)
-	movl	%r12d, -12(%rsp)
+	movl	%r13d, %r14d
+	movl	%r12d, -16(%rsp)
+	movl	%r13d, -8(%rsp)
 	movl	%eax, -4(%rsp)
 	movl	%ecx, %eax
 	jmp	.L2828
 .L2829:
 	movl	%eax, %edi
-	movl	%r11d, %r9d
-	movl	%r15d, %r11d
-	addl	$1, %r13d
-	addl	%r9d, %r11d
-	cmpl	%esi, %r13d
+	movl	%edx, %r9d
+	movl	%ecx, %edx
+	movl	-12(%rsp), %ecx
+	addl	$1, %ebp
+	addl	%edx, %ecx
+	cmpl	%esi, %ebp
 	jnb	.L2830
 .L2833:
-	movl	%r11d, %r14d
+	movl	%ecx, %r13d
 	movl	$0, %r8d
 	movl	%edi, %eax
-	movl	%r11d, %r15d
-	movl	%r9d, %r11d
+	movl	%ecx, -12(%rsp)
+	movl	%edx, %ecx
+	movl	%r9d, %edx
 	jmp	.L2831
 .L2830:
-	movl	%r12d, %eax
-	addl	$1, %r10d
-	addl	%edx, %ecx
-	cmpl	%esi, %r10d
+	movl	%ebx, %ecx
+	movl	%r10d, %eax
+	addl	$1, %r12d
+	addl	%r9d, %ecx
+	cmpl	%esi, %r12d
 	jnb	.L2832
 .L2824:
-	movl	%ecx, %r11d
-	movl	$0, %r13d
-	movl	%eax, %r12d
+	movl	$0, %ebp
+	movl	%ecx, %ebx
+	movl	%eax, %r10d
 	jmp	.L2833
 .L2832:
 	pxor	%xmm0, %xmm0
