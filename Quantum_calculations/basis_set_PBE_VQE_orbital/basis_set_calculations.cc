@@ -4837,7 +4837,9 @@ unsigned int lenght_order)
                             index = pre_index + (m * side) + n;
                             distance = sqrt(x_i + y_i + z_i);
                             if (distance != 0)
-                                reverse_relative_lenghts[index] = distance;
+                                reverse_relative_lenghts[index] = 1/distance;
+                            else
+                                reverse_relative_lenghts[index] = 0;
                             }
                         }
                     }
