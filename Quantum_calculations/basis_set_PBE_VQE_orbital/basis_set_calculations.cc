@@ -5274,12 +5274,12 @@ unsigned int lenght_order, T x, T y, T z)
                                 n_range = lenght_order - n;
                         }
                     }
-    i_max = lenght_order + i_range;
-    j_max = lenght_order + j_range;
-    k_max = lenght_order + k_range;
-    l_max = lenght_order + l_range;
-    m_max = lenght_order + m_range;
-    n_max = lenght_order + n_range;
+    i_max = lenght_order + i_range + 1;
+    j_max = lenght_order + j_range + 1;
+    k_max = lenght_order + k_range + 1;
+    l_max = lenght_order + l_range + 1;
+    m_max = lenght_order + m_range + 1;
+    n_max = lenght_order + n_range + 1;
     i_min = lenght_order - i_range;
     j_min = lenght_order - j_range;
     k_min = lenght_order - k_range;
