@@ -270,7 +270,7 @@ int Slater_basis_set_calculations_DFT<T>::Create_crystal_field(central_cations *
     return(0);
     }
 template <typename T>
-int Slater_basis_set_calculations_DFT<T>::Alocate_densities(unsigned int size_order)
+int Slater_basis_set_calculations_DFT<T>::Allocate_densities(unsigned int size_order)
     {
     unsigned int i;
     unsigned int density_size;
@@ -1468,7 +1468,7 @@ int Slater_basis_set_calculations_DFT<T>::String_to_advanced_parameters(string U
     return(0);
     }
 template <typename T>
-T Slater_basis_set_calculations_DFT<T>::Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate, vector<T>* values)
+T Slater_basis_set_calculations_DFT<T>::Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values)
     {
     T Hamiltonian;
     bool repetition_flag;
@@ -1485,13 +1485,14 @@ T Slater_basis_set_calculations_DFT<T>::Execute_calculation(unsigned int max_ite
        
     Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory,
     values);
-    if (dealocate == true) // Dealocate atom electron and spin densities
+    allocation_memory = false;
+    if (deallocate == true) // deallocate atom electron and spin densities
         Clear();
     return(Hamiltonian);
     }
 // Density functional theory section
 template <typename T>
-T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate, vector<T>* values)
+T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values)
     {
     unsigned int i, j, k;
     unsigned int matrix_order;
@@ -1536,9 +1537,10 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations,
         if (i == matrix_order * matrix_order -1)
             return(Hamiltonian);
         }
-    if (allocation_memory == true)
-        if (Alocate_densities(size_order) != 0)
+    if (allocation_PBE == true)
+        if (Allocate_densities(size_order) != 0)
             return(-1);
+    allocation_PBE = false;
     // compute electron and spin densities
     Compute_densities(this->results.probabilities, atoms_electron_densities,
     index_atoms, size_order, this->results.spins, this->results.spin_paired,
@@ -1586,7 +1588,7 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations,
         size_order);
         PBE_compute(atoms_gradients_densities, atoms_Fi_densities, this->results.probabilities, size_order);
         }
-    if (dealocate == true) // Dealocate atom electron aand spin densities
+    if (deallocate == true) // deallocate atom electron aand spin densities
         Clear();
         
     return(Hamiltonian);
@@ -1594,7 +1596,7 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations,
 // end of density functional theory section
 // VQE section
 template <typename T>
-T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate, vector<T>* values)
+T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values)
     {
     unsigned int i, j;
     unsigned int matrix_order;
@@ -1605,7 +1607,6 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
     T max_PBE_difference = 0;
     
     VQE = true;
-    allocation_memory = true;
     kappa = 0.804; // homogenic electron gass
     mi = (beta * this->Pi * this->Pi)/3.00;
     VQE_Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity, size_order, false, values);
@@ -1631,7 +1632,6 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
     VQE_Wavefunction_lenght_multipliers_1 = this->results.wavefunction_lenght_multipliers;
     VQE_Eigenvectors_1 = values[0];
     
-    allocation_memory = false;
     for (i = 0; i < matrix_order; i++)
         this->results.wavefunction_lenght_multipliers[i] = pre_PBE_wavefunction_lenght_multipliers[i];
     
@@ -1711,7 +1711,7 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
                 }
             VQE_iterations = VQE_iterations + 1;
             }
-        if (dealocate == true) // Dealocate atom electron aand spin densities
+        if (deallocate == true) // deallocate atom electron aand spin densities
             Clear();
         return VQE_Hamiltonian;
         }
@@ -1728,7 +1728,7 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
                 }
             values[0] = VQE_Eigenvectors_1;
             }
-        if (dealocate == true) // Dealocate atom electron aand spin densities
+        if (deallocate == true) // deallocate atom electron aand spin densities
             Clear();
         if (VQE_correlation_energy_sign[0] == false)
             return VQE_Hamiltonian;
@@ -1740,7 +1740,7 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
 // TPSS section
 template <typename T>
 T Slater_basis_set_calculations_DFT<T>::Execute_TPSS(unsigned int max_iterations, T minimal_fidelity,
-unsigned int size_order, bool dealocate, vector<T>* values)
+unsigned int size_order, bool deallocate, vector<T>* values)
     {
     unsigned int i, j;
     unsigned int matrix_order = this->results.n.size();
@@ -1767,11 +1767,13 @@ unsigned int size_order, bool dealocate, vector<T>* values)
         TPSS_error = true;
         return(-1);
         }
-    if (Allocate_gradients_2_densities(size_order) == -1)
-        {
-        TPSS_error = true;
-        return(PBE_VQE_Hamiltonian);
-        }
+        if (Allocate_gradients_2_densities(size_order) == -1)
+            {
+            TPSS_error = true;
+            return(PBE_VQE_Hamiltonian);
+            }
+        else
+            allocation_TPSS = false;
     last_Hamiltonian = PBE_VQE_Hamiltonian;
     
     for (i = 0; i < matrix_order * matrix_order; i++) // avoiding executing PBE and VQE for atomic systems
@@ -1801,7 +1803,7 @@ unsigned int size_order, bool dealocate, vector<T>* values)
             this->correction_matrix[j * (matrix_order + 1)] = correlation_energies[j] + exchange_energies[j]
             + correction_diagonal[j]; // PBE density functional not include polar part of bonds
         
-        TPSS_Hamiltonian = Execute_calculation(max_iterations, minimal_fidelity, size_order, dealocate, values);
+        TPSS_Hamiltonian = Execute_calculation(max_iterations, minimal_fidelity, size_order, deallocate, values);
         if (TPSS_Hamiltonian == -1)
             return(-1);
         if (i + 1 < TPSS_iterations)
@@ -1824,7 +1826,7 @@ unsigned int size_order, bool dealocate, vector<T>* values)
             atoms_gradients_densities, size_order);
             }
         }
-    if (dealocate == true)
+    if (deallocate == true)
         Clear();
     return(TPSS_Hamiltonian);
     }
@@ -2090,7 +2092,7 @@ int Slater_basis_set_calculations_DFT<T>::Gaussian_quadrature()
 
 // CI and basis sets creating section
 template <typename T>
-T Slater_basis_set_calculations_DFT<T>::Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate, vector<T>* values, unsigned int count_shells,
+T Slater_basis_set_calculations_DFT<T>::Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values, unsigned int count_shells,
 unsigned int level_correlation_energy, vector<T> correction_energies)
     {
     unsigned int i, j, k, t;
@@ -2468,6 +2470,196 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
             }
         }
     return(Groung_Hamiltoninan);
+    }
+template <typename T>
+string Slater_basis_set_calculations_DFT<T>::Create_input_from_coordinates(vector<string> species, vector<string> x, vector<string> y, vector<string> z)
+    {
+    unsigned int i, j;
+    unsigned int count_species;
+    unsigned int count_layers;
+    vector<unsigned int> counts_layers;
+    string input = "";
+    string ng_1 = "He_";
+    string ng_2 = "Ne_";
+    string ng_3 = "Ar_";
+    string ng_4 = "Kr_";
+    string ng_5 = "Xe_";
+    string ng_6 = "Rn_";
+    string specie;
+    size_t found;
+    
+    string x_string, y_string, z_string;
+    
+    vector<T> x_pos;
+    vector<T> y_pos;
+    vector<T> z_pos;
+    vector<T> multiplicity;
+    
+    vector<string> elements = {"H", "He",
+    "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
+    "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
+    "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe",
+    "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+    "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn",
+    "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr",
+    "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"};
+    
+    count_species = species.size();
+    counts_layers.reserve(count_species);
+    x_pos.reserve(count_species);
+    y_pos.reserve(count_species);
+    z_pos.reserve(count_species);
+    multiplicity.reserve(count_species);
+    // Check input vectors
+    if (count_species != x.size() or count_species != y.size() or count_species != z.size())
+        {
+        input = "wrong size of coordinate vector";
+        return(input);
+        }
+    // Generate string of atoms
+    for (i = 0; i < count_species; i++)
+        {
+        specie = species[i];
+        for (j = 0; j < 118; j++)
+            {
+            found = specie.find(elements[j]);
+            if (found != string::npos)
+                {
+                input.append(specie + "_");
+                count_layers = 1;
+                if (j > 2) {
+                    input.append(ng_1);
+                    count_layers++;
+                    }
+                if (j > 10) {
+                    input.append(ng_2);
+                    count_layers++;
+                    }
+                if (j > 18) {
+                    input.append(ng_3);
+                    count_layers++;
+                    }
+                if (j > 36) {
+                    input.append(ng_4);
+                    count_layers++;
+                    }
+                if (j > 54) {
+                    input.append(ng_5);
+                    count_layers++;
+                    }
+                if (j > 86) {
+                    input.append(ng_6);
+                    count_layers++;
+                    }
+                counts_layers.push_back(count_layers);
+                break;
+                }
+            }
+        }
+    // Append part of coordinates
+    for (i = 0; i < count_species; i++)
+        {
+        x_string = x[i];
+        y_string = y[i];
+        z_string = z[i];
+        count_layers = counts_layers[i];
+        for (j = 0; j < count_layers; j++)
+            {
+            if (i == 0 and j == 0)
+                continue;
+            
+            input.append("[");
+            input.append(x_string);
+            input.append("_");
+            input.append(y_string);
+            input.append("_");
+            input.append(z_string);
+            input.append("]");
+            }
+        }
+    return(input);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Set_spins_and_bonds(unsigned int size_order, vector<T>* values)
+    {
+    unsigned int i, j, k;
+    unsigned int matrix_order;
+    
+    unsigned int count_unpaired = 0;
+    vector<T> overlap_rows;
+    T overlap_row;
+    unsigned int highest_row;
+    
+    matrix_order = this->results.n.size();
+    // Set all electrons bonding
+    for (i = 0; i < matrix_order; i++)
+        {
+        count_unpaired++;
+        if (this->results.bonding[i] == -1)
+            {
+            count_unpaired++;
+            this->results.bonding[i] = i;
+            }
+        }
+    // Compute overlap integral matrix
+    if (allocation_memory == true)
+        Execute_calculation(1, 1, size_order, false, values);
+    
+    if (this->Create_overlap_integral_matrix(this->overlap_integral_matrix, matrix_order, &this->results) == -1)
+        return(-1);
+    // Set spinsaccording to overlap matrix to minimizing the overlaps
+    overlap_rows.resize(matrix_order);
+    for (i = 0; i < count_unpaired; i++)
+        {
+        for (j = 0; j < matrix_order; j++)
+            {
+            overlap_row = 0;
+            for (k = 0; k < matrix_order; k++)
+                {
+                overlap_row += this->overlap_integral_matrix[j * matrix_order + k];
+                }
+            overlap_row -= 1;
+            overlap_rows[j] = overlap_row;
+            }
+        highest_row = 0;
+        for (j = 0; j < matrix_order; j++)
+            if (overlap_rows[j] > overlap_rows[highest_row])
+                highest_row = j;
+        
+        if (overlap_rows[highest_row] > 1)
+            {
+            // Update spins
+            this->results.spins[highest_row] = - this->results.spins[highest_row];
+            // Update overlap matrix
+            for (j = 0; j < matrix_order; j++)
+                {
+                if (j =! highest_row)
+                    this->overlap_integral_matrix[j * matrix_order + highest_row] =
+                    -this->overlap_integral_matrix[j * matrix_order + highest_row];
+                }
+            for (j = 0; j < matrix_order; j++)
+                {
+                if (j =! highest_row)
+                    this->overlap_integral_matrix[j + highest_row * matrix_order] =
+                    -this->overlap_integral_matrix[j + highest_row * matrix_order];
+                }
+            }
+        }
+    return(0);
+    }
+template <typename T>
+vector<T> Slater_basis_set_calculations_DFT<T>::Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix)
+    {
+    vector<T> basis_energy_levels;
+    // Back computing the energies to basis
+    // Must be performed in the begin and end of CASSCF method and resulting strings must be subtracted
+    
+    // Transpose density matrix
+    
+    // Multiply the Hamiltonian by the density matrix
+    
+    // Diagonalize the resulting matrix
+    return(basis_energy_levels);
     }
 // end of CI and basis sets creating section
 
@@ -3211,6 +3403,8 @@ int Slater_basis_set_calculations_DFT<T>::Clear()
     symetry_planes_parameters.c.clear();
     symetry_planes_parameters.d.clear();
     // Density functional theory section
+    allocation_PBE = true;
+    
     for (i = 0; i < atoms_spin_densities.size(); i++)
         if (atoms_spin_densities[i] != nullptr)
             delete[] atoms_spin_densities[i];
@@ -3255,6 +3449,8 @@ int Slater_basis_set_calculations_DFT<T>::Clear()
     VQE_gates.clear();
     // end of VQE section
     // TPSS section
+    allocation_TPSS = true;
+    
     for (i = 0; i < electrons_gradients_2_densities.size(); i++)
             {
             previous_deleted = false; // avoid double delete
@@ -3290,7 +3486,7 @@ int Slater_basis_set_calculations_DFT<T>::Clear()
         delete[] orthonormalized_Hamiltonian_matrix;*/
     
     Gaussian_basis.clear();
-    /* vector<T*> molecular_orbitals; Backup of pointers to wavefunction alocated form a previous class instance */
+    /* vector<T*> molecular_orbitals; Backup of pointers to wavefunction Allocated form a previous class instance */
     // End of orthonormalizing and Gaussian export section
     // CI and basis sets creating section
     count_basis_per_atom = 0;

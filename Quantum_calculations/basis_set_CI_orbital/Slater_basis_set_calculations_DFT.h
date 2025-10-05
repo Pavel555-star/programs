@@ -61,6 +61,7 @@ public:
     bool planar = false;
     } symetry_planes_parameters;
     // Density functional theory section
+    bool allocation_PBE = true;
     vector <T*> atoms_electron_densities;
     vector <T*> atoms_spin_densities;
     vector <T*> atoms_Fi_densities;
@@ -117,6 +118,7 @@ public:
     QuantumCircuit circuit;
     // End of Qiskit circuit code,  End of VQE section
     // TPSS section
+    bool allocation_TPSS = true;
     vector<T*> electrons_gradients_2_densities; // Laplace densities of electrons
     vector<T*> atoms_sum_electrons_gradients_2_densities; // sums of Laplaces densities of electrons for atoms
     vector<T*> atoms_gradients_2_densities; // Laplace densities of clouds of electrons of atoms
@@ -150,7 +152,7 @@ protected:
     int Detect_dipole_moments(dipole_moment *dipole_moment);
     int Create_crystal_field(central_cations *central_cations);
     // Density functional theory PBE section
-    int Alocate_densities(unsigned int size_order);
+    int Allocate_densities(unsigned int size_order);
     int Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end,
     unsigned int size_order, vector<T> spins, vector<int> spin_paired,
     vector<unsigned int> x_range, vector<unsigned int> y_range, vector<unsigned int> z_range, bool spin_density);
@@ -186,18 +188,18 @@ protected:
 public:
     int String_to_advanced_parameters(string UI_input, unsigned int size_order,
     bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
-    T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+    T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
     vector<T>* values);
     // Density functional theory PBE section
-    T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+    T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
     vector<T>* values);
     // End of density functional theory PBE section
     // VQE section
-    T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+    T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
     vector<T>* values);
     // End of VQE section
     // Density functional theory TPSS section
-    T Execute_TPSS(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+    T Execute_TPSS(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
     vector<T>* values);
     // End of ensity functional theory TPSS section
     // orthonormalizing and Gaussian export section
@@ -208,8 +210,11 @@ public:
     int Gaussian_quadrature();
     // End of orthonormalizing and Gaussian export section
     // CI and basis sets creating section
-    T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+    T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
     vector<T>* values, unsigned int count_shells, unsigned int level_correlation_energy, vector<T> correction_energies = {});
+    string Create_input_from_coordinates(vector<string> species, vector<string> x, vector<string> y, vector<string> z);
+    int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
+    vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
     // end of CI and basis sets creating section
     int Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, vector<unsigned int> atom_numbers);
     int Detect_symetry_information(symetry_axes *symetry_axes, symetry_planes *symetry_planes);

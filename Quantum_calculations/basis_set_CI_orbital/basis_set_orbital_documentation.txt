@@ -57,10 +57,10 @@ unsigned int iterations = 0;
 Counter of iterations
 
 unsigned int determinant_exception_handle = 0;
-1, if there are exceptions with alocate memory in determinant calculations
+1, if there are exceptions with allocate memory in determinant calculations
 
 unsigned int overlap_integral_exception_handle = 0;
-1, if there are exceptions with alocate memory in overlap integral calculations
+1, if there are exceptions with allocate memory in overlap integral calculations
 
 T small_wavefunction_size_factor = 1.5;
 This is factor, from which is computed small lenght order according: sqrt(lenght_order) * small_wavefunction_size_factor.
@@ -326,11 +326,11 @@ int Wavefunction_lenghts_generate(T* lenghts, unsigned int lenght_order);
 This function generate lenghts to center for one-electron integration. Parameter lenghts is pointer to 
 D array of lenghts with side of (2 * lenght_order + 1) pixels. 
 
-T Wavefunction_1s_generate(T* wavefunction, T* lenghts, bool alocate, int Z, T multiplier,unsigned int lenght_order)
+T Wavefunction_1s_generate(T* wavefunction, T* lenghts, bool allocate, int Z, T multiplier,unsigned int lenght_order)
 
 This function generate Laguerr 1s orbital wavefunction into array wavefunction.
 Variable lenghts is auxiliary array of calculated lenghts for speed-up wavefunction generation,
-alocate is true only for first wavefunction generation with generation of lenghts, Z is count protons in atom nucleus,
+allocate is true only for first wavefunction generation with generation of lenghts, Z is count protons in atom nucleus,
 multiplier is multiplier for calculated distances for wavefunction generation and
 lenght_order is number of pixels between center and surface of wavefunction and lenghts cubes.
 (their size is (2*lenght_order+1)^3).
@@ -344,7 +344,7 @@ This function normalize the wavefunction.
 wavefunction_pointer is pointer to wavefunction cube array, normalisation_constant is normalisation_constant and
 size is size of wavefunction cube array.
 
-int Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts, bool alocate, unsigned int Z, T lenght_multiplier,  unsigned int* x_range, unsigned int* y_range,
+int Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts, bool allocate, unsigned int Z, T lenght_multiplier,  unsigned int* x_range, unsigned int* y_range,
 unsigned int* z_range)
     
 This function transcript main, second and magnetic quantum numbers  n, l and m to call functions for generating wavefunctions.
@@ -572,11 +572,11 @@ This function solve Hartree-Fock matrix in array post_basis_set_matrix according
 into vector values and set new values of wavefunction_lenght_multipliers in atom_wavefunctions. Arrays are of size order * order.
 
 int Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
-unsigned int size_order, bool alocate, bool compute_densities)
+unsigned int size_order, bool allocate, bool compute_densities)
 
 This function generate Lenghts, Wavefunctions and Probabilities cube arrays for atom_wavefunctions and small_atom_wavefunctions.
 Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays,
- alocate is true for initial calling and compute densities is true, when you want to recompute electron densities.
+ allocate is true for initial calling and compute densities is true, when you want to recompute electron densities.
 
 
 // section 6: completing Hartree-Fock method and user interface handling
@@ -596,13 +596,13 @@ Variable UI_input is input string, size_order is the lenght orders (number of pi
 wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
 If generate is true, then wavefunctions are generated.
 
-T Slater_basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate, vector<T>* values);
+T Slater_basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values);
 
 Function Calculate run basis set calculation.
 Max_iterations is maximal count of iteration the Hartree-Fock procedure and
 minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
-If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
 In vector values are computed Hartree-Fock energies.
 
 
@@ -621,12 +621,15 @@ Functions in section 6 calls functions in sections 2, 5 and 5.
 Functions in section 5 calls functions in sections 3 and 1.
 For all sections are used public variables and constants.
 
-class wavefunction_calculations:
+class Slater_basis_set_calculations_DFT:
 
 public variables:
 
 unsigned int count_atoms;
 In this variable is information about count atoms in results
+
+bool allocation_memory = true;
+This variable is true, if needed a basic allocatiom memory
 
 vector <unsigned int> electron_to_atom_numbers;
 This vector contait atom number for each electron
@@ -724,6 +727,10 @@ bool planar;
 If structure is planar - true, else false;
 } symetry_planes
 
+
+bool allocation_PBE = true;
+This variable is true, if needed a allocatiom memory for PBE density functional
+
 vector <T*> atoms_electron_densities;
 Pointers to electron densities cubes of atoms
 
@@ -814,6 +821,9 @@ QuantumCircuit circuit;
 This is MicroQiskit QuantumCircuit object
 
 // TPSS section
+bool allocation_TPSS = true;
+This variable is true, if needed a allocatiom memory for TPSS density functional
+
 vector<T*> electrons_gradients_2_densities; 
 Vector with Laplace densities of electrons
 
@@ -901,9 +911,9 @@ int Create_crystal_field(central_cations *central_cations);
 
 This function apply crystal structure parameters (in central_cation_atoms) to structure.
 
-int Alocate_densities(unsigned int size_order);
+int allocate_densities(unsigned int size_order);
 
-This function alocate memory for electron densities of atoms. Parameter size_order means number of pixels between center and edge of 
+This function allocate memory for electron densities of atoms. Parameter size_order means number of pixels between center and edge of 
 3D density cube.
 
 int Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end,
@@ -1011,34 +1021,34 @@ Variable UI_input is input string, size_order is the lenght orders (number of pi
 wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
 If generate is true, then wavefunctions are generated.
 
-T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
 vector<T>* values);
 
 Function Execute_calculation run basis set calculation.
 Max_iterations is maximal count of iteration the Hartree-Fock procedure and
 minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
-If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
 In vector values are computed Hartree-Fock energies.
 
-T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
 vector<T>* values);
 
 Function Execute_PBE run basis set calculation with PBE density functional.
 Max_iterations is maximal count of iteration the Hartree-Fock procedure and
 minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
-If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
 In vector values are computed Hartree-Fock energies.
 
-T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
 vector<T>* values);
 
 Function Execute_PBE_VQE run basis set calculation with PBE density functional and variational quantum eigensolver.
 Max_iterations is maximal count of iteration the Hartree-Fock procedure and
 minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
-If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
 In vector values are computed Hartree-Fock energies, in spin_density_vector the spin density matrix and
 in spin_values are spin energy levels.
 
@@ -1047,14 +1057,14 @@ wavefunctions and probabilities cubes). Extern coordinates is true whin is there
 If generate is true, then wavefunctions are generated.
 
 // Density functional theory TPSS section
-T Execute_TPSS(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T Execute_TPSS(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
 vector<T>* values);
 
 Function Execute_TPSS run basis set calculation with TPSS density functional and variational quantum eigensolver.
 Max_iterations is maximal count of iteration the Hartree-Fock procedure and
 minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
-If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
 In vector values are computed Hartree-Fock energies.
 // End of ensity functional theory TPSS section
 
@@ -1078,13 +1088,30 @@ Export a Slater basis to gaussian basis
 // End of orthonormalizing and Gaussian export section
 
 // CI and basis sets creating section
-T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool dealocate,
+T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
 vector<T>* values, unsigned int number_noble_gas_configuration, unsigned int level_correlation_energy);
 Function Execute_Basis_set_creation run basis set calculation with TPSS density functional and variational quantum
 eigensolver. Max_iterations is maximal count of iteration the Hartree-Fock procedure and
 minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
-Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated. In vector values are computed Hartree-Fock energies.
-Maximal 
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated. In vector values are computed Hartree-Fock energies.
+Maximal
+
+string Create_input_from_coordinates(vector<string> species, vector<T> x, vector<T> y, vector<T> z);
+int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
+vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
+
+This function is for creating a input string from vectors of atom species and coorfinates.
+Input string is next used from string to advanced parameters function. This function was not tested.
+
+int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
+
+This function is for setting all electrons to computing resonance integral matrix and finding optimum base
+spin configuration according to overlap matrix.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). In vector values are computed Hartree-Fock energies.
+This function is untested.
+
+vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
+This is empty function for future recomputing Hamiltonian and density matrix to vector of energy levels of basis functions.
 
 
  // end of CI and basis sets creating section
@@ -1097,7 +1124,7 @@ Function Calculate run Hartree-Fock calculation.
 Max_iterations is maximal count of iteration the Hartree-Fock procedure and minimal_fidelity is minimal fidelity to break basis set
 procedure iterations. Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and
 probabilities cubes).
-If dealocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation dealocated.
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
 In vector values are computed Hartree-Fock energies, in spin_density_vector the spin density matrix and
 in spin_values are spin energy levels. Vector atom_numbers convert columns number of Huckel matrix to atom number.
 

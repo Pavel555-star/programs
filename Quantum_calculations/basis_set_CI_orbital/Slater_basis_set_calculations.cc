@@ -9747,8 +9747,8 @@ int Slater_basis_set_calculations<T>::Create_overlap_integral_matrix(T* matrix, 
         for (j = 0; j < i; j++)
             matrix[(j * order) + i] = matrix[(i * order) + j];
             
-    for (i = 0; i < order; i++) // copying 0 to diagonal
-        matrix[i * (order + 1)] = 0;
+    for (i = 0; i < order; i++) // copying 1 to diagonal
+        matrix[i * (order + 1)] = 1;
 
     return(0);
     }
@@ -10333,7 +10333,7 @@ vector<T>* values, atom_wavefunctions *atom_wavefunctions)
     }
 template <typename T>
 int Slater_basis_set_calculations<T>::Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions,
-small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, bool alocate, bool compute_densities)
+small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, bool allocate, bool compute_densities)
     { // create or modify atom_wavefunctions list of wavefunctions, probabilities and effective lenghts according to lenght multipliers
     unsigned int i, j, k;
     unsigned int count_orbitals;
@@ -10443,7 +10443,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         if (n_i[i] > 1)
             non_s1_system = true;
         }
-    if (alocate == true) // generating lists of lenghts for wavefunctions, wavefunctions, probabilities and lenghts multipliers
+    if (allocate == true) // generating lists of lenghts for wavefunctions, wavefunctions, probabilities and lenghts multipliers
         {
         for (i = 0; i < count_electrons; i++)
             {
@@ -10516,7 +10516,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 }
             }
         catch (int)
-            { // If allocation fail then dealocate alocated memory and return -1;
+            { // If allocation fail then deallocate allocated memory and return -1;
             for (i = 0; i < count_electrons; i++)
                 {
                 if (pointers_to_wavefunctions[i] != nullptr)
@@ -10655,7 +10655,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 }
             }
         }
-    if (alocate == true)
+    if (allocate == true)
         {
         #pragma omp parallel
             {
@@ -10694,7 +10694,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
                 }
             }
     // end of closed-shell basis set method optimalization code
-    if (alocate == true)
+    if (allocate == true)
         {
         for (i = 0; i < count_electrons; i++) // copy values to vectors for restricted and unrestricted method
             {
@@ -11195,7 +11195,7 @@ bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2)
     return(0);
     }
 template <typename T>
-T Slater_basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool alocate, vector<T>* values)
+T Slater_basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool allocate, vector<T>* values)
     {
     unsigned int i, j;
     unsigned int matrix_order;
@@ -11206,7 +11206,7 @@ T Slater_basis_set_calculations<T>::Calculate(unsigned int max_iterations, T min
     memset(basis_set_matrix, 0, matrix_order * matrix_order);
     memset(corr_basis_set_matrix, 0, matrix_order * matrix_order);
     memset(spin_density_matrix, 0, matrix_order * matrix_order);
-    if (alocate == true)
+    if (allocate == true)
         if (Generate_atomic_wavefunctions(&results, &small_results, size_order, true, true) == -1)
             return(-1);  
         else
