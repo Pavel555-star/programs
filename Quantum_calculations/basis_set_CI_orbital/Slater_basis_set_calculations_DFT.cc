@@ -1519,7 +1519,9 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations,
         correction_diagonal.push_back(this->correction_matrix[i * (matrix_order + 1)]);
     
     Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory, values);
-    if (Hamiltonian == -1)
+    if (Hamiltonian != -1)
+        allocation_memory = false;
+    else
         return(-1);
         
     for (i = 0; i < matrix_order; i++)
