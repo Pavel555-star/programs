@@ -1482,10 +1482,10 @@ T Slater_basis_set_calculations_DFT<T>::Execute_calculation(unsigned int max_ite
        return(-1);
     if (central_cation_atoms.atom_numbers.size() > 0)
         Create_crystal_field(&central_cation_atoms);
-       
-    Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory,
-    values);
-    allocation_memory = false;
+    
+    Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory, values);
+    if (Hamiltonian != -1)
+        allocation_memory = false;
     if (deallocate == true) // deallocate atom electron and spin densities
         Clear();
     return(Hamiltonian);
@@ -1518,16 +1518,12 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations,
     for (i = 0; i < matrix_order; i++)
         correction_diagonal.push_back(this->correction_matrix[i * (matrix_order + 1)]);
     
-    if (allocation_memory == true)
-        {
-        Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory, values);
-        if (Hamiltonian == -1)
-            return(-1);
+    Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory, values);
+    if (Hamiltonian == -1)
+        return(-1);
         
-        
-        for (i = 0; i < matrix_order; i++)
-            pre_PBE_wavefunction_lenght_multipliers.push_back(this->results.wavefunction_lenght_multipliers[i]);
-        }
+    for (i = 0; i < matrix_order; i++)
+        pre_PBE_wavefunction_lenght_multipliers.push_back(this->results.wavefunction_lenght_multipliers[i]);
     // Execute calculations
     for (i = 0; i < matrix_order * matrix_order; i++) // avoiding executing PBE for atomic systems
         {
@@ -1639,6 +1635,8 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
     mi = 0.235;
     VQE_previous_Hamiltonian = VQE_Hamiltonian;
     VQE_Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity, size_order, false, values);
+    if (VQE_Hamiltonian == -1)
+        return(-1);
     
     for (i = 0; i < matrix_order; i++) // Filling second wavefunction_lenghts_multipliers and eigenvectors vectors
         {
@@ -1692,6 +1690,8 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE_VQE(unsigned int max_iterati
             
             VQE_previous_Hamiltonian = VQE_Hamiltonian;
             VQE_Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity, size_order, false, values);
+            if (VQE_Hamiltonian == -1)
+                return(-1);
             if ((abs(VQE_Hamiltonian/VQE_previous_Hamiltonian) < (2 - minimal_fidelity)) and
                 (abs(VQE_Hamiltonian/VQE_previous_Hamiltonian) > minimal_fidelity) and (VQE_Hamiltonian/VQE_previous_Hamiltonian > 0))
                 break;
@@ -1767,6 +1767,7 @@ unsigned int size_order, bool deallocate, vector<T>* values)
         TPSS_error = true;
         return(-1);
         }
+    if (allocation_TPSS == true)
         if (Allocate_gradients_2_densities(size_order) == -1)
             {
             TPSS_error = true;
