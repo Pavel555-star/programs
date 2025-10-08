@@ -2493,11 +2493,6 @@ string Slater_basis_set_calculations_DFT<T>::Create_input_from_coordinates(vecto
     
     string x_string, y_string, z_string;
     
-    vector<T> x_pos;
-    vector<T> y_pos;
-    vector<T> z_pos;
-    vector<T> multiplicity;
-    
     vector<string> elements = {"H", "He",
     "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
     "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
@@ -2509,10 +2504,6 @@ string Slater_basis_set_calculations_DFT<T>::Create_input_from_coordinates(vecto
     
     count_species = species.size();
     counts_layers.reserve(count_species);
-    x_pos.reserve(count_species);
-    y_pos.reserve(count_species);
-    z_pos.reserve(count_species);
-    multiplicity.reserve(count_species);
     // Check input vectors
     if (count_species != x.size() or count_species != y.size() or count_species != z.size())
         {
