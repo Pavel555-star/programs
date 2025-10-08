@@ -1108,7 +1108,6 @@ int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
 This function is for setting all electrons to computing resonance integral matrix and finding optimum base
 spin configuration according to overlap matrix.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). In vector values are computed Hartree-Fock energies.
-This function is untested.
 
 vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
 This is empty function for future recomputing Hamiltonian and density matrix to vector of energy levels of basis functions.

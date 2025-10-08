@@ -2601,7 +2601,7 @@ int Slater_basis_set_calculations_DFT<T>::Set_spins_and_bonds(unsigned int size_
     
     if (this->Create_overlap_integral_matrix(this->overlap_integral_matrix, matrix_order, &this->results) == -1)
         return(-1);
-    // Set spinsaccording to overlap matrix to minimizing the overlaps
+    // Set spins with regards to overlap matrix to minimizing the overlaps
     overlap_rows.resize(matrix_order);
     for (i = 0; i < count_unpaired; i++)
         {
