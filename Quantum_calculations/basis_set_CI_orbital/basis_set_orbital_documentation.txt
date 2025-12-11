@@ -891,6 +891,28 @@ This variable is used for marking the exponents of ground and excited Slater-bas
 vector<T> correlation_energies_extended;
 This variable is used for marking the correlation energies of basis wavefuncions.
 
+
+T fine_structure_constant_correction;
+A correction factor for fine structure constant, defaul value is 1.
+
+T fine_structure_constant;
+A fine structure constant
+
+T Lamb_shift_factor;
+Varialbe, which facilitate compution of a Lamb shifts.
+    
+vector<T> nuclear_spins;
+Vector with nuclear spins.
+
+vector<T> nuclear_spin_orbit_couplings;
+Vector with computed sums of nuclear spin-orbit couplings for each electron.
+
+vector<T> lamb_shifts;
+Vector with computed Lamb-shifts for each electron and his nucleus.
+
+T nuclear_spin_spin_interaction;
+The computed sum value of spin-spin interactions between nucluses
+
 // End of CI and basis sets creating section
 
 private functions:
@@ -1076,25 +1098,9 @@ int Compute_Hamiltonian();
 Compute Hamiltonian in Calculate_corr_basis_set_matrix for orthonormalizing
 
 /*
-int Create_orthonormalization_matrix();
-Create a orthonormalization_matrix
-
-int Orthonormalize_Hamiltonian();
-Orthonormalize the Hailtonian
-
-int Gaussian_quadrature();
-Export a Slater basis to gaussian basis
-
-// End of orthonormalizing and Gaussian export section
 
 // CI and basis sets creating section
-T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
-vector<T>* values, unsigned int number_noble_gas_configuration, unsigned int level_correlation_energy);
-Function Execute_Basis_set_creation run basis set calculation with TPSS density functional and variational quantum
-eigensolver. Max_iterations is maximal count of iteration the Hartree-Fock procedure and
-minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
-Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated. In vector values are computed Hartree-Fock energies.
-Maximal
+
 
 string Create_input_from_coordinates(vector<string> species, vector<T> x, vector<T> y, vector<T> z);
 int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
@@ -1108,6 +1114,30 @@ int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
 This function is for setting all electrons to computing resonance integral matrix and finding optimum base
 spin configuration according to overlap matrix.
 Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). In vector values are computed Hartree-Fock energies.
+This function is untested.
+
+int Set_default_nuclear_spins;
+This function set most common nuclear spins for nucleuses based on its Z to nuclear_spins vector.
+For unknown elements are set 0 values.
+
+int Set_custom_nuclear_spins(vector<T> spins);
+This function set custom nuclear spins for nucleuses to nuclear_spins vector. 
+
+int Compute_nuclear_spin_orbit_couplings();
+This function compute spin orbit coupling sums over each nucleus and each electrons and store it into
+nuclear_spin_orbit_couplings vector.
+
+int Compute_Lamb_shifts();
+This function compute Lamb shift for each electrons and its nucleus and store it into
+Lamb_shifts vector.
+
+T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+vector<T>* values, unsigned int number_noble_gas_configuration, unsigned int level_correlation_energy);
+Function Execute_Basis_set_creation run basis set calculation with TPSS density functional and variational quantum
+eigensolver. Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated. In vector values are computed Hartree-Fock energies.
+Maximal
 
 vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
 This is empty function for future recomputing Hamiltonian and density matrix to vector of energy levels of basis functions.

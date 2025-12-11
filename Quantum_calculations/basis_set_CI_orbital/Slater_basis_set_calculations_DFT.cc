@@ -1517,6 +1517,8 @@ T Slater_basis_set_calculations_DFT<T>::Execute_PBE(unsigned int max_iterations,
     
     for (i = 0; i < matrix_order; i++)
         correction_diagonal.push_back(this->correction_matrix[i * (matrix_order + 1)]);
+        
+    Set_spins_and_bonds(size_order, values);
     
     Hamiltonian = this->Calculate(max_iterations, minimal_fidelity, size_order, allocation_memory, values);
     if (Hamiltonian != -1)
@@ -1901,6 +1903,7 @@ int Slater_basis_set_calculations_DFT<T>::Compute_Hamiltonian()
     return(0);
     }
 /*template <typename T>
+// uncomment "#include "Eigen" // compiler parameter: -I eigenLibrary/Eigen" line in Slater_basis_set_calculations_DFT.h
 int Slater_basis_set_calculations_DFT<T>::Create_orthonormalization_matrix()
     {
     unsigned int matrix_order = this->results.n.size();
@@ -2095,6 +2098,270 @@ int Slater_basis_set_calculations_DFT<T>::Gaussian_quadrature()
 
 // CI and basis sets creating section
 template <typename T>
+string Slater_basis_set_calculations_DFT<T>::Create_input_from_coordinates(vector<string> species, vector<string> x, vector<string> y, vector<string> z)
+    {
+    unsigned int i, j;
+    unsigned int count_species;
+    unsigned int count_layers;
+    vector<unsigned int> counts_layers;
+    string input = "";
+    string ng_1 = "He_";
+    string ng_2 = "Ne_";
+    string ng_3 = "Ar_";
+    string ng_4 = "Kr_";
+    string ng_5 = "Xe_";
+    string ng_6 = "Rn_";
+    string specie;
+    size_t found;
+    
+    string x_string, y_string, z_string;
+    
+    vector<T> x_pos;
+    vector<T> y_pos;
+    vector<T> z_pos;
+    vector<T> multiplicity;
+    
+    vector<string> elements = {"H", "He",
+    "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
+    "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
+    "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe",
+    "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+    "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn",
+    "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr",
+    "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"};
+    
+    count_species = species.size();
+    counts_layers.reserve(count_species);
+    x_pos.reserve(count_species);
+    y_pos.reserve(count_species);
+    z_pos.reserve(count_species);
+    multiplicity.reserve(count_species);
+    // Check input vectors
+    if (count_species != x.size() or count_species != y.size() or count_species != z.size())
+        {
+        input = "wrong size of coordinate vector";
+        return(input);
+        }
+    // Generate string of atoms
+    for (i = 0; i < count_species; i++)
+        {
+        specie = species[i];
+        for (j = 0; j < 118; j++)
+            {
+            found = specie.find(elements[j]);
+            if (found != string::npos)
+                {
+                input.append(specie + "_");
+                count_layers = 1;
+                if (j > 2) {
+                    input.append(ng_1);
+                    count_layers++;
+                    }
+                if (j > 10) {
+                    input.append(ng_2);
+                    count_layers++;
+                    }
+                if (j > 18) {
+                    input.append(ng_3);
+                    count_layers++;
+                    }
+                if (j > 36) {
+                    input.append(ng_4);
+                    count_layers++;
+                    }
+                if (j > 54) {
+                    input.append(ng_5);
+                    count_layers++;
+                    }
+                if (j > 86) {
+                    input.append(ng_6);
+                    count_layers++;
+                    }
+                counts_layers.push_back(count_layers);
+                break;
+                }
+            }
+        }
+    // Append part of coordinates
+    for (i = 0; i < count_species; i++)
+        {
+        x_string = x[i];
+        y_string = y[i];
+        z_string = z[i];
+        count_layers = counts_layers[i];
+        for (j = 0; j < count_layers; j++)
+            {
+            if (i == 0 and j == 0)
+                continue;
+            
+            input.append("[");
+            input.append(x_string);
+            input.append("_");
+            input.append(y_string);
+            input.append("_");
+            input.append(z_string);
+            input.append("]");
+            }
+        }
+    return(input);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Set_spins_and_bonds(unsigned int size_order, vector<T>* values)
+    {
+    unsigned int i, j, k;
+    unsigned int matrix_order;
+    
+    unsigned int count_unpaired = 0;
+    vector<T> overlap_rows;
+    T overlap_row;
+    unsigned int highest_row;
+    
+    matrix_order = this->results.n.size();
+    // Set all electrons bonding
+    for (i = 0; i < matrix_order; i++)
+        {
+        count_unpaired++;
+        if (this->results.bonding[i] == -1)
+            {
+            count_unpaired++;
+            this->results.bonding[i] = i;
+            }
+        }
+    // Compute overlap integral matrix
+    if (allocation_memory == true)
+        Execute_calculation(1, 1, size_order, false, values);
+    
+    if (this->Create_overlap_integral_matrix(this->overlap_integral_matrix, matrix_order, &this->results) == -1)
+        return(-1);
+    // Set spins according to overlap matrix to minimizing the overlaps
+    overlap_rows.resize(matrix_order);
+    for (i = 0; i < count_unpaired; i++)
+        {
+        for (j = 0; j < matrix_order; j++)
+            {
+            overlap_row = 0;
+            for (k = 0; k < matrix_order; k++)
+                {
+                overlap_row += this->overlap_integral_matrix[j * matrix_order + k];
+                }
+            overlap_row -= 1;
+            overlap_rows[j] = overlap_row;
+            }
+        highest_row = 0;
+        for (j = 0; j < matrix_order; j++)
+            if (overlap_rows[j] > overlap_rows[highest_row])
+                highest_row = j;
+        
+        if (overlap_rows[highest_row] > 1)
+            {
+            // Update spins
+            this->results.spins[highest_row] = - this->results.spins[highest_row];
+            // Update overlap matrix
+            for (j = 0; j < matrix_order; j++)
+                {
+                if (j =! highest_row)
+                    this->overlap_integral_matrix[j * matrix_order + highest_row] =
+                    -this->overlap_integral_matrix[j * matrix_order + highest_row];
+                }
+            for (j = 0; j < matrix_order; j++)
+                {
+                if (j =! highest_row)
+                    this->overlap_integral_matrix[j + highest_row * matrix_order] =
+                    -this->overlap_integral_matrix[j + highest_row * matrix_order];
+                }
+            }
+        }
+    return(0);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Set_default_nuclear_spins()
+    {
+    unsigned int i;
+    vector<T> default_nuclear_spins_ranges = {0.5, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.5, 0.0,
+    1.5, 0.0, 2.5, 0.0, 0.5, 0.0, 1.5, 0.0,
+    1.5, 0.0, 3.5, 0.0, 3.5, 0.0, 2.5, 0.0, 3.5, 0.0, 1.5, 0.0, 1.5, 0.0, 1.5, 0.0, 1.5, 0.0,
+    1.5, 0.0, 0.5, 0.0, 4.5, 0.0, 4.5, 0.0, 0.5, 0.0, 0.5, 0.0, 4.5, 0.0, 2.5, 0.0, 2.5, 0.0,
+    3.5, 0.0, 3.5, 0.0, 2.5, 0.0, 3.5, 0.0, 2.5, 0.0, 1.5, 0.0, 3.5, 0.0, 0.5, 0.0, 3.5,
+    0.0, 3.5, 0.0, 2.5, 0.0, 1.5, 0.0, 1.5, 0.5, 0.5, 0.5, 4.5, 0.5, 5.0, 0.5,
+    0.5, 1.5, 1.5, 2.5, 1.5, 3.5, 2.5, 0.5, 2.5, 4.5, 1.5, 0.5, 5.0, 4.5, 8.0, 4.5, 0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    
+    // check initializing of model
+    if (count_atoms == 0 or index_atoms.size() == 0)
+        return(-1);
+    
+    nuclear_spins.clear();
+    for (i = 0; i < count_atoms; i++)
+        {
+        nuclear_spins.push_back(default_nuclear_spins_ranges[this->results.Z[index_atoms[i]] -1]);
+        }
+    return(0);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Set_custom_nuclear_spins(vector<T> spins)
+    {
+    unsigned int i;
+    
+    // check initializing of model
+    if (count_atoms == 0 or index_atoms.size() == 0 or spins.size() != index_atoms.size())
+        return(-1);
+    
+    for (i = 0; i < spins.size(); i++)
+        nuclear_spins[i] = spins[i];
+    
+    return(0);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Compute_nuclear_spin_orbit_couplings()
+    {
+    unsigned int i;
+    unsigned int count_electrons = this->results.n.size();
+    
+    T effective_lenght;
+    T potential_energy;
+    T B;
+    T spin_orbit_energy;
+    // resize vector if necessary
+    if (nuclear_spin_orbit_couplings.size() != count_electrons)
+        nuclear_spin_orbit_couplings.resize(count_electrons);
+    // fill vector with spin-orbit couplings
+    for (i = 0; i < count_electrons; i++)
+        if (this->results.wavefunction_constraints[i] != 1)
+            {
+            effective_lenght = this->results.effective_radius_base[i]/this->results.wavefunction_lenght_multipliers[i];
+            potential_energy = this->kinetic_integral_matrix[i * (count_electrons + 1)];
+            B = this->Orbital_magnetic_field(potential_energy, effective_lenght, this->results.l[i]);
+            spin_orbit_energy = this->Spin_moment_energy(nuclear_spins[electron_to_atom_numbers[i]], B);
+            nuclear_spin_orbit_couplings[i] = spin_orbit_energy;
+            }
+    
+    return(0);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Compute_Lamb_shifts()
+    {
+    unsigned int i;
+    unsigned int count_electrons = this->results.n.size();
+    
+    T effective_lenght;
+    T Z;
+    T Lamb_shift;
+    // resize vector if necessary
+    if (Lamb_shifts.size() != count_electrons)
+        Lamb_shifts.resize(count_electrons);
+    // fill vector with Lamb shifts
+    for (i = 0; i < count_electrons; i++)
+        if (this->results.wavefunction_constraints[i] != 1)
+            {
+            effective_lenght = this->results.effective_radius_base[i]/this->results.wavefunction_lenght_multipliers[i];
+            Z = this->results.Z[i];
+            Lamb_shift = Lamb_shift_factor * this->me * Z * ((Z * this->mp)/(Z * this->mp + this->me))
+            * (1/effective_lenght);
+            Lamb_shifts[i] = Lamb_shift;
+            }
+    return(0);
+    }
+template <typename T>
 T Slater_basis_set_calculations_DFT<T>::Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values, unsigned int count_shells,
 unsigned int level_correlation_energy, vector<T> correction_energies)
     {
@@ -2189,6 +2456,18 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
     Gaussian_basis_extended.resize(count_basis_overall);
     correlation_energies_extended.resize(count_basis_overall);
     
+    // The first iteration
+    Hamiltonian = Execute_calculation(1, minimal_fidelity, size_order, false, values);
+    // set nuclear spins
+    if (nuclear_spins.size() != index_atoms.size())
+        Set_default_nuclear_spins();
+    
+    // Compute Lamb shift and nuclear spin-orbit coupling
+    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+        for (i = 0; i < count_electrons; i++)
+            {
+            this->correction_matrix[i * (count_electrons + 1)] += (Lamb_shifts[i] + nuclear_spin_orbit_couplings[i]);
+            }
     // Run computation of the ground state
     switch (level_correlation_energy)
         {
@@ -2233,6 +2512,9 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                     this->correction_matrix[(index_atoms[i] + j) * (count_electrons + 1)]
                     = correction_energies[(i * count_basis_per_atom) + j];
                     }
+            // Add lamb shifts
+            for (i = 0; i < count_electrons; i++)
+                this->correction_matrix[i * (count_electrons + 1)] += Lamb_shifts[i];
             // copy vector
             for (i = 0; i < count_atoms * count_basis_per_atom; i++)
                 correlation_energies_extended.push_back(correction_energies[i]);
@@ -2347,6 +2629,13 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                 case 0:
                                     { // semiempirical correlation energy
                                     this->Helium_correlation_energy = true;
+                                    // subtract previous nuclear spin-orbit coupling and Lamb shift
+                                    this->correction_matrix[excited_position * (count_electrons + 1)] -=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                    // Compute and add nuclear spin-orbit coupling and Lamb shift
+                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                        this->correction_matrix[excited_position * (count_electrons + 1)] +=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
                                     Hamiltonian = Execute_calculation(max_iterations, minimal_fidelity,
                                     size_order, false, values);
                                     if (Hamiltonian == -1)
@@ -2362,6 +2651,11 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
 
                                     this->correction_matrix[excited_position * (count_electrons + 1)] =
                                     correlation_energies[excited_position] + exchange_energies[excited_position];
+                                    
+                                    // Compute and add nuclear spin-orbit coupling and Lamb shift
+                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                        this->correction_matrix[excited_position * (count_electrons + 1)] +=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
                                     // Execute HF calculations
                                     Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity,
                                     size_order, false, values);
@@ -2378,6 +2672,10 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
 
                                     this->correction_matrix[excited_position * (count_electrons + 1)] =
                                     correlation_energies[excited_position] + exchange_energies[excited_position];
+                                    
+                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                        this->correction_matrix[excited_position * (count_electrons + 1)] +=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
                                     // Execute HF calculations
                                     Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity,
                                     size_order, false, values);
@@ -2398,8 +2696,12 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                         
                                     this->correction_matrix[excited_position * (count_electrons + 1)] =
                                     correlation_energies[excited_position] + exchange_energies[excited_position];
+                                    
+                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                        this->correction_matrix[excited_position * (count_electrons + 1)] +=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
                                     // Execute HF calculations
-                                    Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity,
+                                    Hamiltonian = Execute_TPSS(max_iterations, minimal_fidelity,
                                     size_order, false, values);
                                     if (Hamiltonian == -1)
                                         return(-1);
@@ -2413,7 +2715,13 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
             
                                     this->correction_matrix[(index_atoms[i] + excited_position) *
                                     (count_electrons + 1)] = correction_energies[atom_end];
-                                                
+                                    
+                                    // subtract previous nuclear spin-orbit coupling and Lamb shift
+                                    this->correction_matrix[excited_position * (count_electrons + 1)] -=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                        this->correction_matrix[excited_position * (count_electrons + 1)] +=
+                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
                                     // Compute basis
                                     Hamiltonian = Execute_calculation(max_iterations, minimal_fidelity, size_order,
                                     false, values);
@@ -2474,187 +2782,42 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
         }
     return(Groung_Hamiltoninan);
     }
-template <typename T>
-string Slater_basis_set_calculations_DFT<T>::Create_input_from_coordinates(vector<string> species, vector<string> x, vector<string> y, vector<string> z)
-    {
-    unsigned int i, j;
-    unsigned int count_species;
-    unsigned int count_layers;
-    vector<unsigned int> counts_layers;
-    string input = "";
-    string ng_1 = "He_";
-    string ng_2 = "Ne_";
-    string ng_3 = "Ar_";
-    string ng_4 = "Kr_";
-    string ng_5 = "Xe_";
-    string ng_6 = "Rn_";
-    string specie;
-    size_t found;
-    
-    string x_string, y_string, z_string;
-    
-    vector<string> elements = {"H", "He",
-    "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar",
-    "K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr",
-    "Rb", "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe",
-    "Cs", "Ba", "La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
-    "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn",
-    "Fr", "Ra", "Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr",
-    "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"};
-    
-    count_species = species.size();
-    counts_layers.reserve(count_species);
-    // Check input vectors
-    if (count_species != x.size() or count_species != y.size() or count_species != z.size())
-        {
-        input = "wrong size of coordinate vector";
-        return(input);
-        }
-    // Generate string of atoms
-    for (i = 0; i < count_species; i++)
-        {
-        specie = species[i];
-        for (j = 0; j < 118; j++)
-            {
-            found = specie.find(elements[j]);
-            if (found != string::npos)
-                {
-                input.append(specie + "_");
-                count_layers = 1;
-                if (j > 2) {
-                    input.append(ng_1);
-                    count_layers++;
-                    }
-                if (j > 10) {
-                    input.append(ng_2);
-                    count_layers++;
-                    }
-                if (j > 18) {
-                    input.append(ng_3);
-                    count_layers++;
-                    }
-                if (j > 36) {
-                    input.append(ng_4);
-                    count_layers++;
-                    }
-                if (j > 54) {
-                    input.append(ng_5);
-                    count_layers++;
-                    }
-                if (j > 86) {
-                    input.append(ng_6);
-                    count_layers++;
-                    }
-                counts_layers.push_back(count_layers);
-                break;
-                }
-            }
-        }
-    // Append part of coordinates
-    for (i = 0; i < count_species; i++)
-        {
-        x_string = x[i];
-        y_string = y[i];
-        z_string = z[i];
-        count_layers = counts_layers[i];
-        for (j = 0; j < count_layers; j++)
-            {
-            if (i == 0 and j == 0)
-                continue;
-            
-            input.append("[");
-            input.append(x_string);
-            input.append("_");
-            input.append(y_string);
-            input.append("_");
-            input.append(z_string);
-            input.append("]");
-            }
-        }
-    return(input);
-    }
-template <typename T>
-int Slater_basis_set_calculations_DFT<T>::Set_spins_and_bonds(unsigned int size_order, vector<T>* values)
-    {
-    unsigned int i, j, k;
-    unsigned int matrix_order;
-    
-    unsigned int count_unpaired = 0;
-    vector<T> overlap_rows;
-    T overlap_row;
-    unsigned int highest_row;
-    
-    matrix_order = this->results.n.size();
-    // Set all electrons bonding
-    for (i = 0; i < matrix_order; i++)
-        {
-        count_unpaired++;
-        if (this->results.bonding[i] == -1)
-            {
-            count_unpaired++;
-            this->results.bonding[i] = i;
-            }
-        }
-    // Compute overlap integral matrix
-    if (allocation_memory == true)
-        Execute_calculation(1, 1, size_order, false, values);
-    
-    if (this->Create_overlap_integral_matrix(this->overlap_integral_matrix, matrix_order, &this->results) == -1)
-        return(-1);
-    // Set spins with regards to overlap matrix to minimizing the overlaps
-    overlap_rows.resize(matrix_order);
-    for (i = 0; i < count_unpaired; i++)
-        {
-        for (j = 0; j < matrix_order; j++)
-            {
-            overlap_row = 0;
-            for (k = 0; k < matrix_order; k++)
-                {
-                overlap_row += this->overlap_integral_matrix[j * matrix_order + k];
-                }
-            overlap_row -= 1;
-            overlap_rows[j] = overlap_row;
-            }
-        highest_row = 0;
-        for (j = 0; j < matrix_order; j++)
-            if (overlap_rows[j] > overlap_rows[highest_row])
-                highest_row = j;
-        
-        if (overlap_rows[highest_row] > 1)
-            {
-            // Update spins
-            this->results.spins[highest_row] = - this->results.spins[highest_row];
-            // Update overlap matrix
-            for (j = 0; j < matrix_order; j++)
-                {
-                if (j =! highest_row)
-                    this->overlap_integral_matrix[j * matrix_order + highest_row] =
-                    -this->overlap_integral_matrix[j * matrix_order + highest_row];
-                }
-            for (j = 0; j < matrix_order; j++)
-                {
-                if (j =! highest_row)
-                    this->overlap_integral_matrix[j + highest_row * matrix_order] =
-                    -this->overlap_integral_matrix[j + highest_row * matrix_order];
-                }
-            }
-        }
-    return(0);
-    }
+/*
 template <typename T>
 vector<T> Slater_basis_set_calculations_DFT<T>::Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix)
     {
+    unsigned int i;
+    // decomment line "//#include "Eigen" // compiler parameter: -I eigenLibrary/Eigen" in Slater_basis_set_calculations.h
+    // Eigen code
     vector<T> basis_energy_levels;
+    Eigen::Map<Eigen::MatrixXd> density_matrix_Eigen(density_matrix, density_matrix_order, density_matrix_order);
+    Eigen::Map<Eigen::MatrixXd> Hamiltonian_matrix_Eigen(Hamiltonian_matrix, density_matrix_order, density_matrix_order);
+    Eigen::MatrixXd auxilliar_matrix_Eigen;
+    
     // Back computing the energies to basis
     // Must be performed in the begin and end of CASSCF method and resulting strings must be subtracted
     
     // Transpose density matrix
-    
+    auxilliar_matrix_Eigen = density_matrix_Eigen.transpose();
     // Multiply the Hamiltonian by the density matrix
-    
+    auxilliar_matrix_Eigen = auxilliar_matrix_Eigen * density_matrix_Eigen;
     // Diagonalize the resulting matrix
-    return(basis_energy_levels);
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(auxilliar_matrix_Eigen);
+    solver.compute(auxilliar_matrix_Eigen);
+    if (solver.info() != Eigen::Success)
+        {
+        cerr << "Eigen decomposition failed\n";
+        return {-1};
+        }
+    auto eigenvalues = solver.eigenvalues();     // complex eigenvalues
+    // convert to vector
+    vector<T> eigenval(eigenvalues.size());
+    for (i = 0; i < evals.size(); ++i)
+        eigenval[i] = eigenvalues[i].real();
+        // for symetric matrix is not included a imaginary part
+    return(eigenval);
     }
+*/
 // end of CI and basis sets creating section
 
 template <typename T>
@@ -3485,6 +3648,7 @@ int Slater_basis_set_calculations_DFT<T>::Clear()
     // CI and basis sets creating section
     count_basis_per_atom = 0;
     count_basis_overall = 0;
+    fine_structure_constant_correction = 1;
     n_extended.clear();
     l_extended.clear();
     m_extended.clear();
@@ -3494,6 +3658,10 @@ int Slater_basis_set_calculations_DFT<T>::Clear()
     Slater_basis_exponents_extended.clear();
     Gaussian_basis_extended.clear();
     correlation_energies_extended.clear();
+    
+    nuclear_spins.clear();
+    nuclear_spin_orbit_couplings.clear();
+    Lamb_shifts.clear();
     // End of CI and basis sets creating section
     return(0);
     }

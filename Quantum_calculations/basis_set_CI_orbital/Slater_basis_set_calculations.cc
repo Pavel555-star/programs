@@ -10447,13 +10447,6 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
         {
         for (i = 0; i < count_electrons; i++)
             {
-            if (restriction == false)
-                {
-                if (spins[i] == 0.5)
-                    atom_wavefunctions->wavefunction_lenght_multipliers[i] *=  1.005;
-                else
-                    atom_wavefunctions->wavefunction_lenght_multipliers[i] *=  0.995;
-                }
             pointers_to_wavefunctions[i] = nullptr;
             pointers_to_probabilities[i] = nullptr;
             pointers_to_Gradients[i] = nullptr;

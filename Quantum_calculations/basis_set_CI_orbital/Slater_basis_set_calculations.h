@@ -358,7 +358,7 @@ unsigned int order);
 T Solve_basis_set_matrix(T* basis_set_matrix, T* overlap_integral_matrix, unsigned int order,
 vector<T>* values, atom_wavefunctions *atom_wavefunctions);
 int Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions,
-small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, bool alocate, bool compute_densities);
+small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, bool allocate, bool compute_densities);
 public:
 // section 6 - completing basis set method and user interface handling
 int Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR);
@@ -366,7 +366,7 @@ T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions);
 
 int String_to_list_electrons(string UI_input, unsigned int size_order,
 bool extern_coordinates, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
-T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool alocate,
+T Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool allocate,
 vector<T>* values);
 int Create_excitation(unsigned int electron_number,
 unsigned int n, unsigned int l, int m, T spin, bool generate);

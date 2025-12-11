@@ -145,6 +145,17 @@ public:
     vector<T> Slater_basis_exponents_extended;
     vector<vector<pair<T, T>>> Gaussian_basis_extended;
     vector<T> correlation_energies_extended;
+    
+    T fine_structure_constant_correction = 1;
+    T fine_structure_constant = (this->e * this->e)/(2 * this->E0 * this->h * this->c) 
+    * fine_structure_constant_correction;
+    T Lamb_shift_factor = fine_structure_constant * fine_structure_constant * fine_structure_constant
+    * fine_structure_constant * fine_structure_constant * this->c * this->c * (1/(6 * this->Pi)) *
+    log(1/(this->Pi * fine_structure_constant)) * this->Hartree_lenght;
+    
+    vector<T> nuclear_spins;
+    vector<T> nuclear_spin_orbit_couplings;
+    vector<T> Lamb_shifts;
     // End of CI and basis sets creating section
 protected:
     int Create_index_atoms();
@@ -210,11 +221,19 @@ public:
     int Gaussian_quadrature();
     // End of orthonormalizing and Gaussian export section
     // CI and basis sets creating section
-    T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
-    vector<T>* values, unsigned int count_shells, unsigned int level_correlation_energy, vector<T> correction_energies = {});
+    
     string Create_input_from_coordinates(vector<string> species, vector<string> x, vector<string> y, vector<string> z);
     int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
-    vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
+    int Set_default_nuclear_spins();
+    int Set_custom_nuclear_spins(vector<T> spins);
+    int Compute_nuclear_spin_orbit_couplings();
+    int Compute_Lamb_shifts();
+    int Nuclear_spin_spin_interaction();
+    T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+    vector<T>* values, unsigned int count_shells, unsigned int level_correlation_energy,
+    vector<T> correction_energies = {});
+    vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix,
+    T* Hamiltonian_matrix);
     // end of CI and basis sets creating section
     int Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, vector<unsigned int> atom_numbers);
     int Detect_symetry_information(symetry_axes *symetry_axes, symetry_planes *symetry_planes);
