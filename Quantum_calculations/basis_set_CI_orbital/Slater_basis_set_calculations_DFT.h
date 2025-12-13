@@ -147,14 +147,14 @@ public:
     vector<T> correlation_energies_extended;
     
     T fine_structure_constant_correction = 1;
-    T fine_structure_constant = (this->e * this->e)/(2 * this->E0 * this->h * this->c) 
-    * fine_structure_constant_correction;
-    T Lamb_shift_factor = fine_structure_constant * fine_structure_constant * fine_structure_constant
-    * fine_structure_constant * fine_structure_constant * this->c * this->c * (1/(6 * this->Pi)) *
-    log(1/(this->Pi * fine_structure_constant)) * this->Hartree_lenght;
+    T fine_structure_constant_corr = this->fine_structure_constant * fine_structure_constant_correction;
+    T Lamb_shift_factor = fine_structure_constant_corr * fine_structure_constant_corr * fine_structure_constant_corr
+    * fine_structure_constant_corr * fine_structure_constant_corr * this->c * this->c * (1/(6 * this->Pi)) *
+    log(1/(this->Pi * fine_structure_constant_corr)) * this->Hartree_lenght;
     
     vector<T> nuclear_spins;
-    vector<T> nuclear_spin_orbit_couplings;
+    vector<T> electron_nuclear_spin_orbit_couplings;
+    vector<T> electron_nuclear_spin_spin_couplings;
     vector<T> Lamb_shifts;
     // End of CI and basis sets creating section
 protected:
@@ -226,9 +226,9 @@ public:
     int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
     int Set_default_nuclear_spins();
     int Set_custom_nuclear_spins(vector<T> spins);
-    int Compute_nuclear_spin_orbit_couplings();
+    int Compute_electron_nuclear_spin_orbit_couplings();
+    int Compute_electron_nuclear_spin_spin_couplings();
     int Compute_Lamb_shifts();
-    int Nuclear_spin_spin_interaction();
     T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
     vector<T>* values, unsigned int count_shells, unsigned int level_correlation_energy,
     vector<T> correction_energies = {});

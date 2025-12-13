@@ -2293,7 +2293,7 @@ int Slater_basis_set_calculations_DFT<T>::Set_default_nuclear_spins()
     nuclear_spins.clear();
     for (i = 0; i < count_atoms; i++)
         {
-        nuclear_spins.push_back(default_nuclear_spins_ranges[this->results.Z[index_atoms[i]] -1]);
+        nuclear_spins.push_back(-default_nuclear_spins_ranges[this->results.Z[index_atoms[i]] -1]);
         }
     return(0);
     }
@@ -2312,7 +2312,7 @@ int Slater_basis_set_calculations_DFT<T>::Set_custom_nuclear_spins(vector<T> spi
     return(0);
     }
 template <typename T>
-int Slater_basis_set_calculations_DFT<T>::Compute_nuclear_spin_orbit_couplings()
+int Slater_basis_set_calculations_DFT<T>::Compute_electron_nuclear_spin_orbit_couplings()
     {
     unsigned int i;
     unsigned int count_electrons = this->results.n.size();
@@ -2320,10 +2320,14 @@ int Slater_basis_set_calculations_DFT<T>::Compute_nuclear_spin_orbit_couplings()
     T effective_lenght;
     T potential_energy;
     T B;
+    T reduced_mass_correction;
     T spin_orbit_energy;
     // resize vector if necessary
-    if (nuclear_spin_orbit_couplings.size() != count_electrons)
-        nuclear_spin_orbit_couplings.resize(count_electrons);
+    if (electron_nuclear_spin_orbit_couplings.size() != count_electrons)
+        electron_nuclear_spin_orbit_couplings.resize(count_electrons);
+    // check initializing the nuclear spins
+    if (nuclear_spins.size() != count_atoms)
+        return(-1);
     // fill vector with spin-orbit couplings
     for (i = 0; i < count_electrons; i++)
         if (this->results.wavefunction_constraints[i] != 1)
@@ -2331,8 +2335,49 @@ int Slater_basis_set_calculations_DFT<T>::Compute_nuclear_spin_orbit_couplings()
             effective_lenght = this->results.effective_radius_base[i]/this->results.wavefunction_lenght_multipliers[i];
             potential_energy = this->kinetic_integral_matrix[i * (count_electrons + 1)];
             B = this->Orbital_magnetic_field(potential_energy, effective_lenght, this->results.l[i]);
-            spin_orbit_energy = this->Spin_moment_energy(nuclear_spins[electron_to_atom_numbers[i]], B);
-            nuclear_spin_orbit_couplings[i] = spin_orbit_energy;
+            reduced_mass_correction = (this->results.Z[i] * this->mp)/(this->results.Z[i] * this->mp + this->me);
+            spin_orbit_energy = this->Spin_moment_energy(nuclear_spins[electron_to_atom_numbers[i] - 1], B)
+            /reduced_mass_correction;
+            electron_nuclear_spin_orbit_couplings[i] = spin_orbit_energy;
+            }
+    
+    return(0);
+    }
+template <typename T>
+int Slater_basis_set_calculations_DFT<T>::Compute_electron_nuclear_spin_spin_couplings()
+    {
+    unsigned int i;
+    unsigned int count_electrons = this->results.n.size();
+    
+    T effective_lenght;
+    T potential_energy;
+    T reduced_mass_correction;
+    T S_1;
+    T S_2;
+    T B;
+    T spin_spin_energy;
+    // resize vector if necessary
+    if (electron_nuclear_spin_spin_couplings.size() != count_electrons)
+        electron_nuclear_spin_spin_couplings.resize(count_electrons);
+    // check initializing the nuclear spins
+    if (nuclear_spins.size() != count_atoms)
+        return(-1);
+    
+    // fill vector with spin-orbit couplings
+    for (i = 0; i < count_electrons; i++)
+        if (this->results.wavefunction_constraints[i] != 1)
+            {
+            effective_lenght = this->results.effective_radius_base[i]/this->results.wavefunction_lenght_multipliers[i];
+            potential_energy = this->kinetic_integral_matrix[i * (count_electrons + 1)];
+            reduced_mass_correction = (this->results.Z[i] * this->mp)/(this->results.Z[i] * this->mp + this->me);
+            S_1 = this->results.spins[i] * (this->results.spins[i] + 1);
+            S_2 = nuclear_spins[electron_to_atom_numbers[i] - 1] * (nuclear_spins[electron_to_atom_numbers[i] - 1] + 1);
+            B = potential_energy/(effective_lenght * effective_lenght * this->me * reduced_mass_correction * this->e *
+            this->c * this->c) * S_1;
+            spin_spin_energy = B * (S_2 * this->e * this->h  * this->h)/(4 * 4 * this->Pi * this->Pi * this->mp)
+            * this->g_p;
+            // including proton g-factor
+            electron_nuclear_spin_spin_couplings[i] = spin_spin_energy;
             }
     
     return(0);
@@ -2463,10 +2508,12 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
         Set_default_nuclear_spins();
     
     // Compute Lamb shift and nuclear spin-orbit coupling
-    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+    if (Compute_Lamb_shifts() != -1 and Compute_electron_nuclear_spin_orbit_couplings() != -1
+    and Compute_electron_nuclear_spin_spin_couplings() != -1)
         for (i = 0; i < count_electrons; i++)
             {
-            this->correction_matrix[i * (count_electrons + 1)] += (Lamb_shifts[i] + nuclear_spin_orbit_couplings[i]);
+            this->correction_matrix[i * (count_electrons + 1)] += (Lamb_shifts[i] +
+            electron_nuclear_spin_orbit_couplings[i] + electron_nuclear_spin_spin_couplings[i]);
             }
     // Run computation of the ground state
     switch (level_correlation_energy)
@@ -2631,11 +2678,16 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                     this->Helium_correlation_energy = true;
                                     // subtract previous nuclear spin-orbit coupling and Lamb shift
                                     this->correction_matrix[excited_position * (count_electrons + 1)] -=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position]
+                                        + electron_nuclear_spin_spin_couplings[excited_position]);
                                     // Compute and add nuclear spin-orbit coupling and Lamb shift
-                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                    if (Compute_Lamb_shifts() != -1 and Compute_electron_nuclear_spin_orbit_couplings()
+                                    != -1 and Compute_electron_nuclear_spin_spin_couplings() != -1)
                                         this->correction_matrix[excited_position * (count_electrons + 1)] +=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position] +
+                                        electron_nuclear_spin_spin_couplings[excited_position]);
                                     Hamiltonian = Execute_calculation(max_iterations, minimal_fidelity,
                                     size_order, false, values);
                                     if (Hamiltonian == -1)
@@ -2653,9 +2705,12 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                     correlation_energies[excited_position] + exchange_energies[excited_position];
                                     
                                     // Compute and add nuclear spin-orbit coupling and Lamb shift
-                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                    if (Compute_Lamb_shifts() != -1 and Compute_electron_nuclear_spin_orbit_couplings()
+                                    != -1 and Compute_electron_nuclear_spin_spin_couplings() != -1)
                                         this->correction_matrix[excited_position * (count_electrons + 1)] +=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position] +
+                                        electron_nuclear_spin_spin_couplings[excited_position]);
                                     // Execute HF calculations
                                     Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity,
                                     size_order, false, values);
@@ -2673,9 +2728,13 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                     this->correction_matrix[excited_position * (count_electrons + 1)] =
                                     correlation_energies[excited_position] + exchange_energies[excited_position];
                                     
-                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                    // Compute and add nuclear spin-orbit coupling and Lamb shift
+                                    if (Compute_Lamb_shifts() != -1 and Compute_electron_nuclear_spin_orbit_couplings()
+                                    != -1 and Compute_electron_nuclear_spin_spin_couplings() != -1)
                                         this->correction_matrix[excited_position * (count_electrons + 1)] +=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position] +
+                                        electron_nuclear_spin_spin_couplings[excited_position]);
                                     // Execute HF calculations
                                     Hamiltonian = Execute_PBE(max_iterations, minimal_fidelity,
                                     size_order, false, values);
@@ -2697,9 +2756,13 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                     this->correction_matrix[excited_position * (count_electrons + 1)] =
                                     correlation_energies[excited_position] + exchange_energies[excited_position];
                                     
-                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                    // Compute and add nuclear spin-orbit coupling and Lamb shift
+                                    if (Compute_Lamb_shifts() != -1 and Compute_electron_nuclear_spin_orbit_couplings()
+                                    != -1 and Compute_electron_nuclear_spin_spin_couplings() != -1)
                                         this->correction_matrix[excited_position * (count_electrons + 1)] +=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position] +
+                                        electron_nuclear_spin_spin_couplings[excited_position]);
                                     // Execute HF calculations
                                     Hamiltonian = Execute_TPSS(max_iterations, minimal_fidelity,
                                     size_order, false, values);
@@ -2718,10 +2781,16 @@ unsigned int level_correlation_energy, vector<T> correction_energies)
                                     
                                     // subtract previous nuclear spin-orbit coupling and Lamb shift
                                     this->correction_matrix[excited_position * (count_electrons + 1)] -=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
-                                    if (Compute_Lamb_shifts() != -1 and Compute_nuclear_spin_orbit_couplings() != -1)
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position] +
+                                        electron_nuclear_spin_spin_couplings[excited_position]);
+                                    // Compute and add nuclear spin-orbit coupling and Lamb shift
+                                    if (Compute_Lamb_shifts() != -1 and Compute_electron_nuclear_spin_orbit_couplings()
+                                    != -1 and Compute_electron_nuclear_spin_spin_couplings() != -1)
                                         this->correction_matrix[excited_position * (count_electrons + 1)] +=
-                                        (Lamb_shifts[excited_position] + nuclear_spin_orbit_couplings[excited_position]);
+                                        (Lamb_shifts[excited_position] +
+                                        electron_nuclear_spin_orbit_couplings[excited_position] +
+                                        electron_nuclear_spin_spin_couplings[excited_position]);
                                     // Compute basis
                                     Hamiltonian = Execute_calculation(max_iterations, minimal_fidelity, size_order,
                                     false, values);
@@ -3660,7 +3729,8 @@ int Slater_basis_set_calculations_DFT<T>::Clear()
     correlation_energies_extended.clear();
     
     nuclear_spins.clear();
-    nuclear_spin_orbit_couplings.clear();
+    electron_nuclear_spin_orbit_couplings.clear();
+    electron_nuclear_spin_spin_couplings.clear();
     Lamb_shifts.clear();
     // End of CI and basis sets creating section
     return(0);

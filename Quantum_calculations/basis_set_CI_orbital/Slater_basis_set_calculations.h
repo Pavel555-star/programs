@@ -29,7 +29,9 @@ public:
     T c = 299796000; // m·s^-1
     T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
     T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
-    T hyperfine_structure_constant = (e * e)/(2 * E0 * h * c);
+    T fine_structure_constant = (e * e)/(2 * E0 * h * c);
+    T g_e = 2.00232;
+    T g_p = 5.5856946893;
     
     static const unsigned int max_electrons = 1024; // constant for maximum electrons in basis set matrix
     static const unsigned int max_atoms = 512; // constant for maximum atoms in basis set matrix

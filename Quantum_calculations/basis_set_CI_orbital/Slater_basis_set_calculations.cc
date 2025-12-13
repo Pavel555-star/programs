@@ -6059,7 +6059,7 @@ T Slater_basis_set_calculations<T>::Get_relative_Hartree_length(unsigned int Z, 
     T relativistic_shrinkage;
     
     relative_electron_mass = (Z * mp)/(Z * mp + me);
-    relativistic_shrinkage = 1/sqrt(1 - pow(Z * hyperfine_structure_constant/n, 2));
+    relativistic_shrinkage = 1/sqrt(1 - pow(Z * fine_structure_constant/n, 2));
     relative_Hartree_lenght = relativistic_shrinkage/relative_electron_mass;
     return(relative_Hartree_lenght);
     }
@@ -7086,12 +7086,9 @@ T Slater_basis_set_calculations<T>::Spin_moment_energy(T s, T B0)
     T energy;
     T S;
     
-    if (s * (s + 1) != 0)
-        S = (s * (s + 1)) * h/(4 * Pi);
-    else
-        S = 0;
+    S = (s * (s + 1));
         
-    energy = (S * e * h)/(4 * Pi * me) * 2.00232 * B0; // including Bohr magnetron
+    energy = (S * e * h * h)/(4 * 4 * Pi * Pi * me) * g_e * B0; // including g factor
     return(energy);
     }
 template <typename T>
@@ -10590,7 +10587,7 @@ small_atom_wavefunctions *small_atom_wavefunctions, unsigned int size_order, boo
     else
         {
         pointer_to_lenghts = atom_wavefunctions->lenghts[0];
-        if (non_s1_system == true or s1_memory_optimization == false)
+        if ((non_s1_system == true or s1_memory_optimization == false) and count_electrons > 1)
             small_lenghts = small_atom_wavefunctions->lenghts[0];
         for (i = 0; i < count_electrons; i++)
             {
@@ -11278,7 +11275,7 @@ unsigned int n, unsigned int l, int m, T spin, bool generate)
            results.spin_paired[i] = -1;
         }
     // avoid generation excitation from s1 electron systems with not allocated for small_results grid
-    if (non_s1 == false)
+    if (non_s1 == false and results.n.size() > 1)
         {
         // before iterations set a class switch s1_memory-Optimization to false
         if (iterations > 0 and s1_memory_optimization == true)
@@ -11286,6 +11283,8 @@ unsigned int n, unsigned int l, int m, T spin, bool generate)
         else
             s1_memory_optimization = false;
         }
+    if (results.n.size() == 1 and results.n[i] != n)
+        results.effective_radius_base[0] = results.effective_radius_base[0] * T(n)/T(results.n[i]);
     // Set new set of quantum numbers
     results.n[i] = n;
     results.l[i] = l;
@@ -11293,7 +11292,7 @@ unsigned int n, unsigned int l, int m, T spin, bool generate)
     results.spins[i] = spin;
     
     results.wavefunction_lenght_multipliers[i] = 1;
-    if (generate == true)
+    if (generate == true and s1_memory_optimization == false)
         {
         // Generate a new wavefunction
         results.wavefunction_lenght_multipliers[i] = 1;
