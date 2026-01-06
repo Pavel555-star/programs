@@ -1,0 +1,4 @@
+Symetry informations for Hartree-Fock molecular orbital version 2.50
+To construct symetric molecules with program Hartree_Fock_molecular orbital you must:
+1. atoms of the same ellements groups together in input string (function Coulombic_integral(...) depend on the sequence of atoms),
+2. check the spins of electrons and give right sequence of atoms in bonding substrings and right sequence of bonds substrings.

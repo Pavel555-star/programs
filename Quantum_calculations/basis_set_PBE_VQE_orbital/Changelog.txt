@@ -1,0 +1,6 @@
+Changelog 2.5 vs. 2.0: TPSS meta GGA density functional, support for all orbitals with n <= 7 for excited states, export to Gaussian basis functions, excited state solver. Correct definition and reduction and tuning of matrix eigenvalue search and twofold reduction of computational complexity, update rate of exponents calculated by the number of radial nodes instead of angular, storage of calculated distances in RAM even for two-electron Coulomb integrals of electrons on the same nucleus, vectorization even for Coulomb integrals, definition of cuboid slices for integration of all integrals of electron overlaps on different atoms and better tuning of density functionals, minor bug fixes and use-cases for the future. Also, the standard thread library has been replaced by OpenMP to support more than eight processor cores and when calculating with "frozen" orbitals, unchanged integrals are not unnecessarily recalculated.
+
+Changelog 2.7 vs. 2.5: Added possbility to creating basis sets with excited states for b-initio computations
+including possibility to its externally correction and Gaussian exports.
+Changelog 2.8 vs. 2.7: Add correlction for electron-nucleus- spin-orbit coupling and Larmor effect,
+unitarized basis_set_PBE_VQE_orbital, basis_set_TPSS_orbital and basis_set_CI_orbital

@@ -1,0 +1,1178 @@
+Slater_basis_set_calculations code documentation version 2.7
+
+class Slater_basis_set_calculations:
+public variables and constants:
+vector<T> determinants;
+In this vector are stored roots of solved matrix (e.g. Hartree-Fock matrix).
+
+vector<T> spectra_EPR;
+In this vector are stored roots of spin density matrix.
+
+vector<T> electron_spectra;
+In this vector are stored calculated electron spectra [J].
+
+const T Pi = 3.144605511;
+Pi constant calculated from golden ratio.
+
+const T E0 = 8.8541878128E-12;
+Permitivity of vacuum
+
+const T h = 6.62607015E-34;
+Planck constant
+
+const T vacuum_permeability = 1.25663706212E-6;
+Permeability of vacuum
+
+const T e = 1.602176634E-19; 
+Elementary charge
+
+const T me = 9.1093837E-31;
+Mass of electron
+
+const T mp = 1.67262192E-27;
+Mass of proton
+
+const T c = 299796000;
+Speed of light
+
+const T Hartree_lenght = (E0 * h * h)/(Pi * me * 1 * e * e);
+Bohr radius
+
+const T Hartree_energy_constant = me * (e * e /(2 * E0 * h)) * (e * e /(2 * E0 * h));
+Hartree energy
+
+T fine_structure_constant = (e * e)/(2 * E0 * h * c);
+fine structure constant
+
+T g_e = 2.00232;
+electron g-factor
+
+T g_p = 5.5856946893;
+proton g-factor
+
+const T vector_lenght = 10.00;
+Count of pixels in memory equivalent for Hartree Lenght 
+
+const unsigned int max_electrons = 1024;
+Maximal number of electrons for Hartree-Fock calculations
+
+const unsigned int max_atoms = 512;
+Maximal number of atoms for Hartree-Fock calculations
+
+unsigned int electron_number = 0;
+Counter of electrons
+
+unsigned int iterations = 0;
+Counter of iterations
+
+unsigned int determinant_exception_handle = 0;
+1, if there are exceptions with allocate memory in determinant calculations
+
+unsigned int overlap_integral_exception_handle = 0;
+1, if there are exceptions with allocate memory in overlap integral calculations
+
+T small_wavefunction_size_factor = 1.5;
+This is factor, from which is computed small lenght order according: sqrt(lenght_order) * small_wavefunction_size_factor.
+Is possible to change before start of computation.
+
+T small_wavefunction_size_factor = 1.5;
+By this factor is multiplied a square root of lenght order of normal wavefunctions grid in results for calculating
+the lenght order for reduced  wavefunction grid in small_results.
+
+T wavefunction_integration_threshold = 1.0E-15;
+This threshold is used for detecting range of x, y and z indexes for integration by function
+Wavefunction_range_detect(...);
+
+bool Helium_correlation_energy = true;
+If is false, is cancelled a expressing of the correlation energy be generalized Helium correlation energy.
+Using of TPSS density functional switch off to false for systems with bonding or with Z > 10.
+For PBE density functional required false.
+
+bool bonded_system = false;
+Is true for systems with chemical bonding.
+
+bool s1_memory_optimization = true;
+If is true, memory for small_results grid is not allocated for s1 system.
+
+T nucleus_repulsive energy
+Nucleus_repulsive energy sum
+
+T relative_permitivity = 1;
+Relative permitivity
+
+T relative_electron_mass = 1;
+Relative electron mass
+
+T relative_Hartree_lenght = 1.00;
+Relative Hartree lenght
+
+T* nuclear_atraction_integral_matrix;
+Pointer to nuclear atraction integral matrix (count_electrons * count_electrons)
+
+T* nucleuses_atractions;
+Pointer to computed nucleuses atractions (count_electrons * count_electrons), columns represent nucleuses and rows represent electrons
+
+T* nucleuses_distances;
+Pointer to computed matrix of distances between electrons and nucleuses of other electrons. Rows represent electrons. 
+
+T* coulombic_integral_matrix;
+Pointer to coulombic integral matrix (count_electrons * count_electrons)
+
+T* overlap_integral_matrix;
+Pointer to overlap integral matrix (count_electrons * count_electrons)
+
+T* overlap_effective_lenght_integral_matrix;
+Pointer to overlap_effective_lenght_integral_matrix (count_electrons * count_electrons), here are stored calculated effective lenghts
+
+T* resonance_integral_matrix;
+Pointer to resonance integral matrix (count_electrons * count_electrons)
+
+T* basis_set_matrix;
+Pointer to Hartree-Fock matrix (count_electrons * count_electrons)
+
+T* correction_matrix;
+Pointer to correction matrix (count_electrons * count_electrons) to calculate post_basis_set_matrix
+
+T* post_basis_set_matrix;
+Pointer to post_Hartree-Fock matrix (count_electrons * count_electrons)
+
+T* spin_density_matrix;
+Pointer to spin density matrix matrix (count_electrons * count_electrons)
+
+struct atom_orbitals {
+vector<unsigned int> n;
+Primary quantum numbers of electrons
+
+vector<unsigned int> l;
+Secondary quantum numbers of electrons
+
+vector<int> m;
+Magnetic quantum numbers of electrons
+
+vector<T> s;
+Spin quantum numbers of electrons
+
+vector<T> wavefunction_lenght_multipliers;
+Relative elongations of vector_lenght
+
+vector<T> wavefunction_coefficients;
+Coefficient of spin-orbital filling, permitted are only positive value.
+
+vector <int> bonding;
+Electron numbers of bond-paired electron or -1
+
+vector <int> antibonding;
+Electron numbers of antibond-paired electron or -1
+
+vector <bool> paired_with_previous;
+True if electron is spin-paired with previous electron in atom.
+
+unsigned int reduced_Z;
+Charges of nucleus for count electrons in valence shell (count electrons in other shell is subtracted) [elementary charge]
+
+unsigned int Z;
+Charges of atom nucleus
+
+T electronegativity;
+Electronegativity of atoms
+
+} atoms;
+This variable contain initial information for electrons in atom 
+(electron data are represented in vectors with the same index)
+
+struct atom_wavefunctions {
+vector<T*> lenghts;
+Vector of lenght arrays in memory (for fast computing wavefunctions)
+
+vector<T*> wavefunctions;
+Vector of wavefunctions arrays in memory
+
+vector<T*> probabilities;
+Vector of probabilities arrays in memory
+
+vector<T*> Gradientss;
+Vector of gradients wavefunction arrays in memory
+
+vector<unsigned int> lenght_orders;
+Vector of lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes)
+
+vector<unsigned int> x_range;
+Vector with x indexes ranges for integration of wavefunctions
+
+vector<unsigned int> y_range;
+Vector with y indexes ranges for integration of wavefunctions
+
+vector<unsigned int> z_range;
+Vector with z indexes ranges for integration of wavefunctions
+
+vector<T> wavefunction_coefficients;
+Coefficient of spin-orbital filling
+
+vector<T> wavefunction_lenght_multipliers;
+Relative elongation of vector_lenght
+
+vector<T> effective_radius_base;
+The potential radius calculated with first wavefunction generation
+
+vector<T> spins;
+Spin quantum numbers of electrons
+
+vector<int> spin_paired;
+Electron number of spin-paired electron or -1
+
+vector<int> bonding;
+Electron number of bonding spin-paired electron or -1
+
+vector<int> antibonding;
+Electron number of antibonding spin-paired electron or -1
+
+vector <unsigned int> wavefunction_constraints;
+If there are 0, electron wavefunction is not constrainted. Else the wavefunction is constrainted.
+This orbitals are excluded from recomputing integrals.
+
+vector<unsigned int> n;
+Primary quantum numbers of electrons
+
+vector<unsigned int> l;
+Secondary quantum numbers of electrons
+
+vector<int> m;
+Magnetic quantum numbers of electrons
+
+vector<unsigned int> count_electrons;
+Number of electrons in valence shell
+
+vector<unsigned int> reduced_Z;
+Charge of nucleus for count electrons in valence shell (count electrons in other shell is subtracted) [elementary charge]
+
+vector<unsigned int> Z;
+Proton number of nucleus in  electron wavefunction center
+
+vector<unsigned int> electron_numbers;
+Numbers of electrons
+
+vector<T> x;
+X coordinates of center electron wavefunctions
+
+vector<T> y;
+Y coordinates of center electron wavefunctions
+
+vector<T> z;
+Z coordinates of center electron wavefunctions
+} results;
+
+struct small_atom_wavefunctions {
+
+vector<unsigned int> electron_numbers;
+Numbers of electrons
+
+vector<unsigned int> lenght_orders;
+Vector of lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes)
+
+vector<unsigned int> x_range;
+Vector with x indexes ranges for integration of wavefunctions
+
+vector<unsigned int> y_range;
+Vector with y indexes ranges for integration of wavefunctions
+
+vector<unsigned int> z_range;
+Vector with z indexes ranges for integration of wavefunctions
+
+vector<T*> lenghts;
+Vector of lenghts 3D cubes with lenghts between pixel and center in memory (for fast computing wavefunctions)
+    
+vector<T*> wavefunctions;
+Vector of wavefunctions arrays in memory
+
+vector<T> x;
+X coordinates of center electron wavefunctions
+
+vector<T> y;
+Y coordinates of center electron wavefunctions
+
+vector<T> z;
+Z coordinates of center electron wavefunctions
+
+vector<unsigned int> n;
+Primary quantum numbers of electrons
+
+vector<unsigned int> l;
+Secondary quantum numbers of electrons
+
+vector<int> m;
+Magnetic quantum numbers of electrons
+
+vector<unsigned int> Z;
+Proton number of nucleus in  electron wavefunction center
+} small_results
+    
+This variable contain information about small wavefunctions generated for integration of lenght for resonance integrals.
+
+Structure used for containing information about electrons in electron structure
+(electron data are represented in vectors with the same index)
+
+functions:
+// Section 1 - solving Hartree-Fock matrices - inherited from Huckel_calculations
+inline T Determinant(unsigned int order, T* pointer, T* buffer, T* denominator, T* temp1, T* temp2)
+
+This function return determinant of matrix, variable order means order of matrix, pointer is reference to matrix of size order * order,
+buffer, denominator, temp1 and temp2 are variables for storing temporary data of size order * order.
+
+int basis_set_Determinant_set(unsigned int order, T* pointer,unsigned int count, T min, T step, T* output_values)
+
+This function create array of determinants of matrix with increased values added to matrix diagonal.
+Variable order means order of matrix, pointer is reference to matrix of size order * order, count is count of values,
+min is initial value, step is difference between two values and output_values is array for results.
+
+int basis_set_Determinant_solver(unsigned int order, T* pointer)
+
+This function solve roots of matrix with diagonal increasing between -4 and 4.
+Variable order means order of matrix, pointer is reference to matrix of size order * order,
+results are stored into public variable determinants.
+
+// Section 2 - generating the wavefunctions
+int Wavefunction_lenghts_generate(T* lenghts, unsigned int lenght_order);
+This function generate lenghts to center for one-electron integration. Parameter lenghts is pointer to 
+D array of lenghts with side of (2 * lenght_order + 1) pixels. 
+
+T Wavefunction_1s_generate(T* wavefunction, T* lenghts, bool allocate, int Z, T multiplier,unsigned int lenght_order)
+
+This function generate Laguerr 1s orbital wavefunction into array wavefunction.
+Variable lenghts is auxiliary array of calculated lenghts for speed-up wavefunction generation,
+allocate is true only for first wavefunction generation with generation of lenghts, Z is count protons in atom nucleus,
+multiplier is multiplier for calculated distances for wavefunction generation and
+lenght_order is number of pixels between center and surface of wavefunction and lenghts cubes.
+(their size is (2*lenght_order+1)^3).
+Function return the normalisation constant
+
+Other functions named Wavefunction_*_generate for other orbitals  have the same parameters.
+
+int Wavefunction_normalize(T* wavefunction_pointer, T normalisation_constant, unsigned int size)
+
+This function normalize the wavefunction.
+wavefunction_pointer is pointer to wavefunction cube array, normalisation_constant is normalisation_constant and
+size is size of wavefunction cube array.
+
+int Orbitals_to_wavefunctions(unsigned int n, unsigned int l, int m, unsigned int lenght_order, T* wavefunction, T* lenghts, bool allocate, unsigned int Z, T lenght_multiplier,  unsigned int* x_range, unsigned int* y_range,
+unsigned int* z_range)
+    
+This function transcript main, second and magnetic quantum numbers  n, l and m to call functions for generating wavefunctions.
+Other parameters are the same as for Wavefunction_1s_generate function. The x_range, y_range and z_range parameter
+are for range detection for integration.
+
+T Get_relative_Hartree_length(unsigned int Z, unsigned int n);
+
+This function set public variable relative_Hartree_Lenght according numbers of protons in nucleus Z.
+
+int Wavefunction_range_detect(T* wavefunction_pointer, unsigned int lenght_order, unsigned int* x_range,
+unsigned int* y_range, unsigned int* z_range);
+
+This function detect and give indexes ranges for x, y and z directions  for a wavefunction. Within this ranges are excedded a wavefunction_integration_bias. The wavefunction is defined by pointer to its data in wavefunction_pointer and a
+lenght_order. The computed values are given to x_range, y_range and z_range
+
+// Section 3 - mathematical operation for wavefunctions, probabilities densities and integrals
+
+This function returns lower of both number or 0 in case of equality.
+
+int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities,
+    unsigned int lenght_order, T d_x, T d_y, T d_z)
+    
+This function multiply wavefunction_1 and wavefunction_2 array cube into probabilities array, lenght_order is
+number of pixels between center and surface of wavefunction_1 and wavefunction_2 cubes.
+Variables d_x, d_y and d_z are coordination shift between wavefunction_1 and wavefunction_2 in Hartree lenghts (Bohr radius).
+
+int Wavefunction_multiply(T* wavefunction_1, T* wavefunction_2, T* probabilities, unsigned int lenght_order)
+
+This function multiply wavefunction_1 and wavefunction_2 array cube into probabilities array, lenght_order is
+number of pixels between center and surface of wavefunction_1 and wavefunction_2 cubes.
+
+
+
+int Wavefunction_relative_lenghts_generate(T* lenghts, unsigned int lenght_order);
+This function internally generate lenghts array for double integrating of 3D cubes with the same coordinates.
+
+int Wavefunction_square(T* wavefunction_1, T* probabilities, unsigned int lenght_order)
+
+This function square of wavefunction_1 cube into probabilities array, lenght_order is
+number of pixels between center and surface of wavefunction_1 cube.
+
+T Probabilities_lenght(T* Probabilities, unsigned int lenght_order,
+unsigned int x_range, unsigned int y_range, unsigned int z_range, int x, int y, int z)
+
+This function return average potential lenght for Probabilities array and coordinates x, y and z (pixels).
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variables x_range, y_range, z_range define ranges of indexes in x, y and z directions for integration.
+
+T Probabilities_lenght(T* probabilities, unsigned int lenght_order,
+unsigned int x_range, unsigned int y_range, unsigned int z_range)
+
+This function return average potential lenght for Probabilities array and null coordinates.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variables x_range, y_range, z_range define ranges of indexes in x, y and z directions for integration.
+
+int Probabilities_thread(T* Probabilities, unsigned int lenght_order,
+unsigned int x_range, unsigned int y_range, unsigned int z_range, T* lenght)
+
+This function load average lenght for Probabilities array and null coordinates to pointer lenght.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variables x_range, y_range, z_range define ranges of indexes in x, y and z directions for integration.
+
+int Gradient_thread(T* Graadient_1, T* wavefunction_2, unsigned int lenght_order)
+
+This function compute the Gradient from wavefunction_2 3D cube to Gradient 3D vector.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+
+int Slater_basis_set_calculations<T>::Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result,
+unsigned int lenght_order, unsigned int x_range_1, unsigned int x_range_2, unsigned int y_range_1,
+unsigned int y_range_2, unsigned int z_range_1, unsigned int z_range_2, T x, T y, T z)
+
+This function store overlap integral of wavefunction cubes Wavefunction_1 and Wavefunction_2 with x, y and z
+coordinate differences (in Hartree lenghts) into variable result.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variables x_range_1, x_range_2, y_range_1, y_range_2, z_range_1, z_range_2 define ranges of indexes in x, y and z
+directions for integration.
+
+int Integrate_Integral_overlap(T* wavefunction_1, T* wavefunction_2, T* result, unsigned int lenght_order, T x, T y, T z)
+
+This function return the effective lenght in overlap array for resonance integrals.
+Variables wavefunction_1 and wavefunction_1 are poiters to wavefunction 3D raster cubes for integration of overlap,
+lenght_order is number of pixelsfrom center to edge of
+wavefunctions 3D raster cube, x_side, y_side and z_side are distances of two-electron centers in atomic units and result is pointer to the integration result.
+
+int Integral_coulombic(T radius_1, T radius_2, T distance, T* result)
+    
+This function store coulombic integral of wavefunction cubes to adress result.
+Variables radius_1 and radius_2 are electrons radiuses in their atoms, distance is distance between atoms and result is pointer for result.
+
+int Integrate_Integral_coulombic(T* density_1, T* density_2, T* result, unsigned int lenght_order, T x, T y, T z,
+unsigned int x_range_1, unsigned int x_range_2, unsigned int y_range_1, unsigned int y_range_2,
+unsigned int z_range_1, unsigned int z_range_2);
+This function store coulombic integral of wavefunction cubes to adress result.
+Integral is computed by point to point integrating of electron densities density_1 and density_2, lenght_order present number of pixels between center and edge of the densities cubs. Variables x, y and z are coordinates of atom densities.
+Variables x_range_1, x_range_2, y_range_1, y_range_2, z_range_1, z_range_2 define ranges of indexes in x, y and z
+directions for integration.
+
+int Integral_nucleus_atraction(T* probabilities, T probabilities_lenght, T* result, T multiplier,
+    unsigned int lenght_order, T lenght_x, T lenght_y, T lenght_z, unsigned int Z)
+    
+This function store nuclear atraction integral of probabilities cube with lenght_x, lenght_y and lenght_z
+coordinate differences (in Hartree lenghts) into variable result.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variables probabilities_lenght and multiplier are average potential lenght
+and wavefunction_lenght_multiplier for probabilities cube array and Z is count proton in nucleus.
+
+int Slater_basis_set_calculations<T>::Integrate_Integral_nucleus_atraction(T* probabilities,
+T* result, T* lenght, unsigned int lenght_order, unsigned int x_range, unsigned int y_range, unsigned int z_range,
+T lenght_x, T lenght_y, T lenght_z, unsigned int Z)
+
+This function store nuclear atraction integral of probabilities cube with lenght_x, lenght_y and lenght_z
+coordinate differences (in Hartree lenghts) into variable result.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variable probabilities is 3D cube grid array and Z is count proton in nucleus.
+Variables x_range, y_range and z_range define ranges of indexes in x, y and z
+directions for integration.
+
+int Integral_kinetic(T* Gradient_1, T* Gradient_2, T* result,
+unsigned int lenght_order, T d_x, T d_y, T d_z, unsigned int x_range_1, unsigned int x_range_2,
+unsigned int y_range_1, unsigned int y_range_2, unsigned int z_range_1, unsigned int z_range_2)
+
+This function compute interelectron kinetic integral from Gradient 3D arrays in Gradient_1 and Gradient_2 and coordinate difference
+between these 3D cubes in d_x, d_y and d_z the Kinetic integral aand store it to result.
+Variable lenght_order is number of pixels between center and surface of Probabilities cube array.
+Variables x_range_1, x_range_2, y_range_1, y_range_2, z_range_1, z_range_2 define ranges of indexes in x, y and z
+directions for integration.
+
+T Rydberg_energy(unsigned int Z, unsigned int n)
+
+This function return energy according the Rydberg formula for count proton in nucleus Z and main quantum number n.
+
+T Spin_moment_energy(T s, T B0)
+
+This function return spin moment energy for spin quantum number s and  magnetic induction B0.
+
+T Orbital_magnetic_field(T potential_energy, T radius, int l)
+
+This function return magnetic induction B0 for second quantum number l, potential energy potentian_energy and spining radius in variable radius.
+
+// Section 4 - generating lists of electrons
+int Quantum_numbers_to_orbitals(unsigned int n, unsigned int l, int fulness, atom_orbitals* atom_orbitals_PTR)
+
+This function add electron orbitals into atom_orbitals_PTR with main quantum number n, second quantum number l and
+fulness of orbital types in  valence subshell.
+
+int Atoms_to_valence_orbitals(string atom, atom_orbitals* atom_orbitals_PTR)
+
+This function convert atom name in string to atom_orbitals_PTR.
+
+int Create_atomic_wavefunctions(atom_orbitals *atom_orbitals_PTR, atom_wavefunctions *atom_wavefunctions,
+    unsigned int size_order,T x,T y,T z)
+    
+This function convert atom_orbitals_PTR into atom_wavefunctions.
+Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays and
+variables x, y and z are coordinates of converted atom.
+
+int Create_bond_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2,
+    unsigned int count, T electronegativity_1, T electronegativity_2, T x_difference, T y_difference, T z_difference)
+    
+This function create sigma bonds between atoms in *atom_wavefunctions_1 and *atom_wavefunctions_2
+(and pi bonds if there are not antibonding electrons).
+Variable count is number of bonds, electronegativity_1 and electronegativity_2 electronegativities of these atoms,
+x_difference, y_difference and z_difference are coordinate differences between these atoms in Hartree lenghts.
+
+int Sum_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions_1, atom_wavefunctions *atom_wavefunctions_2)
+
+This function add atom_wavefunctions_2 to atom_wavefunctions_1.
+
+// section 5 - generating matrices of integrals and Fock matrices
+int Create_nuclear_atraction_integral_matrix(T* matrix, T* nucleuses, unsigned int order, atom_wavefunctions *atom_wavefunctions)
+
+This function generate nuclear atraction integral matrix into variable matrix and list of nucleuses integrals nucleuses
+of size order * order for *atom_wavefunctions.
+
+int Create_coulombic_integral_matrix(T* matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
+small_atom_wavefunctions *small_atom_wavefunctions)
+
+This function generate coulombic integral matrix into array matrix of size order * order for *atom_wavefunctions.
+Variables atom_wavefunctions and small_atom_wavefunctions must be the same size.
+
+int Create_overlap_integral_matrix(T* matrix, T* lenght_matrix, unsigned int order,
+atom_wavefunctions *atom_wavefunctions)
+
+This function generate overlap integral matrix into array matrix of size order * order and overlap integral effective lenghts 
+into array lenght_matrix of size order * order for *atom_wavefunctions.
+
+int Calculate_resonance_integral_matrix(T* overlap_matrix, T* overlap_effective_lenght_integral_matrix,
+T* resonance_integral_matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions,
+small_atom_wavefunctions *small_atom_wavefunctions)
+    
+This function generate resonance integral matrix into array resonance_integral_matrix of size order * order for
+*atom_wavefunctions and small_atom_wavefunctions. Array effective_lenght_integral matrix is filled by effective lenghts for calculation of
+resonance integrals.
+Variables atom_wavefunctions and small_atom_wavefunctions must be the same size.
+
+int Calculate_kinetic_integral_matrix(T* matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions)
+
+This function generate kinetic integral matrix into array matrix of size order * order for
+*atom_wavefunctions.
+
+int Calculate_basis_set_matrix(T* nuclear_atraction_integral_matrix, T* coulombic_integral_matrix, T* resonance_integral_matrix, T* kinetic_integral_matrix,  T* basis_set_matrix, unsigned int order, atom_wavefunctions *atom_wavefunctions)
+    
+This function generate Hartree-Fock matrix into array basis_set_matrix by adding arrays nuclear_atraction_integral_matrix,
+coulombic_integral_matrix, resonance_integral_matrix and T* kinetic_integral_matrix, of size order * order for atom_wavefunctions.
+In generated Hartree-Fock matrix is added spin-orbit interaction for open-shell systems.
+
+int Calculate_corr_basis_set_matrix(T* basis_set_matrix, T* correction_matrix, T* corr_basis_set_matrix,
+unsigned int order);
+
+This function generate post Hartree-Fock matrix into array corr_basis_set_matrix by adding arrays basis_set_matrix
+and correction_matrix of size order * order.
+
+T Calculate_spin_density_matrix(T* overlap_integral_matrix, T* spin_density_matrix, unsigned int order,
+    atom_wavefunctions *atom_wavefunctions)
+    
+This function generate post spin density matrix into array spin_density_matrix by multiplying array overlap_integral_matrix by spin sign
+from atom_wavefunctions. Arrays are of size order * order.
+
+T Solve_basis_set_matrix(T* basis_set_matrix, T* overlap_integral_matrix, unsigned int order,
+    vector<T>* values, atom_wavefunctions *atom_wavefunctions)
+    
+This function solve Hartree-Fock matrix in array post_basis_set_matrix according array overlap_integral_matrix for atom_wavefunctions
+into vector values and set new values of wavefunction_lenght_multipliers in atom_wavefunctions. Arrays are of size order * order.
+
+int Generate_atomic_wavefunctions(atom_wavefunctions *atom_wavefunctions, small_atom_wavefunctions *small_atom_wavefunctions,
+unsigned int size_order, bool allocate, bool compute_densities)
+
+This function generate Lenghts, Wavefunctions and Probabilities cube arrays for atom_wavefunctions and small_atom_wavefunctions.
+Variable size_order is number of pixels between center and surface of lenghts, wavefunctions and probabilities cube arrays,
+ allocate is true for initial calling and compute densities is true, when you want to recompute electron densities.
+
+
+// section 6: completing Hartree-Fock method and user interface handling
+int Atom_orbitals_generate(string UI_input, atom_orbitals *atom_orbitals_PTR)
+
+This function generate atom_orbitals_PTR from atom or ion from string UI_input.
+
+T Nucleus_repulsive_energy(atom_wavefunctions *atom_wavefunctions)
+
+This functions return sum of nucleus repulsive energies in molecule in atom_wavefunctions.
+
+int Slater_basis_set_calculations<T>::String_to_list_electrons(string UI_input, unsigned int size_order,
+    bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
+
+Function String_to_list_electrons convert input string to list of electrons in class structure results.
+Variable UI_input is input string, size_order is the lenght orders (number of pixels between center and surface of lenghts,
+wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
+If generate is true, then wavefunctions are generated.
+
+T Slater_basis_set_calculations<T>::Calculate(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate, vector<T>* values);
+
+Function Calculate run basis set calculation.
+Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
+In vector values are computed Hartree-Fock energies.
+
+
+int Slater_basis_set_calculations<T>::Create_excitation(unsigned int electron_number,
+unsigned int n, unsigned int l, unsigned int m, T spin);
+This function is used for creating a excited states of electrons with a new set of n, l, m and spin quantum numbers.
+If generate == true, then are regenerated wavefunctions, densities effective radius bases and Gradients. 
+For closed shell and s1 systems must be first called before first iteration of computation and allocating the memory.
+
+
+int Slater_basis_set_calculations<T>::Clear();
+This function free the memory.
+
+
+Functions in section 6 calls functions in sections 2, 5 and 5.
+Functions in section 5 calls functions in sections 3 and 1.
+For all sections are used public variables and constants.
+
+class Slater_basis_set_calculations_DFT:
+
+public variables:
+
+unsigned int count_atoms;
+In this variable is information about count atoms in results
+
+bool allocation_memory = true;
+This variable is true, if needed a basic allocatiom memory
+
+vector <unsigned int> electron_to_atom_numbers;
+This vector contait atom number for each electron
+
+vector <unsigned int> index_atoms;
+This vector contain position of first electron in results
+    
+vector<T>* energies = nullptr;
+Vector for energies to d-orbitals, currently unused
+
+T x_center_of_mass;
+X coordinate of center of mass [atomic units]
+
+T y_center_of_mass;
+Y coordinate of center of mass [atomic units]
+
+T z_center_of_mass;
+Z coordinate of center of mass [atomic units]
+
+struct dipole_moment {
+vector <T> partial_charges;
+ Values of partial charges
+ 
+vector <T> x;
+X coordinates of partial charges
+
+vector <T> y;
+Y coordinates of partial charges
+
+vector <T> z;
+Z coordinates of partial charges
+
+vector <T> x_dipole_moments;
+Dipole moments in x axis.
+
+vector <T> y_dipole_moments;
+Dipole moments in y axis.
+
+vector <T> z_dipole_moments;
+Dipole moments in z axis.
+
+T sum_dipole_moment; // in Bohr radius * elementary charge
+Sum dipole moment of system.
+
+T sum_dipole_moment_Debye; // in Debye
+Sum dipole moment of system in debye.
+} dipoles;
+    
+struct central_cations {
+vector <unsigned int> atom_numbers;
+Atom numbers of central cations
+
+vector <unsigned int> configuration_numbers;
+Configuration of crystalic structure:
+1: Octahedral shape,
+2: Pentagonal bipyramidal shape,
+3: Square antiprismatic shape,
+4: Square planar shape,
+5: Square pyramidal shape,
+6: Tetrahedral shape,
+7: Trigonal bipyramidal shape
+
+vector <unsigned int> high_spin;
+0 for low spin complexes and 1 for high-spin complexes
+} central_cation_atoms;
+
+struct symetry_axes {
+vector <T> u_x; // x = u_x * t + x_center
+vector <T> u_y; // y = u_y * t + y_center
+vector <T> u_z; // z = u_z * t + z_center
+T x_center; // coordinates of mass center
+T y_center;
+T z_center;
+
+Vectors with equation parameters parametres of symetry axes:
+x = u_x * t + x_center,
+y = u_y * t + y_center,
+z = u_z * t + z_center.
+
+bool symetry_center = false;
+If structure is point symetric, is true, else is false.
+
+bool linear;
+If structure is linear - true, else false;
+} symetry_axes
+    
+struct symetry_planes {
+vector <T> a; // a * x + b * y + c * z + d = 0
+vector <T> b;
+vector <T> c;
+vector <T> d;
+Vectors with equation parameters parametres of symetry planes a * x + b * y + c * z + d = 0.
+
+bool planar;
+If structure is planar - true, else false;
+} symetry_planes
+
+
+bool allocation_PBE = true;
+This variable is true, if needed a allocatiom memory for PBE density functional
+
+vector <T*> atoms_electron_densities;
+Pointers to electron densities cubes of atoms
+
+vector <T*> atoms_spin_densities;
+Pointers to spin densities cubes of atoms
+
+vector <T*> atoms_Fi_densities;
+Pointers to Fi densities cubes of atoms
+
+vector <T*> atoms_gradients_densities;
+Pointers to gradient densities cubes of atoms
+
+vector <T> pre_PBE_wavefunction_lenght_multipliers
+Vector of wavefunction_lenght_multipliers computed before application of PBE density functional.
+
+vector <T> exchange_energies;
+Vector of exchange energies of electrons
+
+vector <T> correlation_energies;
+Vector of correlation energies of electrons
+
+vector <T> electron_energies;
+Vector of eigenvectors of electrons
+
+unsigned int PBE_iterations = 1; // Number of iterations of including the correlation energy to main calculations
+Counnt of iterative involving of computed exchange and correlation energies to main computation.
+
+vector<T> VQE_Wavefunction_lenght_multipliers_1;
+vector<T> VQE_Wavefunction_lenght_multipliers_2;
+
+This vectors contais Wavefunction_lenght_multipliers coefficients for two physical models.
+
+vector<T> VQE_Eigenvectors_1;
+vector<T> VQE_Eigenvectors_2;
+
+This vectors contais Eigenvectors of each atomic orbitals for two physical models.
+
+vector<bool> VQE_correlation_energy_sign;
+
+This vector contain true for atomic orbitals with lower energy in first physical model, than in second physical model and false otherwise.
+
+vector<double> VQE_ansatz;
+
+This vector contains ansatz for quantum circuit
+
+T VQE_Hamiltonian;
+
+This variable contain information about Hamiltonian calculated by variational quantum eigensolver
+
+T VQE_previous_Hamiltonian;
+
+This variable contain information about previus step calculated Hamiltonian by variational quantum eigensolver
+
+unsigned int VQE_max_iterations = 0;
+
+This variable contain the maximal number of iterations of variational quantum eigensolver.
+
+unsigned int VQE_iterations = 0;
+
+This variable contain the number of iterations of variational quantum eigensolver.
+
+unsigned int VQE_shots = 1024;
+
+This variable contain the number of quantum circuit shots for every iteration of variational quantum eigensolver.
+
+unsigned int VQE_max_connections = 8;
+
+This variable determine the maximum count of gates in quantum circuit
+
+T VQE_interconnection_distance = 5;
+
+This variable determine maximal distance between atoms for creating gates in quantum circuit in atomic units.
+
+bool Bravyi_Kitaev = false;
+
+This variable determine preferrence of Bravyi_Kitaev transformation, not implemented.
+
+vector<pair<unsigned int, unsigned int>> VQE_gates;
+
+This is vector with entangled electron pairs for creating gates.
+
+string circuit_string;
+
+This is string representation of quantum circuit.
+
+QuantumCircuit circuit;
+
+This is MicroQiskit QuantumCircuit object
+
+// TPSS section
+bool allocation_TPSS = true;
+This variable is true, if needed a allocatiom memory for TPSS density functional
+
+vector<T*> electrons_gradients_2_densities; 
+Vector with Laplace densities of electrons
+
+vector<T*> atoms_sum_electrons_gradients_2_densities;
+Vector with sums of Laplaces densities of electrons for atoms
+
+vector<T*> atoms_gradients_2_densities;
+Vector with Laplace densities of clouds of electrons of atoms
+
+vector<T*> atoms_spins_gradients;
+Vector with gradients of spin densities of atoms
+
+unsigned int TPSS_iterations = 1;
+Number of iterations of including the correlation energy to main calculations
+
+bool TPSS_error = false;
+TPSS error indicator
+
+// End of TPSS section
+
+// Orthonormalizing and Gaussian export section
+T* positive_intraatomic_overlap_matrix = nullptr;
+Positive intraatomic overlap matrix
+
+T* orthonormalizing_matrix = nullptr;
+Orthonormalizing matrix
+
+//T* orthonormalized_Hamiltonian_matrix = nullptr;
+Orthonormalized Hamiltonian matrix
+
+vector<vector<pair<T, T>>> Gaussian_basis;
+Exported Gaussian basis <exponent, coefficient>
+// End of Orthonormalizing and Gaussian export section
+
+// CI and basis sets creating section
+unsigned int count_basis_per_atom;
+This variable is used for marking overall count of ground and excited basis wavefunctions per atom.
+
+unsigned int_count_basis_overall;
+This variable is used for marking overall count of ground and excited basis wavefunctions.
+
+vector<unsigned int> n_extended;
+This variable is used for marking the n numbers of ground and excited basis wavefunctions.
+
+vector<unsigned int> l_extended;
+This variable is used for marking the l numbers of ground and excited basis wavefunctions.
+
+vector<int> m_extended;
+This variable is used for marking the m numbers of ground and excited basis wavefunctions.
+
+
+vector<T> s_extended;
+This variable is used for marking the s numbers of ground and excited basis wavefunctions.
+
+
+vector<unsigned int> counts_ground_basis;
+This variable is used for marking the count of ground basis per individually atoms.
+    
+vector<T> Slater_basis_exponents_extended;
+This variable is used for marking the exponents of ground and excited Slater basis.
+
+vector<vector<pair<T, T>>> Gaussian_basis_extended;
+This variable is used for marking the exponents of ground and excited Slater-based Gaussian basis.
+
+vector<T> correlation_energies_extended;
+This variable is used for marking the correlation energies of basis wavefuncions.
+
+
+T fine_structure_constant_correction;
+A correction factor for fine structure constant, defaul value is 1.
+
+T fine_structure_constant_corr;
+A corrected fine structure constant
+
+T Lamb_shift_factor;
+Varialbe, which facilitate compution of a Lamb shifts.
+    
+vector<T> nuclear_spins;
+Vector with nuclear spins.
+
+vector<T> electron_nuclear_spin_orbit_couplings;
+Vector with computed sums of nuclear spin-orbit couplings for each electron.
+
+vector<T> nuclear_spin_spin_couplings;
+Vector with computed sums of nuclear spin-spin couplings for each electron.
+
+vector<T> lamb_shifts;
+Vector with computed Lamb-shifts for each electron and his nucleus.
+
+// End of CI and basis sets creating section
+
+private functions:
+
+int Create_index_atoms();
+
+This function create atom index (count_atoms, vectord: index_atoms and electron_to_atom_numbers)
+
+int Detect_center_of_mass();
+
+This function detect center of mass coordinates.
+
+int Detect_dipole_moments(dipole_moment *dipole_moment);
+
+This function detect dipole moment of molecule.
+
+int Create_crystal_field(central_cations *central_cations);
+
+This function apply crystal structure parameters (in central_cation_atoms) to structure.
+
+int allocate_densities(unsigned int size_order);
+
+This function allocate memory for electron densities of atoms. Parameter size_order means number of pixels between center and edge of 
+3D density cube.
+
+int Compute_density_thread(T** densities, T* atom_density, unsigned int begin, unsigned int end,
+    unsigned int size_order, vector<T> spins, vector<int> spin_paired,
+    vector<unsigned int> x_range, vector<unsigned int> y_range, vector<unsigned int> z_range, bool spin_density);
+
+This function compute electron densities of atom. Parameter densities is pointer to set of pointers to to electron density 3D grid cubes, atom_density is pointer to target atom density 3D cube. begin is first item in densities list and end is last item for atom in densities list.Lenght_order is a count pixels between center and edge of 3D grid cubes.
+Vectors spins and spin paired contains informations about spin and spin-pairing of electrons.
+Vectors x_range, y_range and z_range storing indexes ranges from center to addition for x, y and z direction.
+Switch spin_density is true, when is computed density of spin.
+
+int Compute_densities(vector<T*> densities, vector<T*> atoms_densities, vector<unsigned int> index,
+unsigned int size_order, vector<T> spins, vector<int> spin_paired, vector<unsigned int> x_range,
+vector<unsigned int> y_range, vector<unsigned int> z_range, bool spin_density);
+
+This function compute electron densities of atoms. Parameter densities is pointer to set of pointers to to electron density 3D cube,
+atom_density is pointer to target atom_density 3D cube. begin is first item in densities list and end is last item for atom in densities. Vector index is index of atom first electron in list densities.
+list. Vectors spins and spin paired contains informations about spin and spin-pairing of electrons. 
+Vectors x_range, y_range and z_range storing indexes ranges from center to addition for x, y and z direction.
+Switch spin_density is true, when is computed density of spin.
+
+
+int Correct_densities(vector<T*> atoms_densities_list, vector<T>  x, vector <T> y, vector <T> z, unsigned int size_order);
+
+This function correct electron densities of atoms by incorporating electron densities from neightboring atoms. Vector
+atoms_densities_list contain pointers to atoms electron densities or atoms spin densities.
+Vectors x, y and z contains coordinates of atoms and parameter size_order means number of pixels between center and edge of 
+3D density cube.
+
+int Compute_Fi_thread(T* spin_density, T* electron_density, T* Fi_density, unsigned int size_order);
+
+This function compute Fi density of atom. Parameter spin_density is pointer spin_density 3D cube,
+electron_density is pointer to electron_density 3D cube, Fi_density is pointer to electron Fi density 3D cube and
+size_order means number of pixels between center and edge of 3D cubes.
+
+int Compute_gradient_thread(T* electron_density, T* gradient_density, unsigned int size_order);
+
+This function compute gradient of atom electron density. Parameter electron_density is pointer to electron density 3D cube,
+gradient_density is pointer to gradient density 3D cube and size_order means number of pixels between center and edge of 
+3D density cube.
+
+int Compute_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_gradients_densities,
+unsigned int size_order);
+
+This function compute gradients of atom electron densities. Vector atoms_electron_densities contain pointers to
+electron densities of atoms, vector atoms_gradients_densities contain pointers to electron gradients of atoms of atoms
+and size_order means number of pixels between center and edge of 3D density cubes.
+
+int Compute_Fi_and_gradients(vector<T*> atoms_electron_densities, vector<T*> atoms_spin_densities,
+vector<T*> atoms_Fi_densities, vector<T*> atoms_gradients_densities, unsigned int size_order);
+
+This function compute Fi and gradients of atom electron densities. Vector atoms_electron_densities contain pointers to
+electron densities of atoms, vector atoms_spin_densities contain pointers to electron spin of atoms, vector atoms_gradients_densities contain pointers to electron gradients of atoms, vector atoms_Fi_densities contain pointers to
+Fi densities of atoms and size_order means number of pixels between center and edge of 
+3D density cubes.
+
+int PBE_thread(T* atoms_gradients_density, T* atoms_Fi_density, T* electron_density,
+unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius);
+
+This function compute PBE correlation and exchange energies. Vector atoms_gradients_densities contain pointers to gradient densities of
+atoms, vector atoms_Fi_densities contain pointers to Fi densities of atoms, vector electron_density contain pointer to electron density
+of atom, size_order means number of pixels between center and edge of 3D density cubes,
+exchange_energy and correlation_energy are pointers to save exchange and correlation energy and
+Wigner_Seitz_radius is Wigner-Seitz radius of atom.
+
+int PBE_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Fi_densities, vector<T*> electron_densities,
+unsigned int size_order);
+
+This function compute PBE correlation and exchange energies. Vector electron_densities contain pointers to
+electron densities 3D cubes, vector atoms_Fi_densities contain pointers to Fi densities of atoms, vector atoms_gradients_densities
+contain pointers to gradient densities of atoms and size_order means number of pixels between center and edge of 3D density cubes.
+
+int Set_circuit();
+
+This function construct variational quantum eigensolver (VQE) circuit from coordinates of electrons.
+
+int Run_circuit(vector<double>& ansatz);
+
+This function run variational quantum eigensolver (VQE) circuit and update ansatz parameters.
+
+// Density functional theory TPSS section
+int Allocate_gradients_2_densities(unsigned int size_order);
+Allocate memory for TPSS
+
+int TPSS_thread(T* atoms_gradients_density, T* atoms_Fi_density, T* electron_density,
+unsigned int size_order, T* exchange_energy, T* correlation_energy, T Wigner_Seitz_radius, T* atom_electron_density,
+T* electron_gradients_2_density, T* atom_sum_gradients_2_densities, T* atom_gradients_2_density,
+T* atoms_spin_density, T* atoms_spin_gradients_density, T spin);
+Compute exchange and correlation energy of a electron
+
+int TPSS_compute(vector<T*> atoms_gradients_densities, vector<T*> atoms_Fi_densities, vector<T*> electron_densities,
+unsigned int size_order);
+Compute a TPSS exchange and correlation energies
+
+
+// End of density functional theory TPSS section
+
+public functions:
+
+int String_to_advanced_parameters(string UI_input, unsigned int size_order,
+bool extern_coordinates, bool generate, vector<T>* x_2, vector<T>* y_2, vector<T>* z_2);
+
+Function String_to_list_electrons convert input string to list of electrons in class structure results.
+Variable UI_input is input string, size_order is the lenght orders (number of pixels between center and surface of lenghts,
+wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
+If generate is true, then wavefunctions are generated.
+
+T Execute_calculation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+vector<T>* values);
+
+Function Execute_calculation run basis set calculation.
+Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
+In vector values are computed Hartree-Fock energies.
+
+T Execute_PBE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+vector<T>* values);
+
+Function Execute_PBE run basis set calculation with PBE density functional.
+Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
+In vector values are computed Hartree-Fock energies.
+
+T Execute_PBE_VQE(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+vector<T>* values);
+
+Function Execute_PBE_VQE run basis set calculation with PBE density functional and variational quantum eigensolver.
+Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
+In vector values are computed Hartree-Fock energies, in spin_density_vector the spin density matrix and
+in spin_values are spin energy levels.
+
+Variable UI_input is input string, size_order is the lenght orders (number of pixels between center and surface of lenghts,
+wavefunctions and probabilities cubes). Extern coordinates is true whin is there vectors with extern coordinates x_2, y_2 and z_2.
+If generate is true, then wavefunctions are generated.
+
+// Density functional theory TPSS section
+T Execute_TPSS(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+vector<T>* values);
+
+Function Execute_TPSS run basis set calculation with TPSS density functional and variational quantum eigensolver.
+Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes).
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
+In vector values are computed Hartree-Fock energies.
+// End of ensity functional theory TPSS section
+
+// orthonormalizing and Gaussian export section
+int Compute_overlap_matrix_reduced();
+Compute a positive_intraatomic_overlap_matrix for orthonormalizing
+
+int Compute_Hamiltonian();
+Compute Hamiltonian in Calculate_corr_basis_set_matrix for orthonormalizing
+
+/*
+
+// CI and basis sets creating section
+
+
+string Create_input_from_coordinates(vector<string> species, vector<T> x, vector<T> y, vector<T> z);
+int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
+vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
+
+This function is for creating a input string from vectors of atom species and coorfinates.
+Input string is next used from string to advanced parameters function. This function was not tested.
+
+int Set_spins_and_bonds(unsigned int size_order, vector<T>* values);
+
+This function is for setting all electrons to computing resonance integral matrix and finding optimum base
+spin configuration according to overlap matrix.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). In vector values are computed Hartree-Fock energies.
+This function is untested.
+
+int Set_default_nuclear_spins;
+This function set most common nuclear spins for nucleuses based on its Z to nuclear_spins vector.
+For unknown elements are set 0 values.
+
+int Set_custom_nuclear_spins(vector<T> spins);
+This function set custom nuclear spins for nucleuses to nuclear_spins vector. 
+
+int Compute_electron_nuclear_spin_orbit_couplings();
+This function compute spin orbit coupling sums over each nucleus and each electrons and store it into
+electron_nuclear_spin_orbit_couplings vector.
+
+int Compute_Lamb_shifts();
+This function compute Lamb shift for each electrons and its nucleus and store it into
+Lamb_shifts vector.
+
+T Execute_Basis_set_creation(unsigned int max_iterations, T minimal_fidelity, unsigned int size_order, bool deallocate,
+vector<T>* values, unsigned int number_noble_gas_configuration, unsigned int level_correlation_energy);
+Function Execute_Basis_set_creation run basis set calculation with TPSS density functional and variational quantum
+eigensolver. Max_iterations is maximal count of iteration the Hartree-Fock procedure and
+minimal_fidelity is minimal fidelity to break Hartree-Fock procedure iterations.
+Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and probabilities cubes). If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated. In vector values are computed Hartree-Fock energies.
+Maximal
+
+vector<T> Compute_correlation_energies(unsigned int density_matrix_order, T* density_matrix, T* Hamiltonian_matrix);
+This is empty function for future recomputing Hamiltonian and density matrix to vector of energy levels of basis functions.
+
+
+ // end of CI and basis sets creating section
+    
+int Calculate_Huckel_Matrix(T* Huckel_matrix, unsigned int* Huckel_matrix_order, T* pi_overlap_integral,
+vector<unsigned int> atom_numbers);
+
+Function Calculate run Hartree-Fock calculation.
+
+Max_iterations is maximal count of iteration the Hartree-Fock procedure and minimal_fidelity is minimal fidelity to break basis set
+procedure iterations. Size_order is the lenght orders (number of pixels between center and surface of lenghts, wavefunctions and
+probabilities cubes).
+If deallocate is true, then the memory of of lenghts, wavefunctions and probabilities cubes is after calculation deallocated.
+In vector values are computed Hartree-Fock energies, in spin_density_vector the spin density matrix and
+in spin_values are spin energy levels. Vector atom_numbers convert columns number of Huckel matrix to atom number.
+
+int Detect_symetry_information(symetry_axes *symetry_axes, symetry_planes *symetry_planes);
+
+This function test the center symetry, find symetry axes and symetry planes and store information to symetry_axes and symetry_planes.
+
+int D3_vector_multiply(T* a, T* b, T* c);
+
+This function returns the vector multiple of three-dimensional vectors pointered by a and b into vector pointered by c.
+
+int Clear();
+
+Copyright (C) Pavel Florian 2023-2025

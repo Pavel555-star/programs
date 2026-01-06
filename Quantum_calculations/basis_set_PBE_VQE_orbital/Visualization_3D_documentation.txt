@@ -1,0 +1,63 @@
+Visualization_3D 1.00 documentation
+
+const unsigned int max_atoms = 64; - Maximal count atoms for visualization
+const vector<T> ratios = {0.95}; - vector with ratios of electron probability of occurance within orbital area.
+unsigned int side_pixels = 0; - size of electron density 3D cube side in pixels
+T cube_side_half_lenght = 0; - - distance between center and border of electron density 3D cube in atomic units
+T pixels_to_unit = 0; - count of pixels to 1 Bohr radius
+T x_min = 0; - minimal x coordinate for 2D cross section
+T y_min = 0; - minimal y coordinate for 2D cross section
+T z_min = 0; - minimal z coordinate for 2D cross section
+T x_max = 0; - maximal x coordinate for 2D cross section
+T y_max = 0; - maximal y coordinate for 2D cross section
+T z_max = 0; - maximal z coordinate for 2D cross section
+    
+vector<T*> atoms_densities_list; - vector with atom electron densities or spin densities 3D cubes
+vector<array<T, 3>> coordinates; - vector with atom electron densities or spin densities 3D cubes coordinates
+vector<T> weights_95; - vector with atom electron densities or spin densities 3D cubes weights for 95 % probability
+for electron within orbital (value for 95 % of electron density array is under her)
+vector<T*> Cross_sections_2D; - pointers to computed 2D cross-sections
+vector<unsigned int> x_pixels_list; - vector with numbers of pixels in x direction for computed 2D cross-sections
+vector<unsigned int> y_pixels_list; - vector with numbers of pixels in y direction for computed 2D cross-sections
+vector<T> averages - pointers to average values for computed 2D cross-sections
+    
+T Compute_density_thread(const vector<T*>* densities, T* atom_density, unsigned int begin, unsigned int end, unsigned int atom_size,
+const vector<T>* spins, const vector<int>* spin_paired, bool spin_density);
+
+This function compute electron or spin density (atom_density) of atom from electron densities (densities)
+and vectors with spin orientations (spins), informations about spin pairing (spin_paired).
+Variables begin and end are begin and end of atom location in densities vector
+and spin density is true for computing spin density and false for computing electron density.
+
+T Compute_densities_weights_thread(T* density, T ratio, T* weight_pointer, unsigned int learning_cycles, unsigned int size_order);
+This function compute weights (value for ratio of electron density array is under her).
+Learning cycles determine count of learning cycles for perceptron and size order deetmine count of pixels
+(count of pixels = (2 * size_order + 1)^3)
+/*
+T Compute_densities_weights_OpenCL(const vector<double*>* densities, vector<double>* weights, double ratio,
+unsigned int training_cycles, unsigned int size_order);
+OpenCL version of Compute_densities_weights_thread
+*/
+
+T Generate_coordinates(T side_half_lenght, const vector<T>* x, const vector <T>* y, const vector<T>* z);
+This function generate x_min, y_min, z_min, x_max, y_max and z_max coordinates from x, y and z vectors of atoms x, y and z coordinates
+and side_half_lenght variable.
+
+T Compute_densities(const vector<T*>* densities, vector<unsigned int>* index, unsigned int size_order,
+const vector<T>* spins, const vector<int>* spin_paired, bool spin_density);
+This function compute atoms electron or spin densities by multtithreading call of Compute_densities
+with his parameters.
+
+T Compute_densities_weights_95(const vector<T*>* densities, vector<T>* weights, unsigned int size_order, bool OpenCL);
+This function compute weights of electron or densities by multtithreading call of Compute_densities_weights_thread
+or Compute_densities_weights_OpenCL with his parameters for 95% densities within.
+
+T Generate_2D_cross_section(unsigned int direction, T coordinate);
+This function generate 2D cross sections for direction (0 - x, 1 - y, 2 - z) and value of coordinate in Bohr radiuses.
+(vectors Cross_sections_2D, x_pixels_list, y_pixels_list and averages)
+
+T Clear();
+This function free memory and set class to default
+
+~Visualization_3D();
+Destructor of object
